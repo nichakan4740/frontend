@@ -1,0 +1,25 @@
+{
+  "name": "",
+  "private": true,
+  "version": "0.0.0",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "serve": "vite serve",
+    "lint": "vite lint"
+  },
+  "dependencies": {
+    "axios": "^0.27.2",
+    "bootstrap": "^5.1.3",
+    "cors": "^2.8.5",
+    "json-server": "^0.17.0",
+    "vue": "^3.2.25",
+    "vue-router": "^4.0.14",
+    "vue-sweetalert2": "^5.0.2"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^2.3.1",
+    "vite": "^2.9.5"
+  }
+}
