@@ -5,7 +5,7 @@ import { ref , onBeforeMount} from 'vue'
 const data = ref(null)
 
 const getevent = async () => {
-  const res = await fetch('http://localhost:8080/api/booking');
+  const res = await fetch('http://10.4.56.91:80/api/booking');
   if (res.status === 200) data.value = await res.json();
   else console.log("not found");
 };
