@@ -10,7 +10,7 @@ const editwithid = ref([]);
 
 onMounted(async () => {
   const res = await fetch(
-    `http://localhost:8080/api/booking/` + params.editid
+    `http://10.4.56.91:8080/api/booking/` + params.editid
   );
   if (res.status === 200) editwithid.value = await res.json();
   else console.log("no event");

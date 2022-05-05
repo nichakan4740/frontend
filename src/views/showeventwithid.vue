@@ -200,7 +200,7 @@ const close = () => appRouter.push({ name: "showeventall" });
 			<div class="progress-container">
 				<div class="progress"></div>
 			</div>
-			<h6>{{ moment(eventwithid.eventStartTime).format('lll') }}</h6>
+			<h6>{{moment(eventwithid.eventStartTime).format('DD MMM YYYY, HH:mm')}}</h6>
 			<p class="name">{{ eventwithid.bookingName }}</p>
       <p class="email">{{ eventwithid.eventEmail }}</p>
       <p class="note">{{ eventwithid.eventNotes }}<span v-if="eventwithid.eventNotes===null" class="nonote">no message</span></p>
@@ -259,6 +259,7 @@ const close = () => appRouter.push({ name: "showeventall" });
 	margin: 0;
 	letter-spacing: 1px;
 	text-transform: uppercase;
+  font-family: 'Prompt', sans-serif;
 }
 
 .course h2 {

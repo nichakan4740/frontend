@@ -5,7 +5,6 @@ import showeventall from '../views/showeventall.vue'
 import showeventwithid from '../views/showeventwithid.vue'
 
 
-
 const history = createWebHistory()
 
 const routes = [
