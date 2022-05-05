@@ -4,6 +4,7 @@ import { ref, onBeforeMount, computed } from "vue";
 import Swal from "sweetalert2";
 import moment from "moment";
 
+
 const events = ref([]);
 
 var jun = moment(events.eventStartTime);
@@ -194,8 +195,8 @@ const editevent = () => appRouter.push({ name: "editevent" });
               </span>
             </td>
             <td>{{ event.eventCategory }}</td>
-            <!-- <td>{{moment(event.eventStartTime).tz('Asia/Bangkok').format('DD MMM YYYY, hh:mm')}}</td> -->
-            <td>{{moment(event.eventStartTime).format('DD MMM YYYY, HH:mm')}}</td>
+            <td>{{moment(event.eventStartTime).utc().format('DD MMM YYYY, hh:mm')}}</td>
+           <!--  <td>{{moment(event.eventStartTime).format('DD MMM YYYY, HH:mm')}}</td> -->
             <td>{{ event.eventDuration }}</td>
             <td>
               <router-link
