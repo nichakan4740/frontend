@@ -1,22 +1,20 @@
 <script setup>
 import { useRouter } from "vue-router";
-import { ref, onBeforeMount ,computed} from "vue";
+import { ref, onBeforeMount, computed } from "vue";
 import Swal from "sweetalert2";
 import moment from "moment";
-import tz from 'moment-timezone';
 
-const events = ref([])
+const events = ref([]);
 
-onBeforeMount( async () => {
+var jun = moment(events.eventStartTime);
+    console.log(jun);
+
+onBeforeMount(async () => {
   const res = await fetch("http://10.4.56.91:8080/api/booking");
   if (res.status === 200) {
-    events.value = await res.json()
-  console.log(events.value);
-
-  }
-  
-else 
-  console.log("no event");
+    events.value = await res.json();
+    console.log(events.value);
+  } else console.log("no event");
 });
 
 //delete event
@@ -28,21 +26,18 @@ const deleteevent = async (deleteeventid) => {
     }
   );
   if (res.status === 200) {
-    Swal.fire('Delete!!!', `You delete event success`, 'success')
-    setTimeout(function(){
-    events.value = events.value.filter((e) => e.id !== deleteeventid);
+    Swal.fire("Delete!!!", `You delete event success`, "success");
+    setTimeout(function () {
+      events.value = events.value.filter((e) => e.id !== deleteeventid);
     }, 1000);
-    
+
     console.log("delete success");
   } else console.log("cannot delete");
-  
 };
 
 const appRouter = useRouter();
 const addevent = () => appRouter.push({ name: "addevent" });
 const editevent = () => appRouter.push({ name: "editevent" });
-
-
 </script>
 
 <template>
@@ -170,77 +165,79 @@ const editevent = () => appRouter.push({ name: "editevent" });
     </g>
   </svg>
 
+  <div class="container">
+    <div class="row">
+      <div class="clinic">
+        <h4>Booking Clinic</h4>
 
-  
-    <div class="container">
-      <div class="row">
-        <div class="clinic">
-          <h4>Booking Clinic</h4>
+        <table>
+          <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>CategoryName</th>
+            <th>StartTime</th>
+            <th>
+              Duration <br />
+              <span style="font-size: 10px">( minute )</span>
+            </th>
+            <th id="editcolumn">Edit</th>
+            <th id="deletecolumn">Delete</th>
+            <th id="detailcolumn">Detail</th>
+          </tr>
 
-          <table>
-            <tr>
-              <th>Name</th>
-              <th>Email</th>
-              <th>CategoryName</th>
-              <th>StartTime</th>
-              <th>Duration <br> <span style="font-size:10px">( minute )</span> </th>
-              <th id="editcolumn">Edit</th>
-              <th id="deletecolumn">Delete</th>
-              <th id="detailcolumn">Detail</th>
-            </tr>
-   
-            <tr v-for="(event, index) in events" :key="index">        
-              <td>{{ event.bookingName }}</td>
-              <td>{{ event.eventEmail }} <span v-if="event.eventEmail===null" class="nonoteshow" > no email </span></td>
-              <td>{{ event.eventCategory }}</td>
-              <td>{{ moment(event.eventStartTime).tz('Asia/Bangkok').format('DD MMM YYYY, HH:mm') }}</td>
-              <td>{{ event.eventDuration }}</td>
-              <td>
-                <router-link :to="{name: 'editevent' , params:{editid: event.id}}">
-                <img
-                  src="../assets/edit.png"
-                  id="info"
-                />
-                </router-link>
-              </td>
-              <td>
-                <img
-                  src="../assets/delete.png"
-                  id="info"
-                  @click="deleteevent(event.id)"
-                />
-              </td>
+          <tr v-for="(event, index) in events" :key="index">
+            <td>{{ event.bookingName }}</td>
+            <td>
+              {{ event.eventEmail }}
+              <span v-if="event.eventEmail === null" class="nonoteshow">
+                no email
+              </span>
+            </td>
+            <td>{{ event.eventCategory }}</td>
+            <!-- <td>{{moment(event.eventStartTime).tz('Asia/Bangkok').format('DD MMM YYYY, hh:mm')}}</td> -->
+            <td>{{moment(event.eventStartTime).format('DD MMM YYYY, HH:mm')}}</td>
+            <td>{{ event.eventDuration }}</td>
+            <td>
+              <router-link
+                :to="{ name: 'editevent', params: { editid: event.id } }"
+              >
+                <img src="../assets/edit.png" id="info" />
+              </router-link>
+            </td>
+            <td>
+              <img
+                src="../assets/delete.png"
+                id="info"
+                @click="deleteevent(event.id)"
+              />
+            </td>
 
-              <td>
-                <router-link :to="{name: 'showeventwithid' , params:{eventid: event.id}}">
-                <img
-                  src="../assets/information.png"
-                  id="infodetail"
-                />
-                </router-link>
-              </td>
+            <td>
+              <router-link
+                :to="{ name: 'showeventwithid', params: { eventid: event.id } }"
+              >
+                <img src="../assets/information.png" id="infodetail" />
+              </router-link>
+            </td>
+          </tr>
+        </table>
 
-            </tr>
-          </table>
-
-          <div v-show="events.length===0" class="noevent">No Scheduled Event</div>
-
-          <div class="booking" @click="addevent">Add Booking</div>
-
+        <div v-show="events.length === 0" class="noevent">
+          No Scheduled Event
         </div>
+
+        <div class="booking" @click="addevent">Add Booking</div>
       </div>
     </div>
-
-    
- 
+  </div>
 </template>
 
 <style>
 @import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@100&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Ubuntu&display=swap");
-@import url('https://fonts.googleapis.com/css2?family=Prompt:wght@200&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Prompt:wght@200&display=swap");
 
-.noevent{
+.noevent {
   font-family: "Montserrat", sans-serif;
   font-weight: bolder;
   font-size: 30px;
@@ -250,17 +247,17 @@ const editevent = () => appRouter.push({ name: "editevent" });
   opacity: 0.3;
 }
 
-#editcolumn{
+#editcolumn {
   background-color: #d694f5;
   width: 6%;
 }
 
-#deletecolumn{
+#deletecolumn {
   background-color: #e283f5;
   width: 6%;
 }
 
-#detailcolumn{
+#detailcolumn {
   background-color: #e96dd4;
   width: 6%;
 }
@@ -287,7 +284,6 @@ svg {
   box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.394);
   background-color: rgb(255, 255, 255);
   border-radius: 20px;
-
 }
 
 .clinic h4 {
@@ -311,13 +307,12 @@ th,
 td {
   text-align: center;
   padding: 8px;
-  
 }
 
 td {
   font-size: 12px;
   font-weight: bold;
-  font-family: 'Prompt', sans-serif;
+  font-family: "Prompt", sans-serif;
   opacity: 0.8;
 }
 
@@ -370,7 +365,7 @@ th {
   transition: transform 0.05s;
 }
 
-#infodetail{
+#infodetail {
   width: 23px;
   opacity: 1;
 }
@@ -383,5 +378,4 @@ th {
   transform: scale(0.9);
   transition: transform 0.05s;
 }
-
 </style>
