@@ -195,12 +195,11 @@ const editevent = () => appRouter.push({ name: "editevent" });
               </span>
             </td>
             <td>{{ event.eventCategory }}</td>
-            {{moment.utc(event.eventStartTime).format('DD MMM YYYY, HH:mm')}}
+            <td>{{moment.utc(event.eventStartTime).format('DD MMM YYYY, HH:mm')}}</td>
             <td>{{ event.eventDuration }}</td>
             <td>
               <router-link
-                :to="{ name: 'editevent', params: { editid: event.id } }"
-              >
+                :to="{ name: 'editevent', params: { editid: event.id } }">
                 <img src="../assets/edit.png" id="info" />
               </router-link>
             </td>
