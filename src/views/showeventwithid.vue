@@ -2,6 +2,7 @@
 import { ref, onMounted } from "vue";
 import { useRoute } from "vue-router";
 import { useRouter } from "vue-router";
+import moment from "moment";
 let { params } = useRoute();
 console.log(params.eventid);
 
@@ -199,12 +200,10 @@ const close = () => appRouter.push({ name: "showeventall" });
 			<div class="progress-container">
 				<div class="progress"></div>
 			</div>
-			<h6>{{ eventwithid.eventStartTime }}</h6>
+			<h6>{{ moment(eventwithid.eventStartTime).format('lll') }}</h6>
 			<p class="name">{{ eventwithid.bookingName }}</p>
       <p class="email">{{ eventwithid.eventEmail }}</p>
-      <p class="note">{{ eventwithid.eventNotes }}</p>
-
-      <p v-if="eventwithid.eventNotes===null" class="nonote">no message</p>
+      <p class="note">{{ eventwithid.eventNotes }}<span v-if="eventwithid.eventNotes===null" class="nonote">no message</span></p>
 
       <img src="../assets/undo.png" id="undo" @click="close">
 		</div>
@@ -306,9 +305,9 @@ const close = () => appRouter.push({ name: "showeventall" });
 .course-preview a {
 	color: #fff;
 	display: inline-block;
-	font-size: 12px;
+	font-size: 14px;
 	opacity: 0.6;
-	margin-top: 30px;
+	margin-top: 80px;
 	text-decoration: none;
 }
 

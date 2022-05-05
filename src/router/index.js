@@ -1,10 +1,13 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import addevent from '../views/addevent.vue'
-import editevent from '../views/editevent.vue'
+import editevent from '../components/editevent.vue'
 import showeventall from '../views/showeventall.vue'
 import showeventwithid from '../views/showeventwithid.vue'
 
+
+
 const history = createWebHistory()
+
 const routes = [
   
  {
@@ -18,7 +21,7 @@ const routes = [
     component: addevent,
   },
   {
-    path: '/editevent',
+    path: '/edit-event/:editid',
     name: 'editevent',
     component: editevent,
   },

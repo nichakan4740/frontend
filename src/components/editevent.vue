@@ -1,30 +1,39 @@
 <script setup>
 import { useRouter } from "vue-router";
-import { ref } from "vue";
+import { ref ,onMounted} from "vue";
 import Swal from "sweetalert2";
+import { useRoute } from "vue-router";
+let { params } = useRoute();
+console.log(params.editid)
+
+const editwithid = ref([]);
+
+onMounted(async () => {
+  const res = await fetch(
+    `http://localhost:8080/api/booking/` + params.editid
+  );
+  if (res.status === 200) editwithid.value = await res.json();
+  else console.log("no event");
+});
 
 const appRouter = useRouter();
 const close = () => appRouter.push({ name: "showeventall" });
 
-const saveevent = () => {
-  Swal.fire({
-    icon: "info",
-    title: "Do you want to save the changes?",
-    showCancelButton: true,
-    confirmButtonText: "Save",
-  }).then((result) => {
-    if (result.isConfirmed) {
-      Swal.fire("Saved!!!", "", "success");
-    }
-  });
-};
+// const saveevent = () => {
+//   Swal.fire({
+//     icon: "info",
+//     title: "Do you want to save the changes?",
+//     showCancelButton: true,
+//     confirmButtonText: "Save",
+//   }).then((result) => {
+//     if (result.isConfirmed) {
+//       Swal.fire("Saved!!!", "", "success");
+//     }
+//   });
+// };
 
-const name = ref("");
-const email = ref("");
-const categoryname = ref("");
-const notes = ref("");
-const StartTimes = ref("");
-const Duration = ref("");
+const starttime = ref('')
+
 </script>
 
 <template>
@@ -195,51 +204,39 @@ const Duration = ref("");
         <div class="modal-body">
           <div class="bg-light p-3 rounded">
             <p class="text">Name</p>
-            <input type="text" class="form-control" v-model="name" />
+            <input type="text" class="form-control" v-model="editwithid.bookingName" />
+      
           </div>
           <br />
 
           <div class="bg-light p-3 rounded">
             <p class="text">Email</p>
-            <input type="email" class="form-control" v-model="email" />
+            <input type="email" class="form-control" v-model="editwithid.eventEmail" />
           </div>
           <br />
 
           <div class="bg-light p-3 rounded">
             <p class="text">CategoryName</p>
-
-            <select class="form-select" v-model="categoryname">
-              <option value="1">Project Management Clinic</option>
-              <option value="2">Database Clinic</option>
-              <option value="3">DevOps-Infra Clinic</option>
-              <option value="4">Front-End Clinic</option>
-              <option value="5">BackEnd Clinic</option>
-              <option value="6">Business Requirements</option>
-            </select>
+            <input class="form-control" v-model="editwithid.eventCategory"/>
 
           </div>
           <br />
 
           <div class="bg-light p-3 rounded">
             <p class="text">Notes</p>
-            <input type="text" class="form-control" v-model="notes" />
+            <input type="text" class="form-control" v-model="editwithid.eventNotes" />
           </div>
           <br />
 
           <div class="bg-light p-3 rounded">
             <p class="text">StartTimes</p>
-            <input
-              type="text"
-              class="form-control"
-              v-model="StartTimes"
-            /><br />
-            <input type="datetime-local" class="form-control" v-model="StartTimes" />
+            <input type="text" class="form-control" v-model="starttime" />
           </div>
           <br />
 
           <div class="bg-light p-3 rounded">
             <p class="text">Duration</p>
-            <input type="number" class="form-control" v-model="Duration" />
+            <input type="text" class="form-control" v-model="editwithid.eventDuration" />
           </div>
         </div>
 

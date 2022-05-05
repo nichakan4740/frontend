@@ -8,7 +8,7 @@ import tz from 'moment-timezone';
 const events = ref([])
 
 onBeforeMount( async () => {
-  const res = await fetch("http://localhost:8080/api/booking");
+  const res = await fetch("http://10.4.56.91:8080/api/booking");
   if (res.status === 200) {
     events.value = await res.json()
   console.log(events.value);
@@ -22,7 +22,7 @@ else
 //delete event
 const deleteevent = async (deleteeventid) => {
   const res = await fetch(
-    `http://localhost:8080/api/booking/${deleteeventid}`,
+    `http://10.4.56.91:8080/api/booking/${deleteeventid}`,
     {
       method: "DELETE",
     }
