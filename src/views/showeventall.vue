@@ -2,26 +2,32 @@
 import { useRouter } from "vue-router";
 import { ref, onBeforeMount ,computed} from "vue";
 import Swal from "sweetalert2";
+import moment from "moment";
+import tz from 'moment-timezone';
 
-const events = ref([]);
+const events = ref([])
 
 onBeforeMount( async () => {
-  const res = await fetch("http://10.4.56.91:8080/api/booking");
-  if (res.status === 200) events.value = await res.json();
-  else 
+  const res = await fetch("http://localhost:8080/api/booking");
+  if (res.status === 200) {
+    events.value = await res.json()
+  console.log(events.value);
+
+  }
+  
+else 
   console.log("no event");
 });
 
 //delete event
 const deleteevent = async (deleteeventid) => {
   const res = await fetch(
-    `http://10.4.56.91:8080/api/booking/${deleteeventid}`,
+    `http://localhost:8080/api/booking/${deleteeventid}`,
     {
       method: "DELETE",
     }
   );
   if (res.status === 200) {
-
     Swal.fire('Delete!!!', `You delete event success`, 'success')
     setTimeout(function(){
     events.value = events.value.filter((e) => e.id !== deleteeventid);
@@ -35,6 +41,7 @@ const deleteevent = async (deleteeventid) => {
 const appRouter = useRouter();
 const addevent = () => appRouter.push({ name: "addevent" });
 const editevent = () => appRouter.push({ name: "editevent" });
+
 
 </script>
 
@@ -175,7 +182,6 @@ const editevent = () => appRouter.push({ name: "editevent" });
               <th>Name</th>
               <th>Email</th>
               <th>CategoryName</th>
-              <th>Notes</th>
               <th>StartTime</th>
               <th>Duration <br> <span style="font-size:10px">( minute )</span> </th>
               <th id="editcolumn">Edit</th>
@@ -185,17 +191,17 @@ const editevent = () => appRouter.push({ name: "editevent" });
    
             <tr v-for="(event, index) in events" :key="index">        
               <td>{{ event.bookingName }}</td>
-              <td>{{ event.eventEmail }} <span v-if="event.eventEmail===null" class="nonote" style="color:blueviolet"> no email </span></td>
+              <td>{{ event.eventEmail }} <span v-if="event.eventEmail===null" class="nonoteshow" > no email </span></td>
               <td>{{ event.eventCategory }}</td>
-              <td>{{ event.eventNotes }} <span v-if="event.eventNotes===null" class="nonote" style="color:blueviolet"> no message </span></td>
-              <td>{{ event.eventStartTime }}</td>
+              <td>{{ moment(event.eventStartTime).tz('Asia/Bangkok').format('DD MMM YYYY, HH:mm') }}</td>
               <td>{{ event.eventDuration }}</td>
               <td>
+                <router-link :to="{name: 'editevent' , params:{editid: event.id}}">
                 <img
                   src="../assets/edit.png"
                   id="info"
-                  @click="editevent"
                 />
+                </router-link>
               </td>
               <td>
                 <img
@@ -224,6 +230,8 @@ const editevent = () => appRouter.push({ name: "editevent" });
         </div>
       </div>
     </div>
+
+    
  
 </template>
 
