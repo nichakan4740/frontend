@@ -210,7 +210,7 @@ const editevent = () => appRouter.push({ name: "editevent" });
               </span>
             </td>
             <td>{{ event.eventCategory }}</td>
-            <td>{{moment(event.eventStartTime).format('DD MMM YYYY, HH:mm')}}</td>
+            <td>{{moment.utc(event.eventStartTime).format('DD MMM YYYY, HH:mm')}}</td>
             <td>{{ event.eventDuration }}</td>
             <td>
               <router-link
