@@ -35,7 +35,7 @@ const StartTimeISO = computed(() => {
 });
 
 const Duration = ref("");
-const CategoryID = ref("");
+const CategoryID = ref("1");
 
 </script>
 
@@ -89,7 +89,7 @@ const CategoryID = ref("");
       <p class="text">Duration</p>
       <input type="number" class="form-control" v-model="Duration" />
     </div>
-
+<!-- 
     <div class="bg-light p-3 rounded">
       <p class="text">eventCategoryID</p>
       <select class="form-select" v-model="CategoryID">
@@ -100,7 +100,7 @@ const CategoryID = ref("");
         <option value="5">BackEnd Clinic</option>
         <option value="6">Business Requirements</option>
       </select>
-    </div>
+    </div> -->
   </div>
 
   <div class="modal-footer">

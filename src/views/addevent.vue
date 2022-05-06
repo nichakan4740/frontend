@@ -36,7 +36,7 @@ const addsevent = async (
   });
   if (res.status === 200) {
     Swal.fire("DONE !!!", "You add event success!", "success");
-    const addbooking = await res.json();
+   /*  const addbooking = await res.json(); */
     console.log('You add event success');   
   } else {
     console.log("error,cannot add");

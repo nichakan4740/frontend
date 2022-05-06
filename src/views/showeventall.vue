@@ -17,7 +17,7 @@ onBeforeMount(async () => {
 //delete event
 const deleteevent = async (deleteeventid) => {
   const res = await fetch(
-    `http://localhost:8080/api/booking/${deleteeventid}`,
+    `http://10.4.56.91:8080/api/booking/${deleteeventid}`,
     {
       method: "DELETE",
     }
