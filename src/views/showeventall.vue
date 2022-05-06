@@ -4,11 +4,7 @@ import { ref, onBeforeMount, computed } from "vue";
 import Swal from "sweetalert2";
 import moment from "moment";
 
-
 const events = ref([]);
-
-var jun = moment(events.eventStartTime);
-    console.log(jun);
 
 onBeforeMount(async () => {
   const res = await fetch("http://10.4.56.91:8080/api/booking");
@@ -21,7 +17,7 @@ onBeforeMount(async () => {
 //delete event
 const deleteevent = async (deleteeventid) => {
   const res = await fetch(
-    `http://10.4.56.91:8080/api/booking/${deleteeventid}`,
+    `http://localhost:8080/api/booking/${deleteeventid}`,
     {
       method: "DELETE",
     }
@@ -36,9 +32,26 @@ const deleteevent = async (deleteeventid) => {
   } else console.log("cannot delete");
 };
 
+/* 
+//edit  event
+const editbooking = async(editwithid) =>{
+  const res = await false( `http://localhost:8080/api/booking/${editwithid.id}`,{
+    method: 'PUT',
+    headers: {
+      'content-type': 'application/json'
+    },
+    body: JSON.stringify({
+      editwithid
+    })
+  })
+}
+
+*/
+
 const appRouter = useRouter();
 const addevent = () => appRouter.push({ name: "addevent" });
 const editevent = () => appRouter.push({ name: "editevent" });
+
 </script>
 
 <template>
@@ -173,6 +186,7 @@ const editevent = () => appRouter.push({ name: "editevent" });
 
         <table>
           <tr>
+            <th>ID</th>
             <th>Name</th>
             <th>Email</th>
             <th>CategoryName</th>
@@ -187,19 +201,21 @@ const editevent = () => appRouter.push({ name: "editevent" });
           </tr>
 
           <tr v-for="(event, index) in events" :key="index">
+            <td>{{ event.id }}</td>
             <td>{{ event.bookingName }}</td>
             <td>
               {{ event.eventEmail }}
               <span v-if="event.eventEmail === null" class="nonoteshow">
-                no email
+                -
               </span>
             </td>
             <td>{{ event.eventCategory }}</td>
-            <td>{{moment.utc(event.eventStartTime).format('DD MMM YYYY, HH:mm')}}</td>
+            <td>{{moment(event.eventStartTime).format('DD MMM YYYY, HH:mm')}}</td>
             <td>{{ event.eventDuration }}</td>
             <td>
               <router-link
-                :to="{ name: 'editevent', params: { editid: event.id } }">
+                :to="{ name: 'editevent', params: { editid: event.id } }"
+              >
                 <img src="../assets/edit.png" id="info" />
               </router-link>
             </td>

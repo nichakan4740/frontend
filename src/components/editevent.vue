@@ -6,8 +6,27 @@ import { useRoute } from "vue-router";
 let { params } = useRoute();
 console.log(params.editid)
 
-const editwithid = ref([]);
 
+
+const editwithid = ref([]);
+/* ----------------------------------------------------------------------------------------------- */
+/* const newbooking = computed (() =>{
+  return{
+     id: id,
+      bookingName: Name,
+      eventEmail: Email,
+      eventCategory: Category, 
+      eventNotes: Notes,
+      eventStartTime: StartTime, 
+      eventDuration: Duration,
+      eventCategoryID: {
+      id:CategoryID
+    }
+  }
+})
+ */
+
+/* ----------------------------------------------------------------------------------------------- */
 onMounted(async () => {
   const res = await fetch(
     `http://10.4.56.91:8080/api/booking/` + params.editid

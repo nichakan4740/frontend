@@ -6,27 +6,48 @@ import Createevent from "../components/createevent.vue";
 const appRouter = useRouter();
 const closeModal = () => appRouter.push({ name: "showeventall" });
 
-// fetch('http://localhost:8080/api/booking')
-//   .then((res) => res.json())
-//   .then((json) => (data.value = json))
-//   .catch((err) => (error.value = err))
-
-/* const addsevent = async (name, email , categoryname , notes , StartTimes) => {
-  const res = await fetch("http://localhost:8080/api/booking", {
+const addsevent = async (
+  id,
+  Name,
+  Email,
+  Category,
+  Notes,
+  StartTimeISO,
+  Duration,
+  CategoryID
+) => {
+  const res = await fetch("http://10.4.56.91:8080/api/booking", {
     method: "POST",
     headers: {
       "content-type": "application/json",
     },
     body: JSON.stringify({
-      bookingName: name,
-      eventEmail: email,
-      eventCategory: categoryname ,
-      eventStartTime: StartTimes,
-      eventNotes: notes ,
+      id: id,
+      bookingName: Name,
+      eventEmail: Email,
+      eventCategory: Category,
+      eventNotes: Notes,
+      eventStartTime:  StartTimeISO,
+      eventDuration: Duration,
+      eventCategoryID: {
+        id: CategoryID,
+      },
     }),
-  });Swal.fire("DONE !!!", "You add event success!", "success")
-}
- */
+  });
+  if (res.status === 200) {
+    Swal.fire("DONE !!!", "You add event success!", "success");
+    const addbooking = await res.json();
+    console.log('You add event success');   
+  } else {
+    console.log("error,cannot add");
+    Swal.fire({
+      icon: "error",
+      title: "Oops...",
+      text: "Cannot add Event!",
+    });
+  }
+    
+};
 </script>
 
 <template>
@@ -193,8 +214,7 @@ const closeModal = () => appRouter.push({ name: "showeventall" });
           ></button>
         </div>
         <hr />
-
-        <Createevent @createevent="addsevent"></Createevent>
+        <Createevent @createevent="addsevent" />
       </div>
     </div>
   </div>
