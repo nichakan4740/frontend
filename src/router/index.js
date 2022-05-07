@@ -5,7 +5,7 @@ import showeventall from '../views/showeventall.vue'
 import showeventwithid from '../views/showeventwithid.vue'
 
 
-const history = createWebHistory()
+const history = createWebHistory('http://intproj21.sit.kmutt.ac.th/kw2')
 
 const routes = [
   
