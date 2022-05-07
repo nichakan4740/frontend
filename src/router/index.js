@@ -4,7 +4,8 @@ import editevent from '../components/editevent.vue'
 import showeventall from '../views/showeventall.vue'
 import showeventwithid from '../views/showeventwithid.vue'
 
-const history = createWebHistory('http://intproj21.sit.kmutt.ac.th/kw2')
+
+const history = createWebHistory(`${import.meta.env.VITE_BASE_URL}`)
 const routes = [
   
  {
