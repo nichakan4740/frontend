@@ -10,7 +10,6 @@ const addsevent = async (
   id,
   Name,
   Email,
-  Category,
   Notes,
   StartTimeISO,
   Duration,
@@ -25,7 +24,6 @@ const addsevent = async (
       id: id,
       bookingName: Name,
       eventEmail: Email,
-      eventCategory: Category,
       eventNotes: Notes,
       eventStartTime:  StartTimeISO,
       eventDuration: Duration,
@@ -36,7 +34,7 @@ const addsevent = async (
   });
   if (res.status === 200) {
     Swal.fire("DONE !!!", "You add event success!", "success");
-   /*  const addbooking = await res.json(); */
+    const addbooking = await res.json();
     console.log('You add event success');   
   } else {
     console.log("error,cannot add");

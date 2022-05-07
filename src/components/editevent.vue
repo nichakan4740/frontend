@@ -268,6 +268,11 @@ const starttime = ref('')
 </template>
 
 <style>
+
+.form-control{
+  font-family: "Prompt", sans-serif;
+}
+
 .editbooking {
   background-color: rgb(39, 110, 216);
   color: #fff;

@@ -1,14 +1,13 @@
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onBeforeMount } from "vue";
 import { useRoute } from "vue-router";
 import { useRouter } from "vue-router";
 import moment from "moment";
 let { params } = useRoute();
-console.log(params.eventid);
 
 const eventwithid = ref([]);
 
-onMounted(async () => {
+onBeforeMount(async () => {
   const res = await fetch(
     `http://10.4.56.91:8080/api/booking/` + params.eventid
   );
@@ -193,7 +192,7 @@ const close = () => appRouter.push({ name: "showeventall" });
 	<div class="course">
 		<div class="course-preview">
 			<h6>Event</h6>
-			<h2>{{ eventwithid.eventCategory }}</h2>
+			<h2>{{ eventwithid.eventCategoryID.eventCategoryName }}</h2>
 			<a>	{{ eventwithid.eventDuration }} minute <i class="fas fa-chevron-right"></i></a>
 		</div>
 		<div class="course-info">
