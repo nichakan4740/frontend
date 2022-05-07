@@ -10,7 +10,7 @@ const Notes = ref()
 const StartTime = ref('2022-01-01T12:00')
 
 const StartTimeISO = computed(() => {
-  return new Date(StartTime.value).toISOString()
+  return new Date(StartTime.value).toISOString('utc')
 })
 
 const Duration = ref('')
