@@ -2,7 +2,7 @@
 import { computed, ref } from "vue";
 defineEmits(["createevent"]);
 
-const id = ref('')
+// const id = ref('')
 const Name = ref('')
 const Email = ref()
 const CategoryID = ref('')
@@ -19,12 +19,7 @@ const Duration = ref('')
 
 <template>
   <div class="modal-body">
-    <div class="bg-light p-3 rounded">
-      <p class="text">id</p>
-      <input type="number" class="form-control" v-model="id" />
-    </div>
-    <br />
-
+    
     <div class="bg-light p-3 rounded">
       <p class="text">Name</p>
       <input type="text" class="form-control" v-model="Name" />
@@ -75,7 +70,6 @@ const Duration = ref('')
       @click="
         $emit(
           'createevent',
-          id,
           Name,
           Email,
           Notes,

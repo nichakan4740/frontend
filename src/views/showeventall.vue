@@ -7,7 +7,7 @@ import moment from "moment";
 const events = ref([]);
 
 onBeforeMount(async () => {
-  const res = await fetch( 'http://intproj21.sit.kmutt.ac.th:8080/kw2/api/booking');
+  const res = await fetch('http://intproj21.sit.kmutt.ac.th:8080/kw2/api/booking');
   if (res.status === 200) {
     events.value = await res.json();
     console.log(events.value);
@@ -17,17 +17,32 @@ onBeforeMount(async () => {
 //delete event
 const deleteevent = async (deleteeventid) => {
   const res = await fetch(
-   `http://intproj21.sit.kmutt.ac.th:8080/kw2/api/booking/${deleteeventid}`,
+    `http://intproj21.sit.kmutt.ac.th:8080/kw2/api/booking/${deleteeventid}`,
     {
       method: "DELETE",
     }
   );
   if (res.status === 200) {
-    Swal.fire("Delete!!!", `You delete event success`, "success");
+ alert("Are you sure?");
+ Swal.fire({
+  title: 'Are you sure?',
+  text: "You won't be able to revert this!",
+  icon: 'warning',
+  showCancelButton: true,
+  confirmButtonColor: '#3085d6',
+  cancelButtonColor: '#d33',
+  confirmButtonText: 'Yes, delete it!'
+}).then((result) => {
+  if (result.isConfirmed) {
+    Swal.fire(
+      'Deleted!',
+      'Your file has been deleted.',
+      'success')
+  }
+})
     setTimeout(function () {
       events.value = events.value.filter((e) => e.id !== deleteeventid);
     }, 1000);
-
     console.log("delete success");
   } else console.log("cannot delete");
 };
@@ -186,7 +201,6 @@ const editevent = () => appRouter.push({ name: "editevent" });
 
         <table>
           <tr>
-            <th>ID</th>
             <th>Name</th>
             <th>Email</th>
             <th>CategoryName</th>
@@ -201,7 +215,6 @@ const editevent = () => appRouter.push({ name: "editevent" });
           </tr>
 
           <tr v-for="(event, index) in events" :key="index">
-            <td>{{ event.id }}</td>
             <td>{{ event.bookingName }}</td>
             <td>
               {{ event.eventEmail }}

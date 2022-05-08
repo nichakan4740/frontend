@@ -6,6 +6,7 @@ import showeventwithid from '../views/showeventwithid.vue'
 
 
 const history = createWebHistory(`${import.meta.env.VITE_BASE_URL}`)
+
 const routes = [
   
  {

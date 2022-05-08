@@ -7,7 +7,6 @@ const appRouter = useRouter();
 const closeModal = () => appRouter.push({ name: "showeventall" });
 
 const addsevent = async (
-  id,
   Name,
   Email,
   Notes,
@@ -15,13 +14,12 @@ const addsevent = async (
   Duration,
   CategoryID
 ) => {
-  const res = await fetch( 'http://intproj21.sit.kmutt.ac.th:8080/kw2/api/booking', {
+  const res = await fetch('http://intproj21.sit.kmutt.ac.th:8080/kw2/api/booking', {
     method: "POST",
     headers: {
       "content-type": "application/json",
     },
     body: JSON.stringify({
-      id: id,
       bookingName: Name,
       eventEmail: Email,
       eventNotes: Notes,
@@ -34,7 +32,7 @@ const addsevent = async (
   });
   if (res.status === 200) {
     Swal.fire("DONE !!!", "You add event success!", "success");
-    const addbooking = await res.json();
+    /* const addbooking = await res.json(); */
     console.log('You add event success');   
   } else {
     console.log("error,cannot add");
