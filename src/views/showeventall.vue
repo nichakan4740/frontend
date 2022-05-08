@@ -7,7 +7,7 @@ import moment from "moment";
 const events = ref([]);
 
 onBeforeMount(async () => {
-  const res = await fetch(`${import.meta.env.VITE_BASE_URL}/api/booking/`);
+  const res = await fetch(`${import.meta.env.VITE_BASE_URL}api/booking/`);
   if (res.status === 200) {
     events.value = await res.json();
     console.log(events.value);
@@ -17,32 +17,17 @@ onBeforeMount(async () => {
 //delete event
 const deleteevent = async (deleteeventid) => {
   const res = await fetch(
-    `${import.meta.env.VITE_BASE_URL}/api/booking/${deleteeventid}`,
+    `${import.meta.env.VITE_BASE_URL}api/booking/${deleteeventid}`,
     {
       method: "DELETE",
     }
   );
   if (res.status === 200) {
  alert("Are you sure?");
- Swal.fire({
-  title: 'Are you sure?',
-  text: "You won't be able to revert this!",
-  icon: 'warning',
-  showCancelButton: true,
-  confirmButtonColor: '#3085d6',
-  cancelButtonColor: '#d33',
-  confirmButtonText: 'Yes, delete it!'
-}).then((result) => {
-  if (result.isConfirmed) {
-    Swal.fire(
-      'Deleted!',
-      'Your file has been deleted.',
-      'success')
-  }
-})
+ Swal.fire('delete success')
     setTimeout(function () {
       events.value = events.value.filter((e) => e.id !== deleteeventid);
-    }, 1000);
+    }, 1500);
     console.log("delete success");
   } else console.log("cannot delete");
 };
