@@ -16,20 +16,21 @@ onBeforeMount(async () => {
 
 //delete event
 const deleteevent = async (deleteeventid) => {
-  const res = await fetch(
-    `${import.meta.env.VITE_BASE_URL}api/booking/${deleteeventid}`,
-    {
-      method: "DELETE",
-    }
-  );
-  if (res.status === 200) {
- alert("Are you sure?");
- Swal.fire('delete success')
-    setTimeout(function () {
-      events.value = events.value.filter((e) => e.id !== deleteeventid);
-    }, 1500);
-    console.log("delete success");
-  } else console.log("cannot delete");
+  if (confirm("you want to delete") == true) {
+    const res = await fetch(
+      `${import.meta.env.VITE_BASE_URL}api/booking/${deleteeventid}`,
+      {
+        method: "DELETE",
+      }
+    );
+    if (res.status === 200) {
+      Swal.fire("Delete!!!", `You delete event success`, "success");
+      setTimeout(function () {
+        events.value = events.value.filter((e) => e.id !== deleteeventid);
+      }, 1000);
+      console.log("delete success");
+    } else console.log("cannot delete");
+  }
 };
 
 /* 
