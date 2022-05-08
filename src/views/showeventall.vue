@@ -7,7 +7,7 @@ import moment from "moment";
 const events = ref([]);
 
 onBeforeMount(async () => {
-  const res = await fetch('http://10.4.56.91:8080/api/booking');
+  const res = await fetch(`${import.meta.env.VITE_BASE_URL}http://10.4.56.91:8080/api/booking`);
   if (res.status === 200) {
     events.value = await res.json();
     console.log(events.value);
@@ -17,7 +17,7 @@ onBeforeMount(async () => {
 //delete event
 const deleteevent = async (deleteeventid) => {
   const res = await fetch(
-   `${import.meta.env.VITE_BASE_URL}/api/booking/``${deleteeventid}`,
+  `${import.meta.env.VITE_BASE_URL}http://10.4.56.91:8080/api/booking/``${deleteeventid}`,
     {
       method: "DELETE",
     }
