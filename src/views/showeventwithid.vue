@@ -9,7 +9,7 @@ const eventwithid = ref([]);
 
 onBeforeMount(async () => {
   const res = await fetch(
-    `${import.meta.env.VITE_BASE_URL}http://10.4.56.91:8080/api/booking` + params.eventid
+    'http://intproj21.sit.kmutt.ac.th:8080/kw2//api/booking' + params.eventid
   );
   if (res.status === 200) eventwithid.value = await res.json();
   else console.log("no event");
