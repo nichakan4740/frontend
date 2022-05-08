@@ -17,7 +17,7 @@ onBeforeMount(async () => {
 //delete event
 const deleteevent = async (deleteeventid) => {
   const res = await fetch(
-    `http://intproj21.sit.kmutt.ac.th:8080/kw2/api/booking/${deleteeventid}`,
+    `${import.meta.env.VITE_BASE_URL}/api/booking/${deleteeventid}`,
     {
       method: "DELETE",
     }

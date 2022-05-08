@@ -14,7 +14,7 @@ const addsevent = async (
   Duration,
   CategoryID
 ) => {
-  const res = await fetch('http://intproj21.sit.kmutt.ac.th:8080/kw2/api/booking', {
+  const res = await fetch(`${import.meta.env.VITE_BASE_URL}/api/booking`, {
     method: "POST",
     headers: {
       "content-type": "application/json",
