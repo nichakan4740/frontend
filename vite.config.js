@@ -6,7 +6,7 @@ export default defineConfig({
   server:{
    proxy:{
      '/api':{
-      target: 'http://intproj21.sit.kmutt.ac.th:8080/kw2/api/booking',
+      target: 'http://backend:8080',
       changeOrigin: true,
       secure: false,
       rewrite: (path) => path.replace(/^\/api/, '')
