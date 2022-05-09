@@ -9,8 +9,10 @@ RUN npm run build
 
 ### STAGE 2: Run ###
 FROM nginx
-COPY ./nginx.conf /etc/nginx/conf.d/default.conf
+COPY ./nginx.conf /etc/nginx/conf.d/default.conf:ro
 COPY --from=build /frontend/dist /usr/share/nginx/html
 EXPOSE 80
+ENTRYPOINT ["/etc/nginx/docker-entrypoint.sh"]
+CMD ["nginx", "-g", "daemon off;"]
 
 
