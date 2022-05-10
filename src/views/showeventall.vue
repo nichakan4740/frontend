@@ -7,7 +7,7 @@ import moment from "moment";
 const events = ref([]);
 
 onBeforeMount(async () => {
-  const res = await fetch(`http://intproj21.sit.kmutt.ac.th:8080/kw2/api/booking`);
+  const res = await fetch(`http://202.44.9.103:8080/kw2/api/booking`);
   if (res.status === 200) {
     events.value = await res.json();
     console.log(events.value);
@@ -18,7 +18,7 @@ onBeforeMount(async () => {
 const deleteevent = async (deleteeventid) => {
   if (confirm("you want to delete") == true) {
     const res = await fetch(
-      `http://intproj21.sit.kmutt.ac.th:8080/kw2/api/booking/${deleteeventid}`,
+      `http://202.44.9.103:8080/kw2/api/booking/${deleteeventid}`,
       {
         method: "DELETE",
       }

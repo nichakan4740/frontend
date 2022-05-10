@@ -29,7 +29,7 @@ const editwithid = ref([]);
 /* ----------------------------------------------------------------------------------------------- */
 onMounted(async () => {
   const res = await fetch(
-    `http://intproj21.sit.kmutt.ac.th:8080/kw2/api/booking` + params.editid
+    `http://202.44.9.103:8080/kw2/api/booking` + params.editid
   );
   if (res.status === 200) editwithid.value = await res.json();
   else console.log("no event");
