@@ -14,7 +14,7 @@ const addsevent = async (
   Duration,
   CategoryID
 ) => {
-  const res = await fetch(`http://202.44.9.103:8080/kw2/api/booking`, {
+  const res = await fetch(`${import.meta.env.VITE_BASE_URL}`, {
     method: "POST",
     headers: {
       "content-type": "application/json",
