@@ -9,8 +9,8 @@ RUN npm run build
 
 ### STAGE 2: Run ###
 FROM nginx
-COPY nginx.conf /etc/nginx/conf.d/default.conf:ro
+COPY /.nginx.conf /etc/nginx/conf.d/default.conf
 COPY --from=build /frontend/dist /usr/share/nginx/html
 EXPOSE 3000
-
+CMD ["nginx", "-g", "daemon off;"]
 
