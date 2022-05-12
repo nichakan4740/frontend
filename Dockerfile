@@ -11,7 +11,7 @@ RUN npm run build
 FROM nginx
 COPY nginx.conf /default.conf
 COPY --from=build /frontend/dist /usr/share/nginx/html
-EXPOSE 80
+EXPOSE 3000
 CMD ["nginx", "-g", "daemon off;"]
 
 
