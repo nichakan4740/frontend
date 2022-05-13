@@ -3,10 +3,9 @@ FROM node  AS build-stage
 RUN mkdir -p /frontend
 WORKDIR /frontend
 COPY  package.json ./
-COPY . .
 RUN npm install
-RUN npm install vue-router@4
-RUN install moment --save
+COPY . .
+RUN npm run build
 ARG VITE_API_URL
 ARG BASE_URL
 RUN ["npm","run","build","--","--base","$BASE_URL"]
