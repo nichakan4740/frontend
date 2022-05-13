@@ -1,7 +1,8 @@
 ### STAGE 1: Build ###
 FROM node  AS build-stage
-RUN /frontend
-COPY package*.json ./
+RUN mkdir -p /frontend
+WORKDIR /frontend
+COPY  package.json ./
 COPY . .
 RUN npm install
 RUN npm install vue-router@4
