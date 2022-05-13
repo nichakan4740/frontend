@@ -1,16 +1,18 @@
 ### STAGE 1: Build ###
-FROM node  AS build
-RUN mkdir -p /frontend
-WORKDIR /frontend
-COPY package.json ./
-RUN npm install
+FROM node  AS build-stage
+RUN /app
+COPY package*.json ./
 COPY . .
-RUN npm run build
+RUN npm install
+RUN npm install vue-router@4
+RUN install moment --save
+ARG VITE_API_URL
+ARG BASE_URL
+RUN ["npm","run","build","--","--base","$BASE_URL"]
 
 ### STAGE 2: Run ###
-FROM nginx
-COPY nginx.conf /
-COPY --from=build /frontend/dist /usr/share/nginx/html
-CMD ["nginx", "-g", "daemon off;"]
+FROM nginx as production-stage
+COPY --from=build-stage /app/dist /usr/share/nginx/html
+COPY nginx.conf /etc/nginx/nginx.conf
 
 
