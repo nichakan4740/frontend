@@ -1,16 +1,16 @@
 ### STAGE 1: Build ###
-FROM node  AS build-stage
+FROM node  AS build
 RUN mkdir -p /frontend
 WORKDIR /frontend
-COPY  package.json ./
+COPY package.json ./
 RUN npm install
 COPY . .
 RUN npm run build
 
 ### STAGE 2: Run ###
-FROM nginx as production-stage
-COPY nginx.conf /etc/nginx/nginx.conf
-COPY --from=build-stage /frontend/dist /usr/share/nginx/html
-
+FROM nginx
+COPY nginx.conf /etc/nginx/conf.d/defult.conf
+COPY --from=build /frontend/dist /usr/share/nginx/html
+CMD ["nginx", "-g", "daemon off;"]
 
 
