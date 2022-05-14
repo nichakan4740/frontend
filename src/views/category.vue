@@ -1,59 +1,25 @@
 <script setup>
-import { useRouter } from "vue-router";
-import Swal from "sweetalert2";
-import Createevent from "../components/createevent.vue";
+import { ref, onBeforeMount, computed } from "vue";
+const categorys = ref([]);
 
-const addsevent = async (
-  Name,
-  Email,
-  Notes,
-  StartTimeISO,
-  CategoryID
-) => {
-  const res = await fetch( `http://202.44.9.103:8080/kw2/api/booking/`, {
-    method: "POST",
-    headers: {
-      "content-type": "application/json",
-    },
-    body: JSON.stringify({
-      bookingName: Name,
-      eventEmail: Email,
-      eventNotes: Notes,
-      eventStartTime:  StartTimeISO,
-      eventCategoryID: {
-        id: CategoryID,
-      },
-    }),
-  });
+onBeforeMount(async () => {
+  const res = await fetch( `http://202.44.9.103:8080/kw2/api/category`);
   if (res.status === 200) {
-    Swal.fire("DONE !!!", "You add event success!", "success");
-    setTimeout(function () {
-        close();
-      }, 1500);
-    console.log('You add event success');   
-  } else {
-    console.log("error,cannot add");
-    Swal.fire({
-      icon: "error",
-      title: "Oops...",
-      text: "Cannot add Event!",
-    });
-  }
-    
-};
-
-const appRouter = useRouter();
-const close = () => appRouter.push({ name: "showeventall" });
-
-
+    categorys.value = await res.json();
+    console.log(categorys.value);
+  } else console.log("no event");
+});
 </script>
 
 <template>
   <svg
-    id="editsvg"
-    data-name="Group 2"
+    class="cat"
     xmlns="http://www.w3.org/2000/svg"
     xmlns:xlink="http://www.w3.org/1999/xlink"
+    id="Group_2"
+    data-name="Group 2"
+    width="1366"
+    height="769"
     viewBox="0 0 1366 769"
   >
     <defs>
@@ -198,94 +164,74 @@ const close = () => appRouter.push({ name: "showeventall" });
     />
   </svg>
 
-  <div class="modal-mask">
-    <div class="modal-wrapper">
-      <div class="modal-container">
-        <div class="modal-header border-bottom-0">
-          <h2 class="modal-title"><b>Booking Event</b></h2>
-        </div>
-        <hr />
-        <Createevent @createevent="addsevent" />
-      </div>
+  <div class="containerss">
+    <div class="bo" v-for="(category, index) in categorys" :key="index">
+      <h3 id="pro">{{ category.eventCategoryName }}</h3>
+      <h6 id="des">{{ category.eventCategoryDescription }}</h6>
+      <span
+        v-if="category.eventCategoryDescription === null"
+        class="nodescription"
+      >
+        No Description
+      </span>
+      <p id="mi">{{ category.eventDuration }} minute</p>
     </div>
   </div>
 </template>
 
 <style>
-@import url("https://fonts.googleapis.com/css2?family=Ubuntu&display=swap");
-
-#editsvg {
+.cat {
+  width: 160%;
+  height: 125%;
+  margin-left: -30%;
   position: fixed;
-  top: 0;
-  left: -20%;
-  height: 115%;
-  width: 137%;
+  transform: rotate(180deg) translate(0px, 0px) scale(0.9, 1);
   z-index: -1;
+  margin-top: -14%;
 }
 
-.modal-mask {
-  position: absolute;
-  margin-top: 120px;
-  left: 0;
+.containerss {
+  width: 70%;
+  margin-left: 15%;
+  margin-top: 14%;
+  margin-bottom: 8%;
+  font-family: "Prompt", sans-serif;
+}
+
+.bo {
+  border-radius: 50px;
+  background-color: rgb(255, 255, 255);
+  margin-bottom: 40px;
   width: 100%;
-  height: 100%;
-  /* box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.394); */
-  display: table;
-  transition: opacity 0.3s ease;
-  z-index: -1;
-}
-.modal-wrapper {
-  display: table-cell;
-  vertical-align: middle;
-}
-.modal-container {
-  width: 700px;
-  margin: 0px auto;
-  margin-top: 5%;
-  margin-bottom: 5%;
-  padding: 20px 30px;
-  background-color: #fff;
-  border-radius: 20px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.33);
-}
-.modal-header {
-  margin-top: 0;
-  color: #000000;
-  font-size: 30px;
-  font-family: "Ubuntu", sans-serif;
-}
-.modal-body {
-  margin: 20px 0;
-}
-.modal-button {
-  display: flex;
-  justify-content: end;
+  padding: 30px 50px 15px 50px;
+  box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.394);
 }
 
-.text {
-  color: rgba(126, 126, 126, 0.616);
-  margin-bottom: 7px;
-  margin-top: -5px;
+.bo:hover {
+  transform: scale(1.05);
+  transition: transform 0.3s;
+  background-color: rgba(236, 235, 236, 0.774);
 }
 
-.addbooking {
-  background-color: rgb(52, 4, 108);
-  color: #fff;
-  width: 23%;
-  text-align: center;
-  border-radius: 10px;
-  font-size: 17px;
-  padding-top: 10px;
+#mi {
+  text-align: right;
+  font-weight: bolder;
+  color: rgb(66, 7, 122);
+}
+
+#pro {
+  font-weight: bolder;
+  padding-bottom: 20px;
+}
+
+#des {
+  color: rgb(116, 116, 116);
+  font-weight: 500;
   padding-bottom: 10px;
-  font-family: "Ubuntu", sans-serif;
-  opacity: 1;
-}
-.addbooking:hover {
-  opacity: 0.8;
 }
 
-.addbooking:active {
-  transform: scale(0.9);
-  transition: transform 0.05s;
+.nodescription {
+  opacity: 0.3;
 }
+
 </style>

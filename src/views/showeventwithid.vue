@@ -3,20 +3,23 @@ import { ref, onBeforeMount } from "vue";
 import { useRoute } from "vue-router";
 import { useRouter } from "vue-router";
 import moment from "moment";
+import { computed } from "@vue/reactivity";
 let { params } = useRoute();
 
 const eventwithid = ref([]);
 
 onBeforeMount(async () => {
-  const res = await fetch(
-   `http://202.44.9.103:8080/kw2/api/booking/` + params.eventid
-  );
-  if (res.status === 200) eventwithid.value = await res.json();
+  const res = await fetch( `http://202.44.9.103:8080/kw2/api/booking/` + params.eventid );
+  if (res.status === 200) {
+    eventwithid.value = await res.json();
+    console.log(eventwithid.value)
+  }
   else console.log("no event");
 });
 
 const appRouter = useRouter();
 const close = () => appRouter.push({ name: "showeventall" });
+
 </script>
 
 <template>
@@ -191,9 +194,9 @@ const close = () => appRouter.push({ name: "showeventall" });
 <div class="courses-container">
 	<div class="course">
 		<div class="course-preview">
-			<h6>Event</h6>
-			<h2>{{ eventwithid.eventCategoryID.eventCategoryName }}</h2>
-			<a>	{{ eventwithid.eventDuration }} minute <i class="fas fa-chevron-right"></i></a>
+			<h6>Detail</h6>
+      <h2> {{ eventwithid.eventCategoryID.eventCategoryName }} </h2>
+			<a>	{{ eventwithid.eventCategoryID.eventDuration }} minute <i class="fas fa-chevron-right"></i></a>
 		</div>
 		<div class="course-info">
 			<div class="progress-container">
@@ -201,7 +204,7 @@ const close = () => appRouter.push({ name: "showeventall" });
 			</div>
 			<h6>{{moment(eventwithid.eventStartTime).format('DD MMM YYYY, HH:mm')}}</h6>
 			<p class="name">{{ eventwithid.bookingName }}</p>
-      <p class="email">{{ eventwithid.eventEmail }}</p>
+      <p class="email">{{ eventwithid.eventEmail }}<span v-if="eventwithid.eventEmail===null" class="noemail">no email</span></p>
       <p class="note">{{ eventwithid.eventNotes }}<span v-if="eventwithid.eventNotes===null" class="nonote">no message</span></p>
 
       <img src="../assets/undo.png" id="undo" @click="close">
@@ -292,6 +295,15 @@ const close = () => appRouter.push({ name: "showeventall" });
   font-weight: bolder;
   font-family: 'Prompt', sans-serif;
   opacity: 0.3;
+}
+
+.noemail{
+  margin-top: 30px;
+  color: #424242;
+  font-weight: bolder;
+  font-family: 'Prompt', sans-serif;
+  opacity: 0.3;
+  text-transform: uppercase;
 }
 
 .course-preview {

@@ -1,41 +1,17 @@
 <script setup>
-import { useRouter } from "vue-router";
-import { ref, onBeforeMount, computed } from "vue";
-import Swal from "sweetalert2";
-import moment from "moment";
-
-const events = ref([]);
+/* const filter = ref([]);
 
 onBeforeMount(async () => {
-  const res = await fetch( `http://202.44.9.103:8080/kw2/api/booking/`);
+  const res = await fetch(`http://localhost:8080/api/booking`);
   if (res.status === 200) {
-    events.value = await res.json();
-    console.log(events.value);
+    filter.value = await res.json();
+    console.log(filter.value);
   } else console.log("no event");
-});
-
-//delete event
-const deleteevent = async (deleteeventid) => {
-  if (confirm("You want to delete") == true) {
-    const res = await fetch(
-      `http://202.44.9.103:8080/kw2/api/booking/${deleteeventid}`,
-      {
-        method: "DELETE",
-      }
-    );
-    if (res.status === 200) {
-      Swal.fire("Delete!!!", `You delete event success`, "success");
-      setTimeout(function () {
-        events.value = events.value.filter((e) => e.id !== deleteeventid);
-      }, 1000);
-      console.log("delete success");
-    } else console.log("cannot delete");
-  }
-};
+}); */
 </script>
-
+ 
 <template>
-  <svg
+ <svg
     id="home"
     xmlns="http://www.w3.org/2000/svg"
     xmlns:xlink="http://www.w3.org/1999/xlink"
@@ -159,27 +135,28 @@ const deleteevent = async (deleteeventid) => {
       />
     </g>
   </svg>
-
-  <div class="container">
+   <div class="container">
     <div class="row">
-      <div class="clinic">
-        <div class="showtotal">
-          <lord-icon
-            src="https://cdn.lordicon.com/wxnxiano.json"
-            trigger="loop"
-            colors="primary:#121331,secondary:#4f1091"
-            delay="2000"
-            state="hover"
-            style="width: 40px; height: 40px"
-            
-          >
-          </lord-icon>
+    <div class="clinic">
+     <h1 class="text">Filter Booking</h1>
+     <div class="bg-light p-3 rounded">
+      <p class="text">CategoryName</p>
+      <select class="form-select" v-model="CategoryID">
+        <option value="1">Project Management Clinic ( 30 minute )</option>
+        <option value="2">DevOps-Infra Clinic ( 20 minute )</option>
+        <option value="3">Database Clinic ( 15 minute )</option>
+        <option value="4">Client-side Clinic ( 30 minute )</option>
+        <option value="5">Server-side Clinic ( 30 minute )</option>
+      </select>  
+    </div>
+     <br/>
 
-          <p class="total">
-            <b>Total Event : {{ events.length }}</b>
-          </p>
-        </div>
-        <table>
+    <div class="bg-light p-3 rounded">
+      <p class="text">StartTimes</p>
+      <input type="datetime-local" class="form-control" :min="today" v-model="StartTime" />
+    </div>
+    <br/>
+         <table>
           <tr>
             <th>Name</th>
             <th>Email</th>
@@ -189,60 +166,13 @@ const deleteevent = async (deleteeventid) => {
               Duration <br />
               <span style="font-size: 10px">( minute )</span>
             </th>
-            <th id="editcolumn">Edit</th>
-            <th id="deletecolumn">Delete</th>
-            <th id="detailcolumn">Detail</th>
-          </tr>
-
-          <tr v-for="(event, index) in events" :key="index">
-            <td>{{ event.bookingName }}</td>
-            <td>
-              {{ event.eventEmail }}
-              <span v-if="event.eventEmail === null" class="nonoteshow">
-                -
-              </span>
-            </td>
-            <td>{{ event.eventCategoryID.eventCategoryName }}</td>
-
-            <td>
-              {{ moment(event.eventStartTime).format("DD MMM YYYY, HH:mm") }}
-            </td>
-
-            <td>{{ event.eventCategoryID.eventDuration }}</td>
-
-            <td>
-              <router-link
-                :to="{ name: 'editevent', params: { editid: event.id } }"
-              >
-                <img src="../assets/edit.png" id="info" />
-              </router-link>
-            </td>
-            <td>
-              <img
-                src="../assets/delete.png"
-                id="info"
-                @click="deleteevent(event.id)"
-              />
-            </td>
-
-            <td>
-              <router-link
-                :to="{ name: 'showeventwithid', params: { eventid: event.id } }"
-              >
-                <img src="../assets/information.png" id="infodetail" />
-              </router-link>
-            </td>
           </tr>
         </table>
-
-        <div v-show="events.length === 0" class="noevent">
-          No Scheduled Event
-        </div>
-      </div>
     </div>
-  </div>
+    </div>
+   </div>
 </template>
-
+ 
 <style>
 @import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@100&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Ubuntu&display=swap");
@@ -281,7 +211,6 @@ const deleteevent = async (deleteeventid) => {
   width: 160%;
   z-index: -1;
 }
-
 .container {
   margin-top: 15%;
   margin-bottom: 5%;
@@ -306,112 +235,5 @@ const deleteevent = async (deleteeventid) => {
   font-family: "Ubuntu", sans-serif;
 }
 
-table {
-  border-collapse: collapse;
-  border-radius: 6px;
-  overflow: hidden;
-  width: 100%;
-  margin: 0 auto;
-  text-align: center;
-}
 
-th,
-td {
-  text-align: center;
-  padding: 8px;
-}
-
-td {
-  font-size: 12px;
-  font-weight: bold;
-  font-family: "Prompt", sans-serif;
-  opacity: 0.8;
-}
-
-tr:nth-child(even) {
-  background-color: #f4f4f4;
-  color: #3c106e;
-}
-
-th {
-  background-color: #7183e9;
-  color: white;
-  font-weight: 500;
-}
-
-.booking {
-  background-color: rgb(52, 4, 108);
-  color: #fff;
-  width: 15%;
-  text-align: center;
-  border-radius: 10px;
-  font-size: 20px;
-  margin-top: 50px;
-  margin-left: 40%;
-  margin-right: 40%;
-  padding-top: 10px;
-  padding-bottom: 10px;
-  opacity: 1;
-  font-family: "Ubuntu", sans-serif;
-}
-
-.booking:hover {
-  opacity: 0.8;
-}
-
-.booking:active {
-  transform: scale(0.9);
-  transition: transform 0.05s;
-}
-
-#info {
-  width: 30px;
-  opacity: 1;
-}
-
-#info:hover {
-  opacity: 0.5;
-}
-
-#info:active {
-  transform: scale(0.9);
-  transition: transform 0.05s;
-}
-
-#infodetail {
-  width: 23px;
-  opacity: 1;
-}
-
-#infodetail:hover {
-  opacity: 0.5;
-}
-
-#infodetail:active {
-  transform: scale(0.9);
-  transition: transform 0.05s;
-}
-
-#logo {
-  width: 50%;
-  position: absolute;
-  margin-top: -16%;
-}
-
-.showtotal {
-  background-color: #d8bbf96b;
-  border-radius: 40px;
-  width: 170px;
-  height: 40px;
-  margin-bottom: 20px;
-  margin-left: 85%;
-}
-.total {
-  margin-top: -27px;
-  font-size: 12px;
-  padding-left: 20px;
-}
-lord-icon {
-  margin-left: 115px;
-}
 </style>

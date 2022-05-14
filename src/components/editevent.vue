@@ -1,63 +1,86 @@
 <script setup>
 import { useRouter } from "vue-router";
-import { ref ,onMounted} from "vue";
+import { ref, onMounted, computed, onBeforeMount } from "vue";
 import Swal from "sweetalert2";
 import { useRoute } from "vue-router";
+import moment from "moment";
 let { params } = useRoute();
-console.log(params.editid)
+
+console.log(params.editid);
+
+const editwithid = ref({});
+
+onBeforeMount(async () => {
+  Swal.fire({
+    icon: "warning",
+    title: "Edit Event",
+    text: "You can edit datetime and notes only.",
+  });
+  const res = await fetch( `http://202.44.9.103:8080/kw2/api/booking/` + params.editid);
+  if (res.status === 200) {
+    editwithid.value = await res.json();
+    console.log(editwithid);
+  } else console.log("no event");
+});
 
 
+const saveevent = async (name, email, notes, startTimeISO, categoryID) => {
+  if (confirm("You want to save change") == true) {
+    const res = await fetch(
+      `http://202.44.9.103:8080/kw2/api/booking/` + params.editid,
+      {
+        method: "PUT",
+        headers: {
+          "content-type": "application/json",
+        },
+        body: JSON.stringify({
+          bookingName: name,
+          eventEmail: email,
+          eventNotes: notes,
+          eventStartTime: startTimeISO,
+          eventCategoryID: {
+            id: categoryID,
+          },
+        }),
+      }
+    );
 
-const editwithid = ref([]);
-/* ----------------------------------------------------------------------------------------------- */
-/* const newbooking = computed (() =>{
-  return{
-     id: id,
-      bookingName: Name,
-      eventEmail: Email,
-      eventCategory: Category, 
-      eventNotes: Notes,
-      eventStartTime: StartTime, 
-      eventDuration: Duration,
-      eventCategoryID: {
-      id:CategoryID
+    if (res.status === 200) {
+      Swal.fire("DONE !!!", "You edit event success!", "success");
+      setTimeout(function () {
+        close();
+      }, 1200);
+      console.log("update user booking success!");
+    } else {
+      console.log("cannot update user booking");
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: "Cannot add Event!",
+      });
     }
   }
-})
- */
-
-/* ----------------------------------------------------------------------------------------------- */
-onMounted(async () => {
-  const res = await fetch(
-    `http://202.44.9.103:8080/kw2/api/booking/` + params.editid
-  );
-  if (res.status === 200) editwithid.value = await res.json();
-  else console.log("no event");
-});
+};
 
 const appRouter = useRouter();
 const close = () => appRouter.push({ name: "showeventall" });
 
-// const saveevent = () => {
-//   Swal.fire({
-//     icon: "info",
-//     title: "Do you want to save the changes?",
-//     showCancelButton: true,
-//     confirmButtonText: "Save",
-//   }).then((result) => {
-//     if (result.isConfirmed) {
-//       Swal.fire("Saved!!!", "", "success");
-//     }
-//   });
-// };
+const StartTime = ref("");
 
-const starttime = ref('')
+const StartTimeISO = computed(() => {
+  return new Date(StartTime.value).toISOString("utc");
+});
+
+const date = new Date();
+const today = new Date(date.getTime() - date.getTimezoneOffset() * 60000)
+  .toISOString()
+  .replace(/\..+/, "");
 
 </script>
 
 <template>
   <svg
-    id="Group_2"
+    id="editsvg"
     data-name="Group 2"
     xmlns="http://www.w3.org/2000/svg"
     xmlns:xlink="http://www.w3.org/1999/xlink"
@@ -223,44 +246,76 @@ const starttime = ref('')
         <div class="modal-body">
           <div class="bg-light p-3 rounded">
             <p class="text">Name</p>
-            <input type="text" class="form-control" v-model="editwithid.bookingName" />
-      
+            <input
+              type="text"
+              class="form-control"
+              v-model="editwithid.bookingName"
+              disabled
+            />
           </div>
           <br />
 
           <div class="bg-light p-3 rounded">
             <p class="text">Email</p>
-            <input type="email" class="form-control" v-model="editwithid.eventEmail" />
+            <input
+              type="email"
+              class="form-control"
+              v-model="editwithid.eventEmail"
+              disabled
+            />
           </div>
           <br />
 
           <div class="bg-light p-3 rounded">
             <p class="text">CategoryName</p>
-            <input class="form-control" v-model="editwithid.eventCategory"/>
-
+            <input
+              class="form-control"
+              v-model="editwithid.eventCategoryID.eventCategoryName"
+              disabled
+            />
           </div>
           <br />
 
           <div class="bg-light p-3 rounded">
             <p class="text">Notes</p>
-            <input type="text" class="form-control" v-model="editwithid.eventNotes" />
+            <input
+              type="text"
+              class="form-control"
+              v-model="editwithid.eventNotes"
+            />
+           
           </div>
           <br />
 
           <div class="bg-light p-3 rounded">
             <p class="text">StartTimes</p>
-            <input type="text" class="form-control" v-model="starttime" />
+            <input
+              type="datetime-local"
+              class="form-control"
+              v-model="StartTime"
+              :min="today"
+            /><br>
+             <p class="text">Date-Time-Booking : {{ moment(editwithid.eventStartTime).format("DD MMM YYYY, HH:mm") }}</p>
           </div>
           <br />
 
-          <div class="bg-light p-3 rounded">
-            <p class="text">Duration</p>
-            <input type="text" class="form-control" v-model="editwithid.eventDuration" />
-          </div>
         </div>
 
         <div class="modal-footer">
-          <div class="editbooking" @click="saveevent">Save</div>
+          <div
+            class="editbooking"
+            @click="
+              saveevent(
+                editwithid.bookingName,
+                editwithid.eventEmail,
+                editwithid.eventNotes,
+                StartTimeISO,
+                editwithid.eventCategoryID.id
+              );
+            "
+          >
+            Save
+          </div>
         </div>
       </div>
     </div>
@@ -268,8 +323,7 @@ const starttime = ref('')
 </template>
 
 <style>
-
-.form-control{
+.form-control {
   font-family: "Prompt", sans-serif;
 }
 
@@ -316,4 +370,5 @@ const starttime = ref('')
   transform: scale(0.9);
   transition: transform 0.05s;
 }
+
 </style>
