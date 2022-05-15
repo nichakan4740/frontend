@@ -5,7 +5,7 @@ import Swal from "sweetalert2";
 import moment from "moment";
 const filters = ref([]);
 onBeforeMount(async () => {
-  const res = await fetch(`http://localhost:8080/api/booking`);
+  const res = await fetch(`http://202.44.9.103:8080/kw2/api/booking/`);
   if (res.status === 200) {
     filters.value = await res.json();
     console.log(filters.value);
