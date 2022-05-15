@@ -4,8 +4,9 @@ import { ref, onBeforeMount, computed } from "vue";
 import Swal from "sweetalert2";
 import moment from "moment";
 const filters = ref([]);
+
 onBeforeMount(async () => {
-  const res = await fetch(`http://202.44.9.103:8080/kw2/api/booking/`);
+  const res = await fetch( `http://202.44.9.103:8080/kw2/api/booking/`);
   if (res.status === 200) {
     filters.value = await res.json();
     console.log(filters.value);
@@ -200,6 +201,7 @@ onBeforeMount(async () => {
 @import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@100&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Ubuntu&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Prompt:wght@200&display=swap");
+
 .noevent {
   font-family: "Montserrat", sans-serif;
   font-weight: 400;
@@ -209,18 +211,22 @@ onBeforeMount(async () => {
   margin-bottom: 50px;
   opacity: 0.15;
 }
+
 #editcolumn {
   background-color: #d694f5;
   width: 6%;
 }
+
 #deletecolumn {
   background-color: #e283f5;
   width: 6%;
 }
+
 #detailcolumn {
   background-color: #e96dd4;
   width: 6%;
 }
+
 #home {
   position: fixed;
   top: 0;
@@ -234,6 +240,7 @@ onBeforeMount(async () => {
   margin-bottom: 5%;
   font-family: "Montserrat", sans-serif;
 }
+
 .clinic {
   position: relative;
   z-index: 1;
@@ -243,6 +250,7 @@ onBeforeMount(async () => {
   background-color: rgb(255, 255, 255);
   border-radius: 20px;
 }
+
 .clinic h4 {
   font-size: 45px;
   margin-bottom: 120px;
@@ -250,4 +258,6 @@ onBeforeMount(async () => {
   /* padding-left: 50px; */
   font-family: "Ubuntu", sans-serif;
 }
+
+
 </style>

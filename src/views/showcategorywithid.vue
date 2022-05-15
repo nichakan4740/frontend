@@ -1,26 +1,70 @@
 <script setup>
+import { useRoute } from "vue-router";
+import { useRouter } from "vue-router";
 import { ref, onBeforeMount, computed } from "vue";
+import Swal from "sweetalert2";
+let { params } = useRoute();
 
-const categorys = ref([]);
+const categorywithid = ref([]);
 
 onBeforeMount(async () => {
-  const res = await fetch( `http://202.44.9.103:8080/kw2/api/booking/`);
+  const res = await fetch(
+    `http://202.44.9.103:8080/kw2/api/category/` + params.categoryid
+  );
   if (res.status === 200) {
-    categorys.value = await res.json();
-    console.log(categorys.value);
+    categorywithid.value = await res.json();
+    console.log(categorywithid.value);
   } else console.log("no event");
 });
+
+
+const saveevent = async (name, description , duration) => {
+  if (confirm("You want to save change") == true) {
+    const res = await fetch(
+      `http://202.44.9.103:8080/kw2/api/category/` + params.categoryid,
+      {
+        method: "PUT",
+        headers: {
+          "content-type": "application/json",
+        },
+        body: JSON.stringify({
+
+        eventCategoryName: name,
+        eventCategoryDescription: description,
+        eventDuration : duration
+        }),
+      }
+    );
+
+    if (res.status === 200) {
+      Swal.fire("DONE !!!", "You edit category success!", "success");
+      setTimeout(function () {
+        close();
+      }, 1200);
+      console.log("update category success!");
+    } else {
+      console.log("cannot update category");
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: "Cannot edit category!",
+      });
+    }
+  }
+};
+
+const appRouter = useRouter();
+const close = () => appRouter.push({ name: "showcategory" });
+
+
 </script>
 
 <template>
   <svg
-    class="cat"
+    id="editsvg"
+    data-name="Group 2"
     xmlns="http://www.w3.org/2000/svg"
     xmlns:xlink="http://www.w3.org/1999/xlink"
-    id="Group_2"
-    data-name="Group 2"
-    width="1366"
-    height="769"
     viewBox="0 0 1366 769"
   >
     <defs>
@@ -165,117 +209,69 @@ onBeforeMount(async () => {
     />
   </svg>
 
-  <div class="containerss">
-    <div class="bo" v-for="(category, index) in categorys" :key="index">
-      <h3 id="pro">
-        {{ category.eventCategoryName
-        }}<span id="mi">{{ category.eventDuration }} minute</span>
-      </h3>
-      <h6 id="des">{{ category.eventCategoryDescription }}</h6>
-      <span
-        v-if="category.eventCategoryDescription === null"
-        class="nodescription"
-      >
-        No Description
-      </span>
-
-      <router-link
-        :to="{ name: 'editcategory' , params: { categoryid: category.id } }"
-      >
-        <div id="ed">
-          Edit
+  <div class="modal-mask">
+    <div class="modal-wrapper">
+      <div class="modal-container">
+        <div class="modal-header border-bottom-0">
+          <h2 class="modal-title"><b>Edit Category</b></h2>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+            @click="close"
+          ></button>
         </div>
-      </router-link>
+        <hr />
+
+        <div class="modal-body">
+          <div class="bg-light p-3 rounded">
+            <p class="text">CategoryName  &nbsp; <span style="font-size: 10px; color: rgb(177, 109, 241);"> ( Characters must not exceed 100 ) </span></p>
+            <input
+              type="text"
+              class="form-control"
+              v-model="categorywithid.eventCategoryName"
+            />
+          </div>
+          <br />
+
+          <div class="bg-light p-3 rounded">
+            <p class="text">Description &nbsp; <span style="font-size: 10px; color: rgb(177, 109, 241);"> ( Characters must not exceed 500 ) </span></p>
+            <textarea
+              class="form-control"
+              rows="3"
+              v-model="categorywithid.eventCategoryDescription"
+            ></textarea>
+          </div>
+          <br />
+
+          <div class="bg-light p-3 rounded">
+            <p class="text">Duration</p>
+            <input
+              type="number"
+              class="form-control"
+              v-model="categorywithid.eventDuration"
+            />
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <div
+            class="editbooking"
+            @click="
+              saveevent(
+                categorywithid.eventCategoryName,
+                categorywithid.eventCategoryDescription,
+                categorywithid.eventDuration
+              )
+            "
+          >
+            Save
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
-<style>
-.cat {
-  width: 160%;
-  height: 125%;
-  margin-left: -30%;
-  position: fixed;
-  transform: rotate(180deg) translate(0px, 0px) scale(0.9, 1);
-  z-index: -1;
-  margin-top: -14%;
-}
-
-.containerss {
-  width: 50%;
-  margin-left: 25%;
-  margin-top: 14%;
-  margin-bottom: 8%;
-  font-family: "Prompt", sans-serif;
-}
-
-.bo {
-  border-radius: 120px 30px 30px 120px;
-  background-color: rgb(255, 255, 255);
-  margin-bottom: 40px;
-  width: 100%;
-  padding: 30px 50px 15px 80px;
-  box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.394);
-}
-
-/* .bo:hover {
-  transform: scale(1.05);
-  transition: transform 0.3s;
-  background-color: rgba(236, 235, 236, 0.774);
-} */
-
-#mi {
-  text-align: right;
-  font-weight: bolder;
-  font-size: 13px;
-  border-radius: 20px;
-  color: rgb(255, 255, 255);
-  background-color: #e66feb5d;
-  padding-left: 10px;
-  padding-right: 10px;
-  padding-top: 5px;
-  padding-bottom: 5px;
-  margin-left: 10px;
-}
-
-#pro {
-  font-weight: bolder;
-  padding-bottom: 20px;
-  padding-top: 10px;
-}
-
-#des {
-  color: rgb(116, 116, 116);
-  font-weight: 500;
-  padding-bottom: 10px;
-}
-
-.nodescription {
-  opacity: 0.3;
-}
-
-#ed {
-  font-weight: 700;
-  background: linear-gradient(to bottom, #bea2e7 0%, #86b7e7 100%);
-  width: 80px;
-  border-radius: 20px;
-  padding-left: 25px;
-  padding-top: 5px;
-  padding-bottom: 5px;
-  margin-left: 88%;
-  margin-bottom: 10px;
-  color: rgb(255, 255, 255);
-  box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.394);
-}
-
-#ed:hover {
-  transform: scale(1.05);
-  transition: transform 0.3s;
-  opacity: 0.9;
-}
-
-#ed:active {
-  transform: scale(0.95);
-  transition: transform 0.05s;
-}
-</style>
+<style></style>

@@ -23,11 +23,10 @@ onBeforeMount(async () => {
   } else console.log("no event");
 });
 
-
 const saveevent = async (name, email, notes, startTimeISO, categoryID) => {
   if (confirm("You want to save change") == true) {
     const res = await fetch(
-      `http://202.44.9.103:8080/kw2/api/booking/` + params.editid,
+       `http://202.44.9.103:8080/kw2/api/booking/` + params.editid,
       {
         method: "PUT",
         headers: {
@@ -75,7 +74,6 @@ const date = new Date();
 const today = new Date(date.getTime() - date.getTimezoneOffset() * 60000)
   .toISOString()
   .replace(/\..+/, "");
-
 </script>
 
 <template>
@@ -277,28 +275,35 @@ const today = new Date(date.getTime() - date.getTimezoneOffset() * 60000)
           <br />
 
           <div class="bg-light p-3 rounded">
-            <p class="text">Notes</p>
-            <input
+            <p class="text">Notes &nbsp; <span style="font-size: 10px; color: rgb(177, 109, 241);"> ( Characters must not exceed 500 ) </span></p>
+
+            <textarea
               type="text"
               class="form-control"
               v-model="editwithid.eventNotes"
-            />
-           
+              Maxlength="500"
+              rows="3"
+            >
+            </textarea>
           </div>
           <br />
 
           <div class="bg-light p-3 rounded">
-            <p class="text">StartTimes</p>
+            <p class="text">StartTimes &nbsp; <span style="font-size: 10px; color: rgb(177, 109, 241);">( Please select a future time )</span></p>
             <input
               type="datetime-local"
               class="form-control"
               v-model="StartTime"
               :min="today"
-            /><br>
-             <p class="text">Date-Time-Booking : {{ moment(editwithid.eventStartTime).format("DD MMM YYYY, HH:mm") }}</p>
+            /><br />
+            <p class="text">
+              Date-Time-Booking :
+              {{
+                moment(editwithid.eventStartTime).format("DD MMM YYYY, HH:mm")
+              }}
+            </p>
           </div>
           <br />
-
         </div>
 
         <div class="modal-footer">
@@ -311,7 +316,7 @@ const today = new Date(date.getTime() - date.getTimezoneOffset() * 60000)
                 editwithid.eventNotes,
                 StartTimeISO,
                 editwithid.eventCategoryID.id
-              );
+              )
             "
           >
             Save
@@ -370,5 +375,4 @@ const today = new Date(date.getTime() - date.getTimezoneOffset() * 60000)
   transform: scale(0.9);
   transition: transform 0.05s;
 }
-
 </style>

@@ -39,16 +39,15 @@ console.log(today);
 
 <template>
   <div class="modal-body">
+    
     <div class="bg-light p-3 rounded">
-      <p class="text">Name</p>
-      <input type="text" class="form-control" v-model="Name" />
+      <p class="text">Name &nbsp; <span style="font-size: 10px; color: rgb(177, 109, 241);"> ( Characters must not exceed 100 ) </span></p>
+      <input type="text" class="form-control" v-model="Name" maxlength="100"/>
+       <!-- <p v-show="Name.length === 100" id="checkname">characters must not exceed 100</p> -->
+       <!-- <p v-show="Name.length < 1" id="checkname">Please enter your name</p> -->
     </div>
     <br />
 
-    <!-- <div class="bg-light p-3 rounded">
-      <p class="text">Email</p>
-      <input type="email" id="email" class="form-control" v-model="Email" :keydown="validation"/>
-    </div> -->
     <div class="bg-light p-3 rounded">
       <p class="text">Email</p>
       <form action="#" id="form">
@@ -59,12 +58,11 @@ console.log(today);
             class="form-control"
             placeholder="Ex. kw2@kmutt.ac.th"
             v-on:keydown="validation()"
-            v-model="Email"
-          />
+            v-model="Email"/>   
         </div>
       </form>
     </div>
-    <br />
+    <br/>
 
     <div class="bg-light p-3 rounded">
       <p class="text">CategoryName</p>
@@ -76,24 +74,29 @@ console.log(today);
         <option value="5">Server-side Clinic ( 30 minute )</option>
       </select>
     </div>
-    <br />
+    <br/>
 
+
+    
     <div class="bg-light p-3 rounded">
-      <p class="text">Notes</p>
-      <input type="text" class="form-control" v-model="Notes" />
+      <p class="text">Notes &nbsp; <span style="font-size: 10px; color: rgb(177, 109, 241);">( Characters must not exceed 500 )</span></p>
+      <textarea type="text" 
+      class="form-control" 
+      v-model="Notes" 
+      Maxlength= "500" rows="3">  </textarea>
+      <!-- <p v-show="Notes.length === 500" id="checkname">characters must not exceed 500</p> -->
     </div>
     <br />
 
     <div class="bg-light p-3 rounded">
-      <p class="text">StartTimes</p>
+      <p class="text">StartTimes  &nbsp; <span style="font-size: 10px; color: rgb(177, 109, 241);">( Please select a future time )</span></p>
       <input
         type="datetime-local"
         class="form-control"
         :min="today"
-        v-model="StartTime"
-      />
+        v-model="StartTime"/>
     </div>
-    <br />
+    <br/>
   </div>
 
   <div class="modal-footer">
@@ -165,4 +168,20 @@ console.log(today);
   -webkit-background-size: cover;
   background-size: cover;
 }
+
+#checkname{
+  color: rgb(255, 255, 255);
+  padding: 10px 10px 10px 10px;
+  font-family: "Prompt", sans-serif;
+  font-weight: 700;
+  /* background: linear-gradient(to right, rgb(228, 19, 19) , rgb(153, 4, 4)); */
+  background-color: rgb(177, 109, 241);
+  width: 50%;
+  border-radius: 120px;
+  margin-top: 15px;
+  margin-bottom: 5px;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.394);
+  text-align: center;
+}
+
 </style>

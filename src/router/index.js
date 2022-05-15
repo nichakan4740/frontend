@@ -6,9 +6,10 @@ import showeventwithid from '../views/showeventwithid.vue'
 import home from '../views/Home.vue'
 import showcategory from '../views/category.vue'
 import checkAppointments from '../views/checkAppointments.vue'
+import editcategory from '../views/showcategorywithid.vue'
 
 
-const history = createWebHistory( `${import.meta.env.BASE_URL}`)
+const history = createWebHistory(`${import.meta.env.BASE_URL}`)
 
 const routes = [
   
@@ -21,6 +22,11 @@ const routes = [
     path: '/category',
     name: 'showcategory',
     component: showcategory,
+  },
+  {
+    path: '/edit-category/:categoryid',
+    name: 'editcategory',
+    component: editcategory,
   },
  {
     path: '/eventall',

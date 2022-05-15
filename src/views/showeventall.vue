@@ -7,7 +7,7 @@ import moment from "moment";
 const events = ref([]);
 
 onBeforeMount(async () => {
-  const res = await fetch( `${import.meta.env.BASE_URL}api/booking/`);
+  const res = await fetch( `http://202.44.9.103:8080/kw2/api/booking/`);
   if (res.status === 200) {
     events.value = await res.json();
     console.log(events.value);
@@ -404,7 +404,8 @@ th {
   width: 170px;
   height: 40px;
   margin-bottom: 20px;
-  margin-left: 85%;
+  margin-left: 83%;
+  box-shadow: 0px 0px 15px rgb(184, 184, 184);
 }
 .total {
   margin-top: -27px;
