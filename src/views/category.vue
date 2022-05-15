@@ -4,7 +4,7 @@ import { ref, onBeforeMount, computed } from "vue";
 const categorys = ref([]);
 
 onBeforeMount(async () => {
-  const res = await fetch( `http://202.44.9.103:8080/kw2/api/booking/`);
+  const res = await fetch( `http://202.44.9.103:8080/kw2/api/category/`);
   if (res.status === 200) {
     categorys.value = await res.json();
     console.log(categorys.value);
