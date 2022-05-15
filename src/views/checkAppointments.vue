@@ -1,13 +1,16 @@
 <script setup>
-/* const filter = ref([]);
-
+import { useRouter } from "vue-router";
+import { ref, onBeforeMount, computed } from "vue";
+import Swal from "sweetalert2";
+import moment from "moment";
+const filters = ref([]);
 onBeforeMount(async () => {
   const res = await fetch(`http://localhost:8080/api/booking`);
   if (res.status === 200) {
-    filter.value = await res.json();
-    console.log(filter.value);
+    filters.value = await res.json();
+    console.log(filters.value);
   } else console.log("no event");
-}); */
+});
 </script>
  
 <template>
@@ -141,7 +144,8 @@ onBeforeMount(async () => {
      <h1 class="text">Filter Booking</h1>
      <div class="bg-light p-3 rounded">
       <p class="text">CategoryName</p>
-      <select class="form-select" v-model="CategoryID">
+      <select class="form-select" v-model="CategoryID" >
+        <option value="">--Please choose an option--</option>
         <option value="1">Project Management Clinic ( 30 minute )</option>
         <option value="2">DevOps-Infra Clinic ( 20 minute )</option>
         <option value="3">Database Clinic ( 15 minute )</option>
@@ -153,7 +157,12 @@ onBeforeMount(async () => {
 
     <div class="bg-light p-3 rounded">
       <p class="text">StartTimes</p>
-      <input type="datetime-local" class="form-control" :min="today" v-model="StartTime" />
+       <select class="form-select" v-model="CategoryID">
+        <option value="">--Please choose an option--</option>
+        <option value="1">past</option>
+        <option value="2">today</option>
+        <option value="3">future</option>
+      </select> 
     </div>
     <br/>
          <table>
@@ -162,11 +171,25 @@ onBeforeMount(async () => {
             <th>Email</th>
             <th>CategoryName</th>
             <th>StartTime</th>
-            <th>
-              Duration <br />
-              <span style="font-size: 10px">( minute )</span>
-            </th>
+            <th>Duration <br /><span style="font-size: 10px">( minute )</span></th>
           </tr>
+        
+           <tr v-for="(filter, index) in filters" :key="index">
+            <td>{{filter.bookingName }}</td>
+            <td>
+              {{filter.eventEmail }}
+              <span v-if="filter.eventEmail === null" class="nonoteshow">
+                -
+              </span>
+            </td>
+            <td>{{filter.eventCategoryID.eventCategoryName }}</td>
+
+            <td>
+              {{ moment(filter.eventStartTime).format("DD MMM YYYY, HH:mm") }}
+            </td>
+
+            <td>{{ filter.eventCategoryID.eventDuration }}</td>
+           </tr>
         </table>
     </div>
     </div>
@@ -177,7 +200,6 @@ onBeforeMount(async () => {
 @import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@100&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Ubuntu&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Prompt:wght@200&display=swap");
-
 .noevent {
   font-family: "Montserrat", sans-serif;
   font-weight: 400;
@@ -187,22 +209,18 @@ onBeforeMount(async () => {
   margin-bottom: 50px;
   opacity: 0.15;
 }
-
 #editcolumn {
   background-color: #d694f5;
   width: 6%;
 }
-
 #deletecolumn {
   background-color: #e283f5;
   width: 6%;
 }
-
 #detailcolumn {
   background-color: #e96dd4;
   width: 6%;
 }
-
 #home {
   position: fixed;
   top: 0;
@@ -216,7 +234,6 @@ onBeforeMount(async () => {
   margin-bottom: 5%;
   font-family: "Montserrat", sans-serif;
 }
-
 .clinic {
   position: relative;
   z-index: 1;
@@ -226,7 +243,6 @@ onBeforeMount(async () => {
   background-color: rgb(255, 255, 255);
   border-radius: 20px;
 }
-
 .clinic h4 {
   font-size: 45px;
   margin-bottom: 120px;
@@ -234,6 +250,4 @@ onBeforeMount(async () => {
   /* padding-left: 50px; */
   font-family: "Ubuntu", sans-serif;
 }
-
-
 </style>

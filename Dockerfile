@@ -12,5 +12,5 @@ FROM nginx
 COPY nginx.conf /nginx.conf
 COPY --from=build /frontend/dist /usr/share/nginx/html
 CMD ["nginx", "-g", "daemon off;"]
-
+EXPOSE 80
 
