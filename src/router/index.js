@@ -8,7 +8,7 @@ import showcategory from '../views/category.vue'
 import checkAppointments from '../views/checkAppointments.vue'
 
 
-const history = createWebHistory( `http://202.44.9.103:8080/kw2/`)
+const history = createWebHistory( `${import.meta.env.BASE_URL}`)
 
 const routes = [
   
