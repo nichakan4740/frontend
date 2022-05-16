@@ -5,14 +5,14 @@ export default defineConfig({
 
   server:{
   base:'/kw2/',
-  proxy: {
+ /*  proxy: {
     '/api':{
       target: 'http://intproj21.sit.kmutt.ac.th',
       changeOrigin:true,
       secure:false,
       rewrite: (path)=>path.replace(/^\/api/,'')
     }
-  }
+  } */
 }
 })
 
