@@ -9,7 +9,7 @@ const categorywithid = ref([]);
 
 onBeforeMount(async () => {
   const res = await fetch(
-    `http://202.44.9.103:8080/kw2/api/category/` + params.categoryid
+    `${import.meta.env.BASE_URL}/api/category/` + params.categoryid
   );
   if (res.status === 200) {
     categorywithid.value = await res.json();
@@ -21,7 +21,7 @@ onBeforeMount(async () => {
 const saveevent = async (name, description , duration) => {
   if (confirm("You want to save change") == true) {
     const res = await fetch(
-      `http://202.44.9.103:8080/kw2/api/category/` + params.categoryid,
+     `${import.meta.env.BASE_URL}/api/category/` + params.categoryid,
       {
         method: "PUT",
         headers: {

@@ -18,7 +18,7 @@ onBeforeMount(async () => {
 const deleteevent = async (deleteeventid) => {
   if (confirm("You want to delete") == true) {
     const res = await fetch(
-      `http://202.44.9.103:8080/kw2/api/booking/${deleteeventid}`,
+     `${import.meta.env.BASE_URL}api/booking/${deleteeventid}`,
       {
         method: "DELETE",
       }

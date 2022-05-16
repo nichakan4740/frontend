@@ -9,7 +9,7 @@ let { params } = useRoute();
 const eventwithid = ref([]);
 
 onBeforeMount(async () => {
-  const res = await fetch( `http://202.44.9.103:8080/kw2/api/booking/` + params.eventid );
+  const res = await fetch( `${import.meta.env.BASE_URL}/api/booking/` + params.eventid );
   if (res.status === 200) {
     eventwithid.value = await res.json();
     console.log(eventwithid.value)

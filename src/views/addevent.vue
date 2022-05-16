@@ -10,7 +10,7 @@ const addsevent = async (
   StartTimeISO,
   CategoryID
 ) => {
-  const res = await fetch( `http://202.44.9.103:8080/kw2/api/booking/`, {
+  const res = await fetch( `${import.meta.env.BASE_URL}/api/booking/`, {
     method: "POST",
     headers: {
       "content-type": "application/json",
