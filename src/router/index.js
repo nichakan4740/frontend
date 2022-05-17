@@ -9,7 +9,7 @@ import checkAppointments from '../views/checkAppointments.vue'
 import editcategory from '../views/showcategorywithid.vue'
 
 
-const history = createWebHistory(`${import.meta.env.BASE_URL}`)
+const history = createWebHistory(`${import.meta.env.VITE_BASE_URL}`)
 
 const routes = [
   
