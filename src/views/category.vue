@@ -4,7 +4,7 @@ import { ref, onBeforeMount, computed } from "vue";
 const categorys = ref([]);
 
 onBeforeMount(async () => {
-  const res = await fetch("http://localhost:8080/api/category");
+  const res = await fetch(`${import.meta.env.VITE_BASE_URL}api/category`);
   if (res.status === 200) {
     categorys.value = await res.json();
     console.log(categorys.value);
