@@ -198,7 +198,7 @@ onBeforeMount(async () => {
         >
           <div class="card__icon"> Edit </div>
         </router-link>
-        <img src="../assets/China-night.gif" class="card__image" />
+        <img src="../assets/icon.png"  class="card__image" />
 
         <div class="card__overlay">
           <div class="card__header">
@@ -314,8 +314,8 @@ onBeforeMount(async () => {
 
 .cards {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 2rem;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 3fr));
+  gap: 4rem;
   margin: 11rem 5vw;
   padding: 0;
   list-style-type: none;
@@ -325,15 +325,14 @@ onBeforeMount(async () => {
 .card {
   position: relative;
   display: block;
-  height: 100%;
-  border-radius: 50px;
+  border-radius: 60px;
   overflow: hidden;
   text-decoration: none;
 }
 
 .card__image {
-  width: 130%;
-  height: auto;
+  width: 100%;
+  height: 100%;
 }
 
 .card__icon {
