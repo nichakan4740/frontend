@@ -18,7 +18,7 @@ onBeforeMount(async () => {
 const deleteevent = async (deleteeventid) => {
   if (confirm("You want to delete") == true) {
     const res = await fetch(
-     `${import.meta.env.VITE_BASE_URL}api/booking/${deleteeventid}`,
+      `${import.meta.env.VITE_BASE_URL}api/booking/${deleteeventid}`,
       {
         method: "DELETE",
       }
