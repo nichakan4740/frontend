@@ -9,7 +9,7 @@ const categorywithid = ref([]);
 
 onBeforeMount(async () => {
   const res = await fetch(
-    `${import.meta.env.VITE_BASE_URL}api/category/` + params.categoryid
+    `${import.meta.env.VITE_BASE_URL}api/category` + params.categoryid
   );
   if (res.status === 200) {
     categorywithid.value = await res.json();
@@ -21,7 +21,7 @@ onBeforeMount(async () => {
 const saveevent = async (name, description , duration) => {
   if (confirm("You want to save change") == true) {
     const res = await fetch(
-     `${import.meta.env.VITE_BASE_URL}api/category/` + params.categoryid,
+     `${import.meta.env.VITE_BASE_URL}api/category` + params.categoryid,
       {
         method: "PUT",
         headers: {
@@ -46,7 +46,7 @@ const saveevent = async (name, description , duration) => {
       console.log("cannot update category");
       Swal.fire({
         icon: "error",
-        title: "Oops...",
+        title: "Sorry !!!",
         text: "Cannot edit category!",
       });
     }
@@ -230,7 +230,7 @@ const close = () => appRouter.push({ name: "showcategory" });
             <input
               type="text"
               class="form-control"
-              v-model="categorywithid.eventCategoryName"
+              v-model.trim="categorywithid.eventCategoryName"
             />
           </div>
           <br />
@@ -240,7 +240,7 @@ const close = () => appRouter.push({ name: "showcategory" });
             <textarea
               class="form-control"
               rows="3"
-              v-model="categorywithid.eventCategoryDescription"
+              v-model.trim="categorywithid.eventCategoryDescription"
             ></textarea>
           </div>
           <br />

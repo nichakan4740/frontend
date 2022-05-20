@@ -5,7 +5,6 @@ import showeventall from '../views/showeventall.vue'
 import showeventwithid from '../views/showeventwithid.vue'
 import home from '../views/Home.vue'
 import showcategory from '../views/category.vue'
-import checkAppointments from '../views/checkAppointments.vue'
 import editcategory from '../views/showcategorywithid.vue'
 
 
@@ -47,11 +46,6 @@ const routes = [
     path: '/event-id/:eventid',
     name: 'showeventwithid',
     component: showeventwithid,
-  },
-  {
-    path: '/checkAppointments',
-    name: 'checkAppointments',
-    component: checkAppointments,
   }
 
 ]

@@ -36,15 +36,6 @@
                 >
               </li>
 
-               <li>
-                <a
-                  ><router-link :to="{ name: 'checkAppointments' }"
-                    >Filter</router-link
-                  ></a
-                >
-              </li>
-
-
               <li>
                 <a
                   ><router-link :to="{ name: 'addevent' }"

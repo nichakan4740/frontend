@@ -16,7 +16,8 @@ onBeforeMount(async () => {
     title: "Edit Event",
     text: "You can edit datetime and notes only.",
   });
-  const res = await fetch( `${import.meta.env.VITE_BASE_URL}api/booking/` + params.editid);
+  const res = await fetch(
+`${import.meta.env.VITE_BASE_URL}api/booking` + params.editid);
   if (res.status === 200) {
     editwithid.value = await res.json();
     console.log(editwithid);
@@ -26,7 +27,7 @@ onBeforeMount(async () => {
 const saveevent = async (name, email, notes, startTimeISO, categoryID) => {
   if (confirm("You want to save change") == true) {
     const res = await fetch(
-       `${import.meta.env.VITE_BASE_URL}api/booking/` + params.editid,
+     `${import.meta.env.VITE_BASE_URL}api/booking`+ params.editid,
       {
         method: "PUT",
         headers: {
@@ -54,8 +55,8 @@ const saveevent = async (name, email, notes, startTimeISO, categoryID) => {
       console.log("cannot update user booking");
       Swal.fire({
         icon: "error",
-        title: "Oops...",
-        text: "Cannot add Event!",
+        title: "Sorry !!!",
+        text: "Cannot edit Event!",
       });
     }
   }
@@ -275,12 +276,27 @@ const today = new Date(date.getTime() - date.getTimezoneOffset() * 60000)
           <br />
 
           <div class="bg-light p-3 rounded">
-            <p class="text">Notes &nbsp; <span style="font-size: 10px; color: rgb(177, 109, 241);"> ( Characters must not exceed 500 ) </span></p>
+            <p class="text">Duration</p>
+            <input
+              v-model="editwithid.eventDuration"
+              class="form-control"
+              disabled
+            />
+          </div>
+          <br />
+
+          <div class="bg-light p-3 rounded">
+            <p class="text">
+              Notes &nbsp;
+              <span style="font-size: 10px; color: rgb(177, 109, 241)">
+                ( Characters must not exceed 500 )
+              </span>
+            </p>
 
             <textarea
               type="text"
               class="form-control"
-              v-model="editwithid.eventNotes"
+              v-model.trim="editwithid.eventNotes"
               Maxlength="500"
               rows="3"
             >
@@ -289,7 +305,12 @@ const today = new Date(date.getTime() - date.getTimezoneOffset() * 60000)
           <br />
 
           <div class="bg-light p-3 rounded">
-            <p class="text">StartTimes &nbsp; <span style="font-size: 10px; color: rgb(177, 109, 241);">( Please select a future time )</span></p>
+            <p class="text">
+              StartTimes &nbsp;
+              <span style="font-size: 10px; color: rgb(177, 109, 241)"
+                >( Please select a future time )</span
+              >
+            </p>
             <input
               type="datetime-local"
               class="form-control"
@@ -297,7 +318,7 @@ const today = new Date(date.getTime() - date.getTimezoneOffset() * 60000)
               :min="today"
             /><br />
             <p class="text">
-              Date-Time-Booking :
+              Previous appointment time :
               {{
                 moment(editwithid.eventStartTime).format("DD MMM YYYY, HH:mm")
               }}

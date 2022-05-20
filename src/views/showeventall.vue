@@ -7,7 +7,7 @@ import moment from "moment";
 const events = ref([]);
 
 onBeforeMount(async () => {
-  const res = await fetch( `${import.meta.env.VITE_BASE_URL}api/booking`);
+  const res = await fetch(`${import.meta.env.VITE_BASE_URL}api/booking`);
   if (res.status === 200) {
     events.value = await res.json();
     console.log(events.value);
@@ -32,6 +32,13 @@ const deleteevent = async (deleteeventid) => {
     } else console.log("cannot delete");
   }
 };
+
+const search = ref("");
+const filsearch = computed(() => {
+  return events.value.filter((sf) =>
+    sf.eventCategoryID.eventCategoryName.includes(search.value)
+  );
+});
 </script>
 
 <template>
@@ -163,15 +170,15 @@ const deleteevent = async (deleteeventid) => {
   <div class="container">
     <div class="row">
       <div class="clinic">
+        
         <div class="showtotal">
           <lord-icon
-            src="https://cdn.lordicon.com/wxnxiano.json"
+            src="https://cdn.lordicon.com/dxoycpzg.json"
             trigger="loop"
-            colors="primary:#121331,secondary:#4f1091"
             delay="2000"
             state="hover"
+            colors="primary:#e8308c,secondary:#646e78,tertiary:#4bb3fd,quaternary:#d1e3fa,quinary:#f9c9c0"
             style="width: 40px; height: 40px"
-            
           >
           </lord-icon>
 
@@ -179,6 +186,15 @@ const deleteevent = async (deleteeventid) => {
             <b>Total Event : {{ events.length }}</b>
           </p>
         </div>
+        
+        <div id="search">
+            <input
+            id="ins"
+              placeholder="Search category do you want ?"
+              v-model="search"
+            />
+        </div>
+
         <table>
           <tr>
             <th>Name</th>
@@ -194,7 +210,7 @@ const deleteevent = async (deleteeventid) => {
             <th id="detailcolumn">Detail</th>
           </tr>
 
-          <tr v-for="(event, index) in events" :key="index">
+          <tr v-for="(event, index) in filsearch" :key="index">
             <td>{{ event.bookingName }}</td>
             <td>
               {{ event.eventEmail }}
@@ -208,7 +224,7 @@ const deleteevent = async (deleteeventid) => {
               {{ moment(event.eventStartTime).format("DD MMM YYYY, HH:mm") }}
             </td>
 
-            <td>{{ event.eventCategoryID.eventDuration }}</td>
+            <td>{{ event.eventDuration }}</td>
 
             <td>
               <router-link
@@ -399,20 +415,45 @@ th {
 }
 
 .showtotal {
-  background-color: #d8bbf96b;
+  background-color: #000000;
   border-radius: 40px;
   width: 170px;
   height: 40px;
   margin-bottom: 20px;
-  margin-left: 83%;
+  margin-top: 1px;
+  margin-left: 1.5%;
   box-shadow: 0px 0px 15px rgb(184, 184, 184);
 }
 .total {
   margin-top: -27px;
   font-size: 12px;
   padding-left: 20px;
+  color: #ffffff;
 }
 lord-icon {
   margin-left: 115px;
 }
+
+#search{
+background-color: #aeaeae46;
+padding: 10px 10px 10px 10px;
+width: 32%;
+border-radius: 30px;
+position: relative;
+margin-top: -60px;
+margin-left: 67%;
+margin-bottom: 30px;
+}
+
+#ins{
+  background-color: #ffffff;
+  width:94%;
+  border: none;
+  text-align: center;
+  border-radius: 30px;
+  margin-left: 10px;
+  color: #490680;
+  
+}
+
 </style>

@@ -9,7 +9,7 @@ let { params } = useRoute();
 const eventwithid = ref([]);
 
 onBeforeMount(async () => {
-  const res = await fetch( `${import.meta.env.VITE_BASE_URL}api/booking/` + params.eventid );
+  const res = await fetch(`${import.meta.env.VITE_BASE_URL}api/booking/` + params.eventid );
   if (res.status === 200) {
     eventwithid.value = await res.json();
     console.log(eventwithid.value)
@@ -190,13 +190,28 @@ const close = () => appRouter.push({ name: "showeventall" });
     />
   </svg>
 
+<svg viewBox="0 0 3387 1000">
+  <path id="planePath" class="planePath" d="M-226 626c439,4 636,-213 934,-225 755,-31 602,769 1334,658 562,-86 668,-698 266,-908 -401,-210 -893,189 -632,630 260,441 747,121 1051,91 360,-36 889,179 889,179" />
+  <g id="plane">
+    <polygon class="fil1" points="-141,-10 199,0 -198,-72 -188,-61 -171,-57 -184,-57 " />
+    <polygon class="fil2" points="199,0 -141,-10 -163,63 -123,9 " />
+    <polygon class="fil3" points="-95,39 -113,32 -123,9 -163,63 -105,53 -108,45 -87,48 -90,45 -103,41 -94,41 " />
+    <path class="fil4" d="M-87 48l-21 -3 3 8 19 -4 -1 -1zm-26 -16l18 7 -2 -1 32 -7 -29 1 11 -4 -24 -1 -16 -18 10 23zm10 9l13 4 -4 -4 -9 0z" />
+    <polygon class="fil1" points="-83,28 -94,32 -65,31 -97,38 -86,49 -67,70 199,0 -123,9 -107,27 " />
+  </g>
+  <!-- Define the motion path animation -->
+  <animateMotion xlink:href="#plane" dur="5s" repeatCount="indefinite" rotate="auto">
+    <mpath xlink:href="#planePath" />
+  </animateMotion> 
+</svg>
+
 
 <div class="courses-container">
 	<div class="course">
 		<div class="course-preview">
 			<h6>Detail</h6>
       <h2> {{ eventwithid.eventCategoryID.eventCategoryName }} </h2>
-			<a>	{{ eventwithid.eventCategoryID.eventDuration }} minute <i class="fas fa-chevron-right"></i></a>
+			<a>	{{ eventwithid.eventDuration }} minute <i class="fas fa-chevron-right"></i></a>
 		</div>
 		<div class="course-info">
 			<div class="progress-container">
@@ -240,7 +255,10 @@ const close = () => appRouter.push({ name: "showeventall" });
 	justify-content: center;
 	flex-direction: column;
 	min-height: 100vh;
-	margin: 0;
+  margin-top: -26%;
+  margin-left: 17%;
+  position: fixed;
+	/* margin: 0; */
 }
 
 .course {
@@ -281,7 +299,7 @@ const close = () => appRouter.push({ name: "showeventall" });
   margin-top: -15px;
   text-transform: lowercase;
   opacity: 0.6;
-  
+  font-family: 'Prompt', sans-serif;
 }
 .note{
   margin-top: 30px;
@@ -382,6 +400,33 @@ const close = () => appRouter.push({ name: "showeventall" });
 #undo:active {
   transform: scale(0.9);
   transition: transform 0.05s;
+}
+
+
+.planePath {
+  stroke: #D9DADA;
+  stroke-width: .1%;
+  stroke-width: .5%;
+  stroke-dasharray: 1% 2%;
+  stroke-linecap: round;
+  fill: none;
+  opacity: 0.2;
+}
+
+.fil1 {
+  fill: #d9dada54;
+}
+
+.fil2 {
+  fill: #c5c6c652;
+}
+
+.fil4 {
+  fill: #e4e4e45d;
+}
+
+.fil3 {
+  fill: #AEAFB0;
 }
 
 </style>

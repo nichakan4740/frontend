@@ -4,12 +4,13 @@ import { ref, onBeforeMount, computed } from "vue";
 const categorys = ref([]);
 
 onBeforeMount(async () => {
-  const res = await fetch( `${import.meta.env.VITE_BASE_URL}api/category`);
+  const res = await fetch(`${import.meta.env.VITE_BASE_URL}api/category`);
   if (res.status === 200) {
     categorys.value = await res.json();
     console.log(categorys.value);
   } else console.log("no event");
 });
+
 </script>
 
 <template>
@@ -165,7 +166,7 @@ onBeforeMount(async () => {
     />
   </svg>
 
-  <div class="containerss">
+  <!-- <div class="containerss">
     <div class="bo" v-for="(category, index) in categorys" :key="index">
       <h3 id="pro">
         {{ category.eventCategoryName
@@ -187,7 +188,42 @@ onBeforeMount(async () => {
         </div>
       </router-link>
     </div>
-  </div>
+  </div> -->
+
+  <ul class="cards">
+    <li v-for="(category, index) in categorys" :key="index">
+      <a class="card">
+        <router-link
+          :to="{ name: 'editcategory', params: { categoryid: category.id } }"
+        >
+          <div class="card__icon"> Edit </div>
+        </router-link>
+        <img src="../assets/China-night.gif" class="card__image" />
+
+        <div class="card__overlay">
+          <div class="card__header">
+            <img class="card__thumb" src="../assets/responsive.png" />
+            <div class="card__header-text">
+              <h3 class="card__title">{{ category.eventCategoryName }}</h3>
+              <span class="card__status"
+                >{{ category.eventDuration }} minute</span
+              >
+            </div>
+          </div>
+          <p class="card__description">
+            {{ category.eventCategoryDescription }}
+            <span
+              v-if="category.eventCategoryDescription === null"
+              class="nodescription"
+            >
+              No Description
+            </span>
+          </p>
+        </div>
+      </a>
+    </li>
+  </ul>
+  
 </template>
 
 <style>
@@ -198,18 +234,10 @@ onBeforeMount(async () => {
   position: fixed;
   transform: rotate(180deg) translate(0px, 0px) scale(0.9, 1);
   z-index: -1;
-  margin-top: -14%;
+  margin-top: -19%;
 }
 
-.containerss {
-  width: 50%;
-  margin-left: 25%;
-  margin-top: 14%;
-  margin-bottom: 8%;
-  font-family: "Prompt", sans-serif;
-}
-
-.bo {
+/* .bo {
   border-radius: 120px 30px 30px 120px;
   background-color: rgb(255, 255, 255);
   margin-bottom: 40px;
@@ -218,11 +246,11 @@ onBeforeMount(async () => {
   box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.394);
 }
 
-/* .bo:hover {
+.bo:hover {
   transform: scale(1.05);
   transition: transform 0.3s;
   background-color: rgba(236, 235, 236, 0.774);
-} */
+}
 
 #mi {
   text-align: right;
@@ -251,7 +279,7 @@ onBeforeMount(async () => {
 }
 
 .nodescription {
-  opacity: 0.3;
+  opacity: 0.7;
 }
 
 #ed {
@@ -277,5 +305,147 @@ onBeforeMount(async () => {
 #ed:active {
   transform: scale(0.95);
   transition: transform 0.05s;
+} */
+
+:root {
+  --surface-color: #fff;
+  --curve: 50;
 }
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+  margin: 11rem 5vw;
+  padding: 0;
+  list-style-type: none;
+  font-family: "Prompt", sans-serif;
+}
+
+.card {
+  position: relative;
+  display: block;
+  height: 100%;
+  border-radius: 50px;
+  overflow: hidden;
+  text-decoration: none;
+}
+
+.card__image {
+  width: 130%;
+  height: auto;
+}
+
+.card__icon {
+  width: 50px;
+  height: 25px;
+  font-family: "Prompt", sans-serif;
+  font-size: 12px;
+  font-weight: 800;
+  margin-top: 13px;
+  margin-left: 82%;
+  padding: 3px 2px 5px 14px;
+  border-radius: 80px;
+  position: absolute;
+  border-width: 0ch;
+  color: #ffffff;
+  background-color: rgb(0, 0, 0);
+  box-shadow: 0px 0px 5px rgb(255, 255, 255);
+}
+
+.card__icon:hover{
+  opacity: 0.5;
+}
+
+.card__overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 1;
+  border-radius: calc(var(--curve) * 1px);
+  background-color: var(--surface-color);
+  transform: translateY(100%);
+  transition: 0.2s ease-in-out;
+}
+
+.card:hover .card__overlay {
+  transform: translateY(0);
+}
+
+.card__header {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 2em;
+  padding: 2em;
+  border-radius: calc(var(--curve) * 1px) 0 0 0;
+  background-color: var(--surface-color);
+  transform: translateY(-100%);
+  transition: 0.2s ease-in-out;
+}
+
+.card:hover .card__header {
+  transform: translateY(0);
+}
+
+.card__thumb {
+  flex-shrink: 0;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+}
+
+.card__title {
+  font-size: 1em;
+  font-weight: 700;
+  margin: 0 0 0.3em;
+  color: #37055f;
+}
+
+.card__tagline {
+  display: block;
+  margin: 1em 0;
+  font-family: "MockFlowFont";
+  font-size: 0.8em;
+  color: #d7bdca;
+}
+
+.card__status {
+  font-size: 0.8em;
+  color: #ffffff;
+  font-weight: 700;
+  background-color: #7000bb;
+  border-radius: 20px;
+  padding: 2px 10px 2px 10px;
+}
+
+.card__description {
+  margin: 0;
+  color: #4d0569;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  overflow: hidden;
+  font-family: "Prompt", sans-serif;
+  font-size: 12px;
+  padding-top: 2px;
+  padding-left: 30px;
+  padding-right: 30px;
+  padding-bottom: 30px;
+}
+
+/* .logo {
+	position: fixed;
+	top: 30px;
+	right: 30px;
+	display: block;
+	z-index: 100;
+	transition: all 250ms linear;
+}
+.logo img {
+	height: 26px;
+	width: auto;
+	display: block;
+} */
 </style>

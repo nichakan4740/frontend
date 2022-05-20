@@ -7,10 +7,12 @@ const addsevent = async (
   Name,
   Email,
   Notes,
+  duration,
   StartTimeISO,
   CategoryID
 ) => {
-  const res = await fetch( `${import.meta.env.VITE_BASE_URL}api/booking`, {
+  const res = await fetch(
+`${import.meta.env.VITE_BASE_URL}api/booking`, {
     method: "POST",
     headers: {
       "content-type": "application/json",
@@ -19,6 +21,7 @@ const addsevent = async (
       bookingName: Name,
       eventEmail: Email,
       eventNotes: Notes,
+      eventDuration: duration,
       eventStartTime:  StartTimeISO,
       eventCategoryID: {
         id: CategoryID,
@@ -35,7 +38,7 @@ const addsevent = async (
     console.log("error,cannot add");
     Swal.fire({
       icon: "error",
-      title: "Oops...",
+      title: "Sorry !!!",
       text: "Cannot add Event!",
     });
   }
@@ -279,12 +282,35 @@ const close = () => appRouter.push({ name: "showeventall" });
   padding-bottom: 10px;
   font-family: "Ubuntu", sans-serif;
   opacity: 1;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.33);
 }
 .addbooking:hover {
   opacity: 0.8;
 }
 
 .addbooking:active {
+  transform: scale(0.9);
+  transition: transform 0.05s;
+}
+
+.clearbooking {
+  background-color: rgb(121, 1, 145);
+  color: #fff;
+  width: 15%;
+  text-align: center;
+  border-radius: 10px;
+  font-size: 17px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  font-family: "Ubuntu", sans-serif;
+  opacity: 1;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.33);
+}
+.clearbooking:hover {
+  opacity: 0.8;
+}
+
+.clearbooking:active {
   transform: scale(0.9);
   transition: transform 0.05s;
 }
