@@ -36,7 +36,7 @@ const deleteevent = async (deleteeventid) => {
 const search = ref("");
 const filsearch = computed(() => {
   return events.value.filter((sf) =>
-    sf.bookingName.includes(search.value.toLowerCase())
+    sf.bookingName.includes(search.value)
   );
 });
 </script>
