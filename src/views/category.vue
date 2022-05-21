@@ -10,7 +10,6 @@ onBeforeMount(async () => {
     console.log(categorys.value);
   } else console.log("no event");
 });
-
 </script>
 
 <template>
@@ -166,43 +165,26 @@ onBeforeMount(async () => {
     />
   </svg>
 
-  <!-- <div class="containerss">
-    <div class="bo" v-for="(category, index) in categorys" :key="index">
-      <h3 id="pro">
-        {{ category.eventCategoryName
-        }}<span id="mi">{{ category.eventDuration }} minute</span>
-      </h3>
-      <h6 id="des">{{ category.eventCategoryDescription }}</h6>
-      <span
-        v-if="category.eventCategoryDescription === null"
-        class="nodescription"
-      >
-        No Description
-      </span>
-
-      <router-link
-        :to="{ name: 'editcategory' , params: { categoryid: category.id } }"
-      >
-        <div id="ed">
-          Edit
-        </div>
-      </router-link>
-    </div>
-  </div> -->
-
   <ul class="cards">
     <li v-for="(category, index) in categorys" :key="index">
       <a class="card">
         <router-link
           :to="{ name: 'editcategory', params: { categoryid: category.id } }"
         >
-          <div class="card__icon"> Edit </div>
+          <div class="card__icon">Edit</div>
         </router-link>
-        <img src="../assets/icon.png"  class="card__image" />
+
+        <router-link
+          :to="{ name: 'show', params: { id: category.id } }"
+        >
+          <div class="card__icon_e">Event</div>
+        </router-link>
+
+        <img src="../assets/Forest-night.gif" class="card__image" />
 
         <div class="card__overlay">
           <div class="card__header">
-            <img class="card__thumb" src="../assets/responsive.png" />
+            <img class="card__thumb" src="../assets/category.png" />
             <div class="card__header-text">
               <h3 class="card__title">{{ category.eventCategoryName }}</h3>
               <span class="card__status"
@@ -223,7 +205,7 @@ onBeforeMount(async () => {
       </a>
     </li>
   </ul>
-  
+
 </template>
 
 <style>
@@ -237,76 +219,6 @@ onBeforeMount(async () => {
   margin-top: -19%;
 }
 
-/* .bo {
-  border-radius: 120px 30px 30px 120px;
-  background-color: rgb(255, 255, 255);
-  margin-bottom: 40px;
-  width: 100%;
-  padding: 30px 50px 15px 80px;
-  box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.394);
-}
-
-.bo:hover {
-  transform: scale(1.05);
-  transition: transform 0.3s;
-  background-color: rgba(236, 235, 236, 0.774);
-}
-
-#mi {
-  text-align: right;
-  font-weight: bolder;
-  font-size: 13px;
-  border-radius: 20px;
-  color: rgb(255, 255, 255);
-  background-color: #e66feb5d;
-  padding-left: 10px;
-  padding-right: 10px;
-  padding-top: 5px;
-  padding-bottom: 5px;
-  margin-left: 10px;
-}
-
-#pro {
-  font-weight: bolder;
-  padding-bottom: 20px;
-  padding-top: 10px;
-}
-
-#des {
-  color: rgb(116, 116, 116);
-  font-weight: 500;
-  padding-bottom: 10px;
-}
-
-.nodescription {
-  opacity: 0.7;
-}
-
-#ed {
-  font-weight: 700;
-  background: linear-gradient(to bottom, #bea2e7 0%, #86b7e7 100%);
-  width: 80px;
-  border-radius: 20px;
-  padding-left: 25px;
-  padding-top: 5px;
-  padding-bottom: 5px;
-  margin-left: 88%;
-  margin-bottom: 10px;
-  color: rgb(255, 255, 255);
-  box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.394);
-}
-
-#ed:hover {
-  transform: scale(1.05);
-  transition: transform 0.3s;
-  opacity: 0.9;
-}
-
-#ed:active {
-  transform: scale(0.95);
-  transition: transform 0.05s;
-} */
-
 :root {
   --surface-color: #fff;
   --curve: 50;
@@ -315,7 +227,7 @@ onBeforeMount(async () => {
 .cards {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 3fr));
-  gap: 4rem;
+  gap: 5rem;
   margin: 11rem 5vw;
   padding: 0;
   list-style-type: none;
@@ -328,11 +240,12 @@ onBeforeMount(async () => {
   border-radius: 60px;
   overflow: hidden;
   text-decoration: none;
+  height: 100%;
 }
 
 .card__image {
-  width: 100%;
-  height: 100%;
+  width: 130%;
+  height: 150%;
 }
 
 .card__icon {
@@ -352,7 +265,28 @@ onBeforeMount(async () => {
   box-shadow: 0px 0px 5px rgb(255, 255, 255);
 }
 
-.card__icon:hover{
+.card__icon:hover {
+  opacity: 0.5;
+}
+
+.card__icon_e {
+  width: 60px;
+  height: 25px;
+  font-family: "Prompt", sans-serif;
+  font-size: 12px;
+  font-weight: 800;
+  margin-top: 13px;
+  margin-left: 63%;
+  padding: 3px 2px 5px 14px;
+  border-radius: 80px;
+  position: absolute;
+  border-width: 0ch;
+  color: #ffffff;
+  background-color: rgb(168, 1, 104);
+  box-shadow: 0px 0px 5px rgb(255, 255, 255);
+}
+
+.card__icon_e:hover {
   opacity: 0.5;
 }
 

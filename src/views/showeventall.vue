@@ -36,7 +36,7 @@ const deleteevent = async (deleteeventid) => {
 const search = ref("");
 const filsearch = computed(() => {
   return events.value.filter((sf) =>
-    sf.eventCategoryID.eventCategoryName.includes(search.value)
+    sf.bookingName.includes(search.value.toLowerCase())
   );
 });
 </script>
@@ -170,7 +170,6 @@ const filsearch = computed(() => {
   <div class="container">
     <div class="row">
       <div class="clinic">
-        
         <div class="showtotal">
           <lord-icon
             src="https://cdn.lordicon.com/dxoycpzg.json"
@@ -186,14 +185,16 @@ const filsearch = computed(() => {
             <b>Total Event : {{ events.length }}</b>
           </p>
         </div>
-        
+
         <div id="search">
-            <input
+          <input
             id="ins"
-              placeholder="Search category do you want ?"
-              v-model="search"
-            />
+            placeholder="Search name do you want ?"
+            v-model="search"
+          />
+          <img src="../assets/search.png" id="iconsearch" />
         </div>
+        <br />
 
         <table>
           <tr>
@@ -434,26 +435,33 @@ lord-icon {
   margin-left: 115px;
 }
 
-#search{
-background-color: #aeaeae46;
-padding: 10px 10px 10px 10px;
-width: 32%;
-border-radius: 30px;
-position: relative;
-margin-top: -60px;
-margin-left: 67%;
-margin-bottom: 30px;
+#search {
+  background-color: #aeaeae46;
+  padding: 10px 10px 10px 10px;
+  width: 28%;
+  border-radius: 30px;
+  position: relative;
+  margin-top: -60px;
+  margin-left: 70%;
+  margin-bottom: 30px;
 }
 
-#ins{
+#ins {
   background-color: #ffffff;
-  width:94%;
+  width: 80%;
   border: none;
   text-align: center;
   border-radius: 30px;
   margin-left: 10px;
-  color: #490680;
-  
+  color: #000000;
+  outline: none;
+  font-size: 12px;
+  margin-right: 10px;
+  padding-top: 5px;
+  padding-bottom: 5px;
 }
 
+#iconsearch {
+  width: 30px;
+}
 </style>

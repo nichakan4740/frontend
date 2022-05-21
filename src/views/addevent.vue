@@ -11,7 +11,8 @@ const addsevent = async (
   StartTimeISO,
   CategoryID
 ) => {
-  const res = await fetch(`${import.meta.env.VITE_BASE_URL}api/booking`, {
+  const res = await fetch(`${import.meta.env.VITE_BASE_URL}api/booking`
+, {
     method: "POST",
     headers: {
       "content-type": "application/json",
@@ -231,10 +232,9 @@ const close = () => appRouter.push({ name: "showeventall" });
   left: 0;
   width: 100%;
   height: 100%;
-  /* box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.394); */
   display: table;
   transition: opacity 0.3s ease;
-  z-index: -1;
+  z-index: 1;
 }
 .modal-wrapper {
   display: table-cell;

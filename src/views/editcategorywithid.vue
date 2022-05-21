@@ -1,6 +1,7 @@
 <script setup>
 import { useRoute } from "vue-router";
 import { useRouter } from "vue-router";
+import moment from "moment";
 import { ref, onBeforeMount, computed } from "vue";
 import Swal from "sweetalert2";
 let { params } = useRoute();
@@ -9,7 +10,7 @@ const categorywithid = ref([]);
 
 onBeforeMount(async () => {
   const res = await fetch(
-    `${import.meta.env.VITE_BASE_URL}api/category/` + params.categoryid
+   `${import.meta.env.VITE_BASE_URL}api/category/` + params.categoryid
   );
   if (res.status === 200) {
     categorywithid.value = await res.json();
@@ -17,21 +18,19 @@ onBeforeMount(async () => {
   } else console.log("no event");
 });
 
-
-const saveevent = async (name, description , duration) => {
+const saveevent = async (name, description, duration) => {
   if (confirm("You want to save change") == true) {
     const res = await fetch(
-      `${import.meta.env.VITE_BASE_URL}api/category/` + params.categoryid,
+     `${import.meta.env.VITE_BASE_URL}api/category/` + params.categoryid,
       {
         method: "PUT",
         headers: {
           "content-type": "application/json",
         },
         body: JSON.stringify({
-
-        eventCategoryName: name,
-        eventCategoryDescription: description,
-        eventDuration : duration
+          eventCategoryName: name,
+          eventCategoryDescription: description,
+          eventDuration: duration,
         }),
       }
     );
@@ -55,8 +54,6 @@ const saveevent = async (name, description , duration) => {
 
 const appRouter = useRouter();
 const close = () => appRouter.push({ name: "showcategory" });
-
-
 </script>
 
 <template>
@@ -226,22 +223,58 @@ const close = () => appRouter.push({ name: "showcategory" });
 
         <div class="modal-body">
           <div class="bg-light p-3 rounded">
-            <p class="text">CategoryName  &nbsp; <span style="font-size: 10px; color: rgb(177, 109, 241);"> ( Characters must not exceed 100 ) </span></p>
+            <p class="text">
+              CategoryName &nbsp;
+              <span style="font-size: 10px; color: rgb(177, 109, 241)">
+                ( Characters must not exceed 100 )
+              </span>
+            </p>
             <input
               type="text"
               class="form-control"
               v-model.trim="categorywithid.eventCategoryName"
             />
+            <div>
+              <p
+                v-if="categorywithid.eventCategoryName.length"
+                class="input-count"
+                id="count"
+              >
+                {{ categorywithid.eventCategoryName.length }}/100
+              </p>
+
+              <p
+                v-show="categorywithid.eventCategoryName.length < 1"
+                id="checkname"
+              >
+                * Please input your categoryname
+              </p>
+            </div>
           </div>
+
           <br />
 
           <div class="bg-light p-3 rounded">
-            <p class="text">Description &nbsp; <span style="font-size: 10px; color: rgb(177, 109, 241);"> ( Characters must not exceed 500 ) </span></p>
+            <p class="text">
+              Description &nbsp;
+              <span style="font-size: 10px; color: rgb(177, 109, 241)">
+                ( Characters must not exceed 500 )
+              </span>
+            </p>
             <textarea
               class="form-control"
               rows="3"
               v-model.trim="categorywithid.eventCategoryDescription"
             ></textarea>
+            <div>
+              <p
+                v-if="categorywithid.eventCategoryDescription.length"
+                class="input-count"
+                id="count"
+              >
+                {{ categorywithid.eventCategoryDescription.length }}/500
+              </p>
+            </div>
           </div>
           <br />
 

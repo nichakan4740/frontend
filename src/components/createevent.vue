@@ -21,7 +21,8 @@ const Name = ref("");
 const Email = ref("");
 const CategoryID = ref("");
 const Notes = ref();
-const StartTime = ref("");
+const StartTime = ref('')
+
 
 const Duration = computed(() => {
   if (CategoryID.value == "") {
@@ -62,11 +63,8 @@ const date = new Date();
 const today = new Date(date.getTime() - date.getTimezoneOffset() * 60000)
   .toISOString()
   .replace(/\..+/, "");
-console.log(today);
 
-const pass = () => {
-  moment(StartTime.value).subtract(1, "minutes");
-};
+
 </script>
 
 <template>
@@ -91,7 +89,6 @@ const pass = () => {
         </p>
       </div>
 
-      <!-- <p v-show="Name.length === 100" id="checkname">characters must not exceed 100</p> -->
       <p v-show="Name.length < 1" id="checkname">* Please input your name</p>
     </div>
     <br />
@@ -164,8 +161,6 @@ const pass = () => {
       </p>
     </div>
 
-    <!-- <p>{{moment(StartTime.value).subtract(1, 'minutes')}}</p> -->
-
     <br />
   </div>
 
@@ -184,7 +179,8 @@ const pass = () => {
           Duration,
           StartTimeISO,
           CategoryID
-        )
+        ),
+        cleartext()
       "
     >
       Add Event
