@@ -270,7 +270,12 @@ const close = () => appRouter.push({ name: "showcategory" });
           <br />
 
           <div class="bg-light p-3 rounded">
-            <p class="text">Duration</p>
+             <p class="text">Duration
+               &nbsp;
+              <span style="font-size: 10px; color: rgb(177, 109, 241)">
+                ( The duration of the appointment does not exceed 30 minutes.)
+              </span>
+            </p>
             <input
               type="number"
               class="form-control"
