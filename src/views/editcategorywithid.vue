@@ -266,15 +266,6 @@ const close = () => appRouter.push({ name: "showcategory" });
               rows="3"
               v-model.trim="categorywithid.eventCategoryDescription"
             ></textarea>
-            <div>
-              <p
-                v-if="categorywithid.eventCategoryDescription.length"
-                class="input-count"
-                id="count"
-              >
-                {{ categorywithid.eventCategoryDescription.length }}/500
-              </p>
-            </div>
           </div>
           <br />
 
