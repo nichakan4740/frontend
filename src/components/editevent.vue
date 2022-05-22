@@ -23,7 +23,7 @@ onBeforeMount(async () => {
   } else console.log("no event");
 });
 
-const saveevent = async (name, email, notes, startTimeISO, categoryID) => {
+const saveevent = async (notes, startTimeISO) => {
   if (confirm("You want to save change") == true) {
     const res = await fetch(
       `${import.meta.env.VITE_BASE_URL}api/booking/` + params.editid,
@@ -33,13 +33,8 @@ const saveevent = async (name, email, notes, startTimeISO, categoryID) => {
           "content-type": "application/json",
         },
         body: JSON.stringify({
-          bookingName: name,
-          eventEmail: email,
           eventNotes: notes,
           eventStartTime: startTimeISO,
-          eventCategoryID: {
-            id: categoryID,
-          },
         }),
       }
     );
@@ -331,11 +326,8 @@ const today = new Date(date.getTime() - date.getTimezoneOffset() * 60000)
             class="editbooking"
             @click="
               saveevent(
-                editwithid.bookingName,
-                editwithid.eventEmail,
                 editwithid.eventNotes,
                 StartTimeISO,
-                editwithid.eventCategoryID.id
               )
             "
           >
