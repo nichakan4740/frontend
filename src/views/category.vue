@@ -367,18 +367,4 @@ onBeforeMount(async () => {
   padding-right: 30px;
   padding-bottom: 30px;
 }
-
-/* .logo {
-	position: fixed;
-	top: 30px;
-	right: 30px;
-	display: block;
-	z-index: 100;
-	transition: all 250ms linear;
-}
-.logo img {
-	height: 26px;
-	width: auto;
-	display: block;
-} */
 </style>

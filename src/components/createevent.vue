@@ -245,18 +245,13 @@ const today = new Date(date.getTime() - date.getTimezoneOffset() * 60000)
 
 #checkname {
   color: rgb(192, 6, 6);
-  /* padding: 10px 10px 10px 10px; */
   font-family: "Prompt", sans-serif;
   font-weight: 700;
   font-size: 10px;
-  /* background: linear-gradient(to right, rgb(228, 19, 19) , rgb(153, 4, 4)); */
-  /* background-color: rgb(177, 109, 241); */
   width: 50%;
   border-radius: 120px;
   margin-top: 10px;
   margin-bottom: -5px;
-  /* box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.394); */
-  /* text-align: center; */
 }
 
 #count {
