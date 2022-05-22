@@ -273,7 +273,7 @@ const close = () => appRouter.push({ name: "showcategory" });
              <p class="text">Duration
                &nbsp;
               <span style="font-size: 10px; color: rgb(177, 109, 241)">
-                ( The duration of the appointment does not exceed 30 minutes.)
+                ( Duration must between 1-480 minute)
               </span>
             </p>
             <input
