@@ -1,9 +1,8 @@
 <script setup>
-import { ref, onBeforeMount } from "vue";
+import { ref, onBeforeMount,computed } from "vue";
 import { useRoute } from "vue-router";
 import { useRouter } from "vue-router";
 import moment from "moment";
-import { computed } from "@vue/reactivity";
 let { params } = useRoute();
 
 const eventwithid = ref([]);

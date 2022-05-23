@@ -21,8 +21,7 @@ const Name = ref("");
 const Email = ref("");
 const CategoryID = ref("");
 const Notes = ref();
-const StartTime = ref('')
-
+const StartTime = ref("");
 
 const Duration = computed(() => {
   if (CategoryID.value == "") {
@@ -51,7 +50,7 @@ const validation = () => {
 };
 
 const cleartext = () => {
-    (Name.value = ""),
+  (Name.value = ""),
     (Email.value = ""),
     (CategoryID.value = ""),
     (Notes.value = null),
@@ -63,8 +62,6 @@ const date = new Date();
 const today = new Date(date.getTime() - date.getTimezoneOffset() * 60000)
   .toISOString()
   .replace(/\..+/, "");
-
-
 </script>
 
 <template>
@@ -89,7 +86,12 @@ const today = new Date(date.getTime() - date.getTimezoneOffset() * 60000)
         </p>
       </div>
 
-      <p v-show="Name.length < 1" id="checkname">* Please input your name</p>
+      <div>
+        <p v-show="Name.length < 1" id="checkname">* Please input your name <span></span></p>
+        <p v-show="Name.length >= 100" id="checkname">
+          * Characters must not exceed 100
+        </p>
+      </div>
     </div>
     <br />
 
@@ -180,7 +182,7 @@ const today = new Date(date.getTime() - date.getTimezoneOffset() * 60000)
           StartTimeISO,
           CategoryID
         ),
-        cleartext()
+          cleartext()
       "
     >
       Add Event

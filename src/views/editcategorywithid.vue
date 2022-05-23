@@ -10,7 +10,7 @@ const categorywithid = ref([]);
 
 onBeforeMount(async () => {
   const res = await fetch(
-   `${import.meta.env.VITE_BASE_URL}api/category/` + params.categoryid
+  `${import.meta.env.VITE_BASE_URL}api/category/` + params.categoryid
   );
   if (res.status === 200) {
     categorywithid.value = await res.json();
@@ -226,12 +226,13 @@ const close = () => appRouter.push({ name: "showcategory" });
             <p class="text">
               CategoryName &nbsp;
               <span style="font-size: 10px; color: rgb(177, 109, 241)">
-                ( Characters must not exceed 100 )
+                ( Characters must not exceed 100 and not unique )
               </span>
             </p>
             <input
               type="text"
               class="form-control"
+              maxlength="100"
               v-model.trim="categorywithid.eventCategoryName"
             />
             <div>
@@ -248,6 +249,12 @@ const close = () => appRouter.push({ name: "showcategory" });
                 id="checkname"
               >
                 * Please input your categoryname
+              </p>
+              <p
+                v-show="categorywithid.eventCategoryName.length >= 100"
+                id="checkname"
+              >
+                * Characters must not exceed 100
               </p>
             </div>
           </div>
@@ -270,16 +277,17 @@ const close = () => appRouter.push({ name: "showcategory" });
           <br />
 
           <div class="bg-light p-3 rounded">
-             <p class="text">Duration
-               &nbsp;
+            <p class="text">
+              Duration &nbsp;
               <span style="font-size: 10px; color: rgb(177, 109, 241)">
-                ( Duration must between 1-480 minute)
+                ( Duration must between 1 - 480 )
               </span>
             </p>
             <input
               type="number"
               class="form-control"
               v-model="categorywithid.eventDuration"
+              maxlength="480"
             />
           </div>
         </div>

@@ -18,7 +18,7 @@ onBeforeMount(async () => {
 const deleteevent = async (deleteeventid) => {
   if (confirm("You want to delete") == true) {
     const res = await fetch(
-     `${import.meta.env.VITE_BASE_URL}api/booking/${deleteeventid}`,
+    `${import.meta.env.VITE_BASE_URL}api/booking/${deleteeventid}`,
       {
         method: "DELETE",
       }
@@ -35,9 +35,7 @@ const deleteevent = async (deleteeventid) => {
 
 const search = ref("");
 const filsearch = computed(() => {
-  return events.value.filter((sf) =>
-    sf.bookingName.includes(search.value)
-  );
+  return events.value.filter((sf) => sf.bookingName.includes(search.value));
 });
 </script>
 
@@ -199,8 +197,9 @@ const filsearch = computed(() => {
         <table>
           <tr>
             <th>Name</th>
-            <th>Email</th>
+            <!-- <th>Email</th> -->
             <th>CategoryName</th>
+            <th>Date</th>
             <th>StartTime</th>
             <th>
               Duration <br />
@@ -213,16 +212,13 @@ const filsearch = computed(() => {
 
           <tr v-for="(event, index) in filsearch" :key="index">
             <td>{{ event.bookingName }}</td>
-            <td>
-              {{ event.eventEmail }}
-              <span v-if="event.eventEmail === null" class="nonoteshow">
-                -
-              </span>
-            </td>
+        
             <td>{{ event.eventCategoryID.eventCategoryName }}</td>
 
+            <td>{{ moment(event.eventStartTime).format("DD MMM YYYY") }}</td>
+
             <td>
-              {{ moment(event.eventStartTime).format("DD MMM YYYY, HH:mm") }}
+              {{ moment(event.eventStartTime).format("HH:mm") }}
             </td>
 
             <td>{{ event.eventDuration }}</td>

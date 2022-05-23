@@ -26,7 +26,7 @@ onBeforeMount(async () => {
 const saveevent = async (notes, startTimeISO) => {
   if (confirm("You want to save change") == true) {
     const res = await fetch(
-      `${import.meta.env.VITE_BASE_URL}api/booking/` + params.editid,
+     `${import.meta.env.VITE_BASE_URL}api/booking/` + params.editid,
       {
         method: "PUT",
         headers: {
@@ -69,6 +69,7 @@ const date = new Date();
 const today = new Date(date.getTime() - date.getTimezoneOffset() * 60000)
   .toISOString()
   .replace(/\..+/, "");
+  
 </script>
 
 <template>
