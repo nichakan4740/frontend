@@ -9,7 +9,7 @@ let { params } = useRoute();
 const categoryevent = ref([]);
 
 onBeforeMount(async () => {
-  const res = await fetch(`${import.meta.env.VITE_BASE_URL}api/category/` + params.id);
+  const res = await fetch(`${import.meta.env.VITE_BASE_URL}api/categories/` + params.id);
   if (res.status === 200) {
     categoryevent.value = await res.json();
     console.log(categoryevent.value);
@@ -214,7 +214,7 @@ const close = () => appRouter.push({ name: "showcategory" });
         </lord-icon>
 
         <p class="totalevent">
-          <b>Total Event : {{ categoryevent.event.length }}</b>
+          <b>Total Event : {{ categoryevent.events.length }}</b>
         </p>
       </div>
 
@@ -231,7 +231,7 @@ const close = () => appRouter.push({ name: "showcategory" });
             </th>
           </tr>
 
-          <tr v-for="list in categoryevent.event">
+          <tr v-for="list in categoryevent.events">
             <td>{{ list.bookingName }}</td>
             <td>{{ list.eventEmail }}</td>
             <td>{{ categoryevent.eventCategoryName }}</td>
@@ -242,7 +242,7 @@ const close = () => appRouter.push({ name: "showcategory" });
           </tr>
         </table>
 
-        <div v-show="categoryevent.event.length === 0" class="noevent2">
+        <div v-show="categoryevent.events.length === 0" class="noevent2">
           No Scheduled Event
         </div>
       </div>

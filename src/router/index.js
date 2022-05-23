@@ -25,12 +25,12 @@ const routes = [
   }
   ,
   {
-    path: '/filter-category/:id',
+    path: '/filter-categorys/:id',
     name: 'show',
     component: show,
   },
   {
-    path: '/edit-category/:categoryid',
+    path: '/edit-categorys/:categoryid',
     name: 'editcategory',
     component: editcategory,
   },
@@ -45,7 +45,7 @@ const routes = [
     component: addevent,
   },
   {
-    path: '/edit-event/:editid',
+    path: '/edit-events/:editid',
     name: 'editevent',
     component: editevent,
   },

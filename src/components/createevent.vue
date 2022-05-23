@@ -6,7 +6,7 @@ defineEmits(["createevent"]);
 const category = ref([]);
 
 onBeforeMount(async () => {
-  const res = await fetch(`${import.meta.env.VITE_BASE_URL}api/category`);
+  const res = await fetch(`${import.meta.env.VITE_BASE_URL}api/categories`);
   if (res.status === 200) {
     category.value = await res.json();
     console.log(category.value);

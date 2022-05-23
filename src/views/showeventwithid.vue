@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onBeforeMount,computed } from "vue";
+import { ref, onBeforeMount , computed} from "vue";
 import { useRoute } from "vue-router";
 import { useRouter } from "vue-router";
 import moment from "moment";
@@ -8,7 +8,7 @@ let { params } = useRoute();
 const eventwithid = ref([]);
 
 onBeforeMount(async () => {
-  const res = await fetch(`${import.meta.env.VITE_BASE_URL}api/booking/` + params.eventid );
+  const res = await fetch(`${import.meta.env.VITE_BASE_URL}api/events/` + params.eventid );
   if (res.status === 200) {
     eventwithid.value = await res.json();
     console.log(eventwithid.value)

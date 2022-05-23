@@ -7,7 +7,7 @@ import moment from "moment";
 const events = ref([]);
 
 onBeforeMount(async () => {
-  const res = await fetch(`${import.meta.env.VITE_BASE_URL}api/booking`);
+  const res = await fetch(`${import.meta.env.VITE_BASE_URL}api/events`);
   if (res.status === 200) {
     events.value = await res.json();
     console.log(events.value);
@@ -18,7 +18,7 @@ onBeforeMount(async () => {
 const deleteevent = async (deleteeventid) => {
   if (confirm("You want to delete") == true) {
     const res = await fetch(
-    `${import.meta.env.VITE_BASE_URL}api/booking/${deleteeventid}`,
+    `${import.meta.env.VITE_BASE_URL}api/events/${deleteeventid}`,
       {
         method: "DELETE",
       }
@@ -212,7 +212,7 @@ const filsearch = computed(() => {
 
           <tr v-for="(event, index) in filsearch" :key="index">
             <td>{{ event.bookingName }}</td>
-        
+    
             <td>{{ event.eventCategoryID.eventCategoryName }}</td>
 
             <td>{{ moment(event.eventStartTime).format("DD MMM YYYY") }}</td>
@@ -315,7 +315,6 @@ const filsearch = computed(() => {
   font-size: 45px;
   margin-bottom: 120px;
   padding-top: 20px;
-  /* padding-left: 50px; */
   font-family: "Ubuntu", sans-serif;
 }
 

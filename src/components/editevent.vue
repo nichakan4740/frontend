@@ -16,7 +16,7 @@ onBeforeMount(async () => {
     title: "Edit Event",
     text: "You can edit datetime and notes only.",
   });
-  const res = await fetch(`${import.meta.env.VITE_BASE_URL}api/booking/` + params.editid);
+  const res = await fetch(`${import.meta.env.VITE_BASE_URL}api/events/` + params.editid);
   if (res.status === 200) {
     editwithid.value = await res.json();
     console.log(editwithid);
@@ -26,7 +26,7 @@ onBeforeMount(async () => {
 const saveevent = async (notes, startTimeISO) => {
   if (confirm("You want to save change") == true) {
     const res = await fetch(
-     `${import.meta.env.VITE_BASE_URL}api/booking/` + params.editid,
+     `${import.meta.env.VITE_BASE_URL}api/events/` + params.editid,
       {
         method: "PUT",
         headers: {
