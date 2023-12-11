@@ -34,7 +34,7 @@ const mysugar = ref({
 
 const MysugarLoad = async () => {
   try {
-    const response = await fetch(`${import.meta.env.VITE_BASE_URL}api/mysugar`);
+    const response = await fetch(`http://cp23ssa2.sit.kmutt.ac.th:8000/api/mysugar`);
     const data = await response.json();
     result.value = data;
   } catch (error) {
@@ -56,7 +56,7 @@ const router = useRouter();
 
 const saveData = async () => {
   try {
-   const response = await fetch(`${import.meta.env.VITE_BASE_URL}api/mysugar`, 
+   const response = await fetch(`http://cp23ssa2.sit.kmutt.ac.th:8000/api/mysugar`, 
    
    {
       method: 'POST',
@@ -105,7 +105,7 @@ const edit = (record) => {
 
 const updateData = async () => {
   try {
-    const editrecords = `${import.meta.env.VITE_BASE_URL}api/mysugar/${mysugar.value.id}`;
+    const editrecords = `http://cp23ssa2.sit.kmutt.ac.th:8000/api/mysugar/${mysugar.value.id}`;
     const response = await fetch(editrecords, {
       method: 'PUT',
       headers: {
@@ -130,7 +130,7 @@ const updateData = async () => {
 
 const remove = async (record) => {
   try {
-    const url = `${import.meta.env.VITE_BASE_URL}api/mysugar/${record.id}`;
+    const url = `http://cp23ssa2.sit.kmutt.ac.th:8000/api/mysugar/${record.id}`;
     const response = await fetch(url, { method: 'DELETE' });
     if (response.ok) {
       alert('Deleted');

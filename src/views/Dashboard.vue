@@ -79,7 +79,7 @@ const save = async () => {
 const saveData = async () => {
   try {
     const response = await fetch(
-      `${import.meta.env.VITE_BASE_URL}api/mysugar`,
+      `http://cp23ssa2.sit.kmutt.ac.th:8000/api/mysugar`,
       {
         method: "POST",
         headers: {
@@ -111,7 +111,7 @@ const edit = (record) => {
 
 const updateData = async () => {
   try {
-    const editrecords = `${import.meta.env.VITE_BASE_URL}api/mysugar/${
+    const editrecords = `http://cp23ssa2.sit.kmutt.ac.th:8000/api/mysugar/${
       mysugar.value.id
     }`;
     // Display confirmation dialog using Swal
@@ -149,7 +149,7 @@ const updateData = async () => {
 /* ลบ */
 const remove = async (record) => {
   try {
-    const url = `${import.meta.env.VITE_BASE_URL}api/mysugar/${record.id}`;
+    const url = `http://cp23ssa2.sit.kmutt.ac.th:8000/api/mysugar/${record.id}`;
 
     // Display confirmation dialog using Swal
     const confirmationResult = await Swal.fire({
