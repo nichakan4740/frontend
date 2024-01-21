@@ -4,6 +4,12 @@ import Home from '../views/Home.vue'
 import Dashboard from '../views/Dashboard.vue'
 import Chatbot from '../views/Chatbot.vue'
 import SugarValue from '../views/SugarValue.vue';
+
+
+import Register from '../views/Register.vue';
+import HomeRole from '../views/HomeRole.vue';
+
+
 const history = createWebHistory(`${import.meta.env.VITE_BASE_URL}`)
 
 const routes = [
@@ -11,9 +17,21 @@ const routes = [
  
   
   {
-    path: '/',
+    path: '/login',
     name: 'login',
     component: Login,
+  },
+
+  {
+    path: '/register',
+    name: 'register',
+    component: Register,
+  },
+
+  {
+    path: '/',
+    name: 'homerole',
+    component: HomeRole,
   },
 
   {
