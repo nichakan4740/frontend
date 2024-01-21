@@ -1,12 +1,18 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import Login from '../views/Login.vue';
+
 import Home from '../views/Home.vue'
 import Dashboard from '../views/Dashboard.vue'
 import Chatbot from '../views/Chatbot.vue'
 import SugarValue from '../views/SugarValue.vue';
 
+ /* login-register พยาบาล */
+import LoginNurse from '../views/Authentication/LoginNurse.vue';
+import RegisterNurse from '../views/Authentication/RegisterNurse.vue';
 
-import Register from '../views/Register.vue';
+ /* login-register ผู้ป่วย */
+import LoginPatient from '../views/Authentication/LoginPatient.vue';
+import RegisterPatient from '../views/Authentication/RegisterPatient.vue';
+
 import HomeRole from '../views/HomeRole.vue';
 
 
@@ -15,18 +21,38 @@ const history = createWebHistory(`${import.meta.env.VITE_BASE_URL}`)
 const routes = [
 
  
-  
+  /* login-register พยาบาล */
   {
-    path: '/login',
-    name: 'login',
-    component: Login,
+    path: '/login/nurse',
+    name: 'loginNurse',
+    component:  LoginNurse ,
   },
 
   {
-    path: '/register',
-    name: 'register',
-    component: Register,
+    path: '/register/nurse',
+    name: 'registerNurse',
+    component: RegisterNurse,
   },
+
+ /* login-register ผู้ป่วย */
+  {
+    path: '/login/patient',
+    name: 'loginPatient',
+    component:  LoginPatient ,
+  },
+
+  {
+    path: '/register/patient',
+    name: 'registerPatient',
+    component: RegisterPatient,
+  },
+
+
+
+
+
+
+
 
   {
     path: '/',
