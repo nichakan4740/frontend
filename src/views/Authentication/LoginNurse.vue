@@ -4,12 +4,11 @@ import { ref ,onBeforeMount} from "vue";
 import Swal from "sweetalert2";
 
 
-
 const professional_id = ref("");
 const password = ref("");
-
 const loginnurse = async (professional_id, password) => {
   const res = await fetch(`${import.meta.env.VITE_BASE_URL}api/nurse/login`, {
+    
     method: "POST",
     headers: {
       'Content-type': 'application/json',
@@ -20,24 +19,24 @@ const loginnurse = async (professional_id, password) => {
     }),
   })
 
-  const jwt = await res.json()
-  localStorage.setItem('professional_id', jwt.name)
-  localStorage.setItem('accesstoken', jwt.accessToken)
-  localStorage.setItem('refreshtoken', jwt.refreshToken)
-   
   if (res.status === 200) {
-    Swal.fire({
+  const response = await res.json()
+  localStorage.setItem('professional_id', response.user.professional_id)
+/*   localStorage.setItem('accesstoken', jwt.accessToken)
+  localStorage.setItem('refreshtoken', jwt.refreshToken) */
+        console.log(response)
+        Swal.fire({
         icon: 'success',
         title: 'You login success!',
         showConfirmButton: false,
       })
     setTimeout(function () {
-      location.reload()
     }, 1000); 
     close();
- 
     console.log("You login success");
+
   }
+
   if (res.status === 404) {
     Swal.fire({
       icon: "error",
@@ -57,6 +56,9 @@ const loginnurse = async (professional_id, password) => {
 };
 
 const appRouter = useRouter();
+const close = () => appRouter.push({ name: "home" });
+
+
 </script>
 
 <template>
@@ -114,10 +116,9 @@ const appRouter = useRouter();
                   </div>
 
                 <div>
-                     <button 
+                     <div
                      @click="loginnurse(professional_id, password)"
-                     type="submit" 
-                     class=" block w-full bg-blue-900 hover:bg-blue-800 text-white font-bold py-2 px-4 mb-4 border rounded">เข้าสู่ระบบ</button>
+                     class=" block w-full bg-blue-900 hover:bg-blue-800 text-white font-bold py-2 px-4 mb-4 border rounded">เข้าสู่ระบบ</div>
                 </div>
                 
     <div class="text-center">

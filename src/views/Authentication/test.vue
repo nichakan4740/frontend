@@ -1,65 +1,45 @@
-
-
- <script setup>
+<script setup>
 import { useRouter } from "vue-router";
 import Swal from "sweetalert2";
-import { ref ,onBeforeMount} from "vue";
-const email = ref("");
-const password = ref("");
+import Createevent from "../components/createevent.vue";
+import { ref } from "vue";
 
-const login = async (email, password) => {
-  const res = await fetch(`${import.meta.env.VITE_BASE_URL}api/login`, {
+const name = ref("");
+const email = ref("");
+const role = ref("student");
+const password = ref("");
+const passwordcheck = ref("");
+
+const adduser = async (name, email, role, password) => {
+  // if (confirm("Please check you password") == true) {
+  const res = await fetch(`${import.meta.env.VITE_BASE_URL}api/users/signup`, {
     method: "POST",
     headers: {
-      'Content-type': 'application/json',
+      "content-type": "application/json",
     },
     body: JSON.stringify({
+      name: name,
       email: email,
-      password: password
+      role: role,
+      password: password,
     }),
-  })
-
-  const jwt = await res.json()
-  localStorage.setItem('username', jwt.username)
-  // localStorage.setItem('email', jwt.email)
-  localStorage.setItem('role', jwt.role)
-  localStorage.setItem('accesstoken', jwt.accessToken)
-  localStorage.setItem('refreshtoken', jwt.refreshToken)
-   
+  });
   if (res.status === 200) {
-    Swal.fire({
-        icon: 'success',
-        title: 'You login success!',
-        showConfirmButton: false,
-      })
+    Swal.fire("DONE !!!", "You add user success!", "success");
     setTimeout(function () {
-      location.reload()
-    }, 1000); 
-    close();
- 
-    console.log("You login success");
-  }
-  if (res.status === 404) {
+      close();
+    }, 1500);
+    console.log("You add user success");
+  } else {
+    console.log("error,cannot add");
     Swal.fire({
       icon: "error",
       title: "Sorry !!!",
-      text: "Email dose not exist!",
+      text: "Cannot add user!",
     });
-    console.log("Email dose not exist");
   }
-  if (res.status === 401) {
-    Swal.fire({
-      icon: "error",
-      title: "Sorry !!!",
-      text: "Incorrect password!",
-    });
-    console.log("Password Not Matched");
-  }
+  // }
 };
-
-
-
-
 
 const validation = () => {
   let email = document.getElementById("email").value;
@@ -78,23 +58,49 @@ const validation = () => {
   }
 };
 
+const checkmatch = () => {
+  const pass = password;
+  const passcheck = passwordcheck;
+  if (pass.value === passcheck.value) {
+    document.getElementById("password").style.backgroundColor = "#e9f7e3";
+    document.getElementById("passwordcheck").style.backgroundColor = "#e9f7e3";
+  }
+  else {
+    document.getElementById("password").style.backgroundColor = "#fae2e0";
+    document.getElementById("passwordcheck").style.backgroundColor = "#fae2e0";
+  }
+};
+
 const cleartext = () => {
-  (email.value = ""), (password.value = ""), (passwordcheck.value = "");
+  (name.value = ""),
+    (email.value = ""),
+    (password.value = ""),
+    (passwordcheck.value = "");
   form.classList.remove("valid");
   form.classList.remove("invalid");
   document.getElementById("password").style.backgroundColor = "white";
   document.getElementById("passwordcheck").style.backgroundColor = "white";
 };
 
+
+
+const checkinputpassword = (pass,passcheck) => {
+  if (pass.length === 0) {
+    password.value = null;
+    alert("password is not null")
+  }
+  if (pass.length < 7) {
+    password.value = null;
+    alert("Password must not be less than 7 characters")
+  }
+  if (passcheck != pass){
+    password.value = null;
+    alert("password is not match");
+  }
+};
+
 const appRouter = useRouter();
 const close = () => appRouter.push({ name: "home" });
-const register = () => appRouter.push({ name: "adduser" });
-
-// const clearpassword = () => {
-//   (password.value = ""), (passwordcheck.value = "")
-//   document.getElementById("password").style.backgroundColor="white"
-//   document.getElementById("passwordcheck").style.backgroundColor="white";
-// };
 </script>
 
 <template>
@@ -251,27 +257,78 @@ const register = () => appRouter.push({ name: "adduser" });
     <div class="modal-wrapper">
       <div class="modal-container">
         <div class="modal-header border-bottom-0">
-          <h2 class="modal-title"><b>Sign-in to OASIP !</b></h2>
+          <h2 class="modal-title"><b>Sign-up to OASIP !</b></h2>
+          <!-- <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+            @click="close"
+          ></button> -->
         </div>
         <hr />
-
         <div class="modal-body">
           <div class="bg-light p-3 rounded">
+            <p class="text">
+              Name &nbsp;
+              <span style="font-size: 10px; color: rgb(177, 109, 241)">
+                ( Characters must not exceed 100 )
+              </span>
+            </p>
+            <input
+              type="text"
+              class="form-control"
+              v-model.trim="name"
+              maxlength="100"
+            />
+
+            <div>
+              <p v-if="name.length" class="input-count" id="count">
+                {{ name.length }}/100
+              </p>
+            </div>
+
+            <div>
+              <p v-show="name.length < 1" id="checkname">
+                * Please input your name <span></span>
+              </p>
+              <p v-show="name.length > 100" id="checkname">
+                * Characters must not exceed 100
+              </p>
+            </div>
+          </div>
+          <br />
+
+          <div class="bg-light p-3 rounded">
             <p class="text">Email</p>
-           
-           <form action="#" id="form">
+            <form action="#" id="form">
               <div class="input-box">
                 <input
                   type="email"
                   id="email"
                   class="form-control"
-                  placeholder="Enter your email"
+                  placeholder="Ex. kw2@kmutt.ac.th"
                   v-on:keydown="validation"
                   v-model.trim="email"
                 />
+                <p v-show="email < 1" id="checkname">
+                  * Please input your Email
+                </p>
               </div>
             </form>
           </div>
+          <br />
+
+          <div class="bg-light p-3 rounded">
+            <p class="text">Role</p>
+            <select class="form-select" v-model="role">
+              <option value="student">Student</option>
+              <option value="lecturer">Lecturer</option>
+              <option value="admin">Admin</option>
+            </select>
+            <p v-show="role.length < 1" id="checkname">* Please select role</p>
+          </div>
+
           <br />
 
           <div class="bg-light p-3 rounded">
@@ -281,23 +338,57 @@ const register = () => appRouter.push({ name: "adduser" });
               class="form-control"
               name="password"
               id="password"
-              placeholder="Enter your password"
               v-model="password"
               maxlength="14"
               minlength="7"
             />
-          </div><br>
-          &nbsp;&nbsp;&nbsp;<span style="font-size: 12px; color: rgba(70, 70, 70, 0.555)">Don't have an account? &nbsp;
-            <a style="font-size: 12px; color: rgb(58, 2, 122); font-weight: 700;" @click="register">Sign Up</a></span>
-          
+            <p v-if="password" class="input-count" id="count">
+              {{ password.length }}/14
+            </p>
+
+            <p v-show="password.length < 7" id="checkname">
+              * Password must not be less than 7 characters
+            </p>
+            <p v-show="password.length > 14" id="checkname">
+              * Password must not be more than 14 characters
+            </p>
+          </div>
+          <br />
+          <div class="bg-light p-3 rounded" v-show="password.length >= 1">
+            <p class="text">Please Confirm Password &nbsp;</p>
+            <input
+              type="password"
+              class="form-control"
+              name="passwordcheck"
+              id="passwordcheck"
+              v-model="passwordcheck"
+              maxlength="14"
+              minlength="7"
+              v-on:keyup="checkmatch"
+            />
+            <p v-if="passwordcheck" class="input-count" id="count">
+              {{ passwordcheck.length }}/14
+            </p>
+
+            <p v-show="passwordcheck.length < 7" id="checkname">
+              * Password must not be less than 7 characters
+            </p>
+            <p v-show="passwordcheck.length > 14" id="checkname">
+              * Password must not be more than 14 characters
+            </p>
+          </div>
         </div>
+
         <div class="modal-footer">
           <div class="clearbooking" @click="cleartext">Clear</div>
           &nbsp;
 
-          <div class="adduser" @click="login(email, password)" >Sign in</div>
-        
-        
+          <div
+            class="adduser"
+            @click="checkinputpassword(password,passwordcheck),adduser(name, email, role, password)"
+          >
+            Sign Up
+          </div>
         </div>
       </div>
     </div>
@@ -349,10 +440,9 @@ const register = () => appRouter.push({ name: "adduser" });
 .modal-body {
   margin: 20px 0;
 }
-
 .modal-button {
   display: flex;
-  /* justify-content: end; */
+  justify-content: end;
 }
 
 .text {

@@ -48,12 +48,6 @@ const routes = [
   },
 
 
-
-
-
-
-
-
   {
     path: '/',
     name: 'homerole',
@@ -80,9 +74,6 @@ const routes = [
     name: 'SugarValue',
     component: SugarValue,
   },
- 
- 
- 
  
 
 ]
