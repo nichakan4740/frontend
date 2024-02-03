@@ -22,8 +22,8 @@ const loginnurse = async (professional_id, password) => {
   if (res.status === 200) {
   const response = await res.json()
   localStorage.setItem('professional_id', response.user.professional_id)
-/*   localStorage.setItem('accesstoken', jwt.accessToken)
-  localStorage.setItem('refreshtoken', jwt.refreshToken) */
+  localStorage.setItem('accesstoken',response.authorisation.token)
+ /* localStorage.setItem('refreshtoken', jwt.refreshToken) */
         console.log(response)
         Swal.fire({
         icon: 'success',
@@ -116,9 +116,9 @@ const close = () => appRouter.push({ name: "home" });
                   </div>
 
                 <div>
-                     <div
+                     <button 
                      @click="loginnurse(professional_id, password)"
-                     class=" block w-full bg-blue-900 hover:bg-blue-800 text-white font-bold py-2 px-4 mb-4 border rounded">เข้าสู่ระบบ</div>
+                     class=" block w-full bg-blue-900 hover:bg-blue-800 text-white font-bold py-2 px-4 mb-4 border rounded">เข้าสู่ระบบ</button>
                 </div>
                 
     <div class="text-center">
