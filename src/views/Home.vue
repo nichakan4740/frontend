@@ -156,7 +156,7 @@ const logout = () => {
 };
 
 const appRouter = useRouter();
-const  backloginnurse = () => appRouter.push({ name: "loginNurse" });
+const  backloginnurse = () => appRouter.push({ name: "homerole" });
 
 
 </script>
