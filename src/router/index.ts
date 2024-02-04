@@ -16,6 +16,7 @@ import RegisterPatient from '../views/Authentication/RegisterPatient.vue';
 import HomeRole from '../views/HomeRole.vue';
 
 
+
 const history = createWebHistory(`${import.meta.env.VITE_BASE_URL}`)
 
 const routes = [
@@ -53,6 +54,7 @@ const routes = [
     name: 'homerole',
     component: HomeRole,
   },
+
 
   {
     path: '/home',
