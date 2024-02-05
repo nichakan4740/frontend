@@ -103,7 +103,7 @@ const toggle = () => {
                             fill="#A8B4CD"
                         />
                     </svg>
-                    <span class="text-slate-300">ความรู้</span>
+                    <router-link  :to="{ name: 'knowledge' }" class="text-slate-300">สาระความรู้</router-link>
                 </a>
                 <!-- ------------------------------------------------------------------------------- -->
                 <a
