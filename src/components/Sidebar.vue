@@ -9,6 +9,7 @@ const toggle = () => {
     open.value = !open.value;
 };
 
+// เพิ่ม pusher
 const pusherScript = document.createElement('script');
 pusherScript.src = 'https://js.pusher.com/8.2.0/pusher.min.js';
 document.head.appendChild(pusherScript);
