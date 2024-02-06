@@ -3,17 +3,17 @@ import { useRouter } from "vue-router";
 import { ref, onBeforeMount } from "vue";
 import Swal from "sweetalert2";
 
-const idcard = ref("");
-const password = ref("");
-const loginpatient = async (idcard, password) => {
+const idcard = ref('');
+const password = ref('');
+const loginpatient = async () => {
   const res = await fetch(`${import.meta.env.VITE_BASE_URL}api/patient/login`, {
     method: "POST",
     headers: {
       "Content-type": "application/json",
     },
     body: JSON.stringify({
-      idcard: idcard,
-      password: password,
+      idcard: idcard.value,
+      password: password.value,
     }),
   });
 
@@ -28,12 +28,11 @@ const loginpatient = async (idcard, password) => {
       title: "เข้าสู่ระบบสำเร็จ!",
       showConfirmButton: false,
     });
-    /*  setTimeout(function () {
-    }, 500);  */
-    close();
-    console.log("You login success");
+     setTimeout(() => {
+      close();
+      console.log("You login success");
+    }, 1000); 
   }
-
   if (res.status === 404) {
     Swal.fire({
       icon: "error",
@@ -109,7 +108,7 @@ const close = () => appRouter.push({ name: "home" });
 
             <div>
               <button
-                @click="loginpatient(idcard, password)"
+                  @click.prevent="loginpatient"
                 class="block w-full bg-blue-900 hover:bg-blue-800 text-white font-bold py-2 px-4 mb-4 border rounded"
               >
                 เข้าสู่ระบบ
