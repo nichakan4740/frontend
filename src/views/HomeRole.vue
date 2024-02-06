@@ -1,13 +1,13 @@
 <script setup>
 import { useRouter } from "vue-router";
 import { ref } from "vue";
-/* import Header from '../layouts/Header.vue'; */
+import Header from '../layouts/Header.vue';
 </script>
 
 <template>
 
   <div class="bg-white">
-<!--  <Header></Header> -->
+ <Header></Header>
     <div class="relative isolate px-6 pt-14 lg:px-8">
       <div
         class="absolute inset-x-0 -top-40 -z-10 transform-gpu overflow-hidden blur-3xl sm:-top-80"
@@ -48,7 +48,7 @@ import { ref } from "vue";
             Tele-Nursing System  ระบบพยาบาลทางไกล
           </h1>
           <p class="mt-6 text-lg leading-8 text-gray-600">
-            โปรดเลือกเข้าสู่ระบบหรือลงทะเบียน
+            โปรดเลือกงาน
           </p>
           <div class="mt-10 flex items-center justify-center gap-x-6">
          

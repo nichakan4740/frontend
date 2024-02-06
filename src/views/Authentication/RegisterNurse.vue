@@ -3,24 +3,21 @@ import { useRouter } from "vue-router";
 import { ref } from "vue";
 import Swal from "sweetalert2";
 
-
-/* 
 const name = ref("");
 const professional_id = ref("");
 const password = ref("");
 const passwordcheck = ref("");
 
-const registernurse = async (name, professional_id , password) => {
-  // if (confirm("Please check you password") == true) {
+const registernurse = async () => {
   const res = await fetch(`${import.meta.env.VITE_BASE_URL}api/nurse/register`, {
     method: "POST",
     headers: {
       "content-type": "application/json",
     },
     body: JSON.stringify({
-      name: name,
-      professional_id: professional_id,
-      password: password,
+      name: name.value,
+      professional_id: professional_id.value,
+      password: password.value,
     }),
   });
   if (res.status === 200) {
@@ -37,42 +34,42 @@ const registernurse = async (name, professional_id , password) => {
       text: "ไม่สามารถสร้างบัญชีได้ โปรดตรวจสอบความถูกต้อง!",
     });
   }
-  
 };
 
 const checkmatch = () => {
-  const pass = password;
-  const passcheck = passwordcheck;
-  if (pass.value === passcheck.value) {
+  const pass = password.value;
+  const passcheck = passwordcheck.value;
+  if (pass === passcheck) {
     document.getElementById("password").style.backgroundColor = "#e9f7e3";
     document.getElementById("passwordcheck").style.backgroundColor = "#e9f7e3";
-  }
-  else {
+  } else {
     document.getElementById("password").style.backgroundColor = "#fae2e0";
     document.getElementById("passwordcheck").style.backgroundColor = "#fae2e0";
   }
 };
 
-const checkinputpassword = (pass,passcheck) => {
+const checkinputpassword = () => {
+  const pass = password.value;
+  const passcheck = passwordcheck.value;
   if (pass.length === 0) {
     password.value = null;
-    alert("โปรดใส่รหัสผ่าน")
+    Swal.fire("โปรดใส่รหัสผ่าน");
   }
   if (pass.length < 8) {
     password.value = null;
-    alert("รหัสผ่านต้องมีความยาวมากกว่า 8 ตัวอักษร")
+    Swal.fire("รหัสผ่านต้องมีความยาวมากกว่า 8 ตัวอักษร");
   }
-  if (passcheck != pass){
+  if (passcheck !== pass) {
     password.value = null;
-    alert("รหัสผ่านไม่ตรงกัน");
+    Swal.fire("รหัสผ่านไม่ตรงกัน");
   }
 };
 
 const appRouter = useRouter();
-const close = () => appRouter.push({ name: "home" }); */
+const close = () => appRouter.push({ name: "loginNurse" });
 
 </script>
- 
+
 <template>
  <div class="container mx-auto">
   <div class="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
@@ -102,20 +99,21 @@ const close = () => appRouter.push({ name: "home" }); */
                       </p>
                        <p v-show="name.length < 1" >
                       * Please input your name <span></span>
-               </p>
-               <p v-show="name.length > 100" >
-                * Characters must not exceed 100
-              </p>
+                       </p>
+                      <p v-show="name.length > 100" >
+                      * Characters must not exceed 100
+                      </p>
 
                   </div>
 
                   
 
-                  <div>
+                    <div>
                       <label 
                       class="block mb-2 text-sm font-medium text-gray-900">เลขใบประกอบวิชาชีพ</label>
                       <input 
-                      v-model="professional_id"
+                      type="text"
+                      v-model.trim="professional_id"
                       placeholder="xxxxxxxx" 
                       maxlength="11"
                       class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:placeholder-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500"
@@ -125,13 +123,15 @@ const close = () => appRouter.push({ name: "home" }); */
                       </p>
                        <p v-show="professional_id.length < 1" >
                       * Please input your professional_id  <span></span>
-               </p>
-               <p v-show="professional_id.length > 100" >
-                * Characters must not exceed 11
-              </p>
-                  </div>
+                      </p>
+                      <p v-show="professional_id.length > 100" >
+                      * Characters must not exceed 11
+                      </p>
+                      </div>
 
-                  <div>
+
+
+                      <div>
                       <label  
                       class="block mb-2 text-sm font-medium text-gray-900">รหัสผ่าน</label>
                       <input 
@@ -139,55 +139,48 @@ const close = () => appRouter.push({ name: "home" }); */
                       class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:placeholder-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500"
                       type="password"
                       name="password"
-                      v-model="password"
+                      v-model.trim="password"
                       maxlength="14"
                       minlength="8"
                       >
                       <p v-if="password" class="input-count" id="count">
-              {{ password.length }}/14
-            </p>
+                      {{ password.length }}/14
+                      </p>
 
-            <p v-show="password.length < 8" id="checkname">
-              * Password must not be less than 8 characters
-            </p>
-            <p v-show="password.length > 14" id="checkname">
-              * Password must not be more than 14 characters
-            </p>
-                  </div>
+                      <p v-show="password.length < 8" id="checkname">
+                       * Password must not be less than 8 characters
+                      </p>
+                      <p v-show="password.length > 14" id="checkname">
+                      * Password must not be more than 14 characters
+                      </p>
+                      </div>
 
 
                   <div v-show="password.length >= 1">
                       <label 
                       class="block mb-2 text-sm font-medium text-gray-900">ยืยยันรหัสผ่าน</label>
-                      <input 
-                      placeholder="xxxxxxxx" 
-                      class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:placeholder-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                      type="password"
-                      name="passwordcheck"
-                      v-model="passwordcheck"
-                      maxlength="14"
-                      minlength="8"
-                      v-on:keyup="checkmatch"
+                     <input 
+                     placeholder="xxxxxxxx" 
+                     class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:placeholder-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                     type="password"
+                     name="passwordcheck"
+                     v-model="passwordcheck"
+                     maxlength="14"
+                     minlength="8"
+                     @keyup="checkmatch"
+                     @blur="checkinputpassword"
                       >
-                       <p v-if="passwordcheck" class="input-count" id="count">
-                     {{ passwordcheck.length }}/14
-                      </p>
-
-                   <p v-show="passwordcheck.length < 8" id="checkname">
-                   * Password must not be less than 8  characters
-                    </p>
-                   <p v-show="passwordcheck.length > 14" id="checkname">
-                   * Password must not be more than 14 characters
-                   </p>
-                  </div>
+                     <p v-if="passwordcheck" class="input-count">{{ passwordcheck.length }}/14</p>
+                     <p v-show="passwordcheck.length < 8" class="checkname">* Password must be at least 8 characters long</p>
+                     <p v-show="passwordcheck.length > 14" class="checkname">* Password must not exceed 14 characters</p>
+                     </div>
 
                 
 
 
-
                   <button
                    class="block w-full bg-blue-900 hover:bg-blue-800 text-white font-bold py-2 px-4 mb-4 border rounded"
-                    @click="registernurse (name, professional_id, password)"
+                    @click.prevent="registernurse"
                    >
                    
                  สร้างบัญชี
