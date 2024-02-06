@@ -8,7 +8,34 @@ const right = ref(false); */
 const toggle = () => {
     open.value = !open.value;
 };
+
+const pusherScript = document.createElement('script');
+pusherScript.src = 'https://js.pusher.com/8.2.0/pusher.min.js';
+document.head.appendChild(pusherScript);
+
+// Pusher initialization code
+pusherScript.onload = () => {
+  window.Pusher.logToConsole = true;
+  var pusher = new window.Pusher('d0537e1c7c0b105eaa20', {
+    cluster: 'ap1'
+  });
+  var channel = pusher.subscribe('user-milk');
+  channel.bind('my-event', function(data) {
+    // Assuming `app` is defined somewhere else
+    alert('my-event')
+  });
+  channel.bind('live-chat', function(data) {
+    // Assuming `app` is defined somewhere else
+    alert('live-chat'+data.message)
+  });
+};
+ 
 </script>
+
+
+
+
+
 <template>
     <div class="relative flex h-screen  sticky top-0">
         <!-- Sidebar -->

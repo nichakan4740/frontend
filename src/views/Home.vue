@@ -159,6 +159,17 @@ const appRouter = useRouter();
 const  backloginnurse = () => appRouter.push({ name: "homerole" });
 
 
+
+// ฟังก์ชันสำหรับการ logout ของ ผู้ป่วย
+const logoutpatient = () => {
+  // ลบ JWT จาก localStorage หรือตำแหน่งที่คุณเก็บ token
+  localStorage.removeItem('idcard');
+  localStorage.removeItem('accesstoken');
+  backloginpatient()
+};
+const  backloginpatient = () => appRouter.push({ name: "homerole" });
+
+
 </script>
 
 <template >
@@ -228,6 +239,12 @@ const  backloginnurse = () => appRouter.push({ name: "homerole" });
    <button @click="logout"  class="box-content p-3  ml-5 mr-5 mt-10 bg-gradient-to-b from-blue-900 to-blue-800  shadow-lg shadow-slate-500/50  rounded-lg">
             <h2 class="font-semibold text-xl text-center text-slate-200 ">ออก</h2>
     </button>
+
+
+     <button @click="  logoutpatient"  class="box-content p-3  ml-5 mr-5 mt-10 bg-gradient-to-b from-blue-900 to-blue-800  shadow-lg shadow-slate-500/50  rounded-lg">
+            <h2 class="font-semibold text-xl text-center text-slate-200 ">ออก ผู้ป่วย</h2>
+    </button>
+  
                
     </Layout>
 

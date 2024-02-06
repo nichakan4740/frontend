@@ -3,17 +3,17 @@ import { useRouter } from "vue-router";
 import { ref, onBeforeMount } from "vue";
 import Swal from "sweetalert2";
 
-const professional_id = ref("");
-const password = ref("");
-const loginnurse = async (professional_id, password) => {
+const professional_id = ref('');
+const password = ref('');
+const loginnurse = async () => {
   const res = await fetch(`${import.meta.env.VITE_BASE_URL}api/nurse/login`, {
     method: "POST",
     headers: {
       "Content-type": "application/json",
     },
     body: JSON.stringify({
-      professional_id: professional_id,
-      password: password,
+      professional_id: professional_id.value,
+      password: password.value,
     }),
   });
 
@@ -28,10 +28,10 @@ const loginnurse = async (professional_id, password) => {
       title: "เข้าสู่ระบบสำเร็จ!",
       showConfirmButton: false,
     });
-    /*  setTimeout(function () {
-    }, 500);  */
-    close();
-    console.log("You login success");
+    setTimeout(() => {
+      close();
+      console.log("You login success");
+    }, 1000); 
   }
 
   if (res.status === 404) {
@@ -78,7 +78,7 @@ const close = () => appRouter.push({ name: "home" });
                 >เลขใบประกอบวิชาชีพพยาบาล</label
               >
               <input
-                type="professional_id"
+                type="text"
                 name="professional_id"
                 id="professional_id"
                 class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:placeholder-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500"
@@ -109,7 +109,7 @@ const close = () => appRouter.push({ name: "home" });
 
             <div>
               <button
-                @click="loginnurse(professional_id, password)"
+                @click.prevent="loginnurse"
                 class="block w-full bg-blue-900 hover:bg-blue-800 text-white font-bold py-2 px-4 mb-4 border rounded"
               >
                 เข้าสู่ระบบ
