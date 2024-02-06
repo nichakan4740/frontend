@@ -4,7 +4,7 @@ import { ref } from "vue";
 import Swal from "sweetalert2";
 
 
-
+/* 
 const name = ref("");
 const professional_id = ref("");
 const password = ref("");
@@ -69,7 +69,7 @@ const checkinputpassword = (pass,passcheck) => {
 };
 
 const appRouter = useRouter();
-const close = () => appRouter.push({ name: "home" });
+const close = () => appRouter.push({ name: "home" }); */
 
 </script>
  
