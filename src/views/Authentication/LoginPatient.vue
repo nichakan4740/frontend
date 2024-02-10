@@ -20,6 +20,7 @@ const loginpatient = async () => {
   if (res.status === 200) {
     const response = await res.json();
     localStorage.setItem("idcard", response.user.idcard);
+    localStorage.setItem("iduser", response.user.id);
     localStorage.setItem("accesstoken", response.authorisation.token);
     /* localStorage.setItem('refreshtoken', jwt.refreshToken) */
     console.log(response);

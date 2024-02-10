@@ -35,9 +35,13 @@ const mysugar = ref({
 
 const MysugarLoad = async () => {
   try {
+    const user_id = localStorage.getItem('iduser');
     const response = await fetch(`${import.meta.env.VITE_BASE_URL}api/mysugar`);
     const data = await response.json();
-    result.value = data;
+
+    // เพิ่ม user_id เข้าไปในข้อมูลที่โหลดมา
+    result.value = data.map(item => ({ ...item, user_id }));
+
   } catch (error) {
     console.error('Error fetching data:', error);
   }
@@ -54,7 +58,7 @@ const save = async () => {
 
 const router = useRouter();
 
-
+/* 
 const saveData = async () => {
   try {
    const response = await fetch(`${import.meta.env.VITE_BASE_URL}api/mysugar`, 
@@ -85,6 +89,41 @@ const saveData = async () => {
   }
 };
 
+ */
+const saveData = async () => {
+  try {
+    // ดึง user_id จาก Local Storage
+    const user_id = localStorage.getItem('iduser');
+
+    const dataToSend = {
+      ...mysugar.value,
+      user_id: user_id // เพิ่ม user_id เข้าไปในข้อมูลที่จะส่ง
+    };
+
+    const response = await fetch(`${import.meta.env.VITE_BASE_URL}api/mysugar`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(dataToSend),
+    });
+    if (response.ok) {
+      await Swal.fire({
+        position: 'center',
+        icon: 'success',
+        title: 'บันทึกค่าน้ำตาลเรียบร้อย',
+        showConfirmButton: false,
+        timer: 1500
+      });
+      await MysugarLoad();
+      navigateToSugarValue(mysugar.value.sugarValue);
+    } else {
+      throw new Error('Failed to save');
+    }
+  } catch (error) {
+    console.error('Error saving data:', error);
+  }
+};
 
 
 // ทำการนำทางไปยังหน้า SugarValue
@@ -103,7 +142,7 @@ const navigateToSugarValue = (sugarValue) => {
 const edit = (record) => {
   mysugar.value = { ...record };
 };
-
+/* 
 const updateData = async () => {
   try {
     const editrecords = `${import.meta.env.VITE_BASE_URL}api/mysugar/${mysugar.value.id}`;
@@ -127,7 +166,40 @@ const updateData = async () => {
   } catch (error) {
     console.error('Error updating data:', error);
   }
+}; */
+const updateData = async () => {
+  try {
+    // ดึง user_id จาก Local Storage
+    const user_id = localStorage.getItem('iduser');
+
+    const editrecords = `${import.meta.env.VITE_BASE_URL}api/mysugar/${mysugar.value.id}`;
+    const dataToSend = {
+      ...mysugar.value,
+      user_id: user_id // เพิ่ม user_id เข้าไปในข้อมูลที่จะส่ง
+    };
+
+    const response = await fetch(editrecords, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(dataToSend),
+    });
+    if (response.ok) {
+      alert('Updated!!!');
+      await MysugarLoad();
+      mysugar.value.sugarValue = '';
+      mysugar.value.symptom = '';
+      mysugar.value.note = '';
+      mysugar.value.id = '';
+    } else {
+      throw new Error('Failed to update');
+    }
+  } catch (error) {
+    console.error('Error updating data:', error);
+  }
 };
+
 
 const remove = async (record) => {
   try {

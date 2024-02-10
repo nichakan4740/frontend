@@ -50,12 +50,16 @@ const getDateDetails = () => {
 };
 
 const result = ref([]);
+
 const mysugar = ref({
   id: "",
   sugarValue: "",
   symptom: "",
   note: "",
 });
+
+
+
 
 const MysugarLoad = async () => {
   try {
@@ -76,8 +80,37 @@ const save = async () => {
   }
 };
 
+/* const saveData = async () => {
+  try {
+    const response = await fetch(
+     `${import.meta.env.VITE_BASE_URL}api/mysugar`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(mysugar.value),
+      }
+    );
+    if (response.ok) {
+      alert("Saved");
+      await MysugarLoad();
+      mysugar.value.id = "";
+      mysugar.value.sugarValue = "";
+      mysugar.value.symptom = "";
+      mysugar.value.note = "";
+    } else {
+      throw new Error("Failed to save");
+    }
+  } catch (error) {
+    console.error("Error saving data:", error);
+  }
+}; */
 const saveData = async () => {
   try {
+    const iduser = localStorage.getItem('iduser'); // ดึงข้อมูล user_id จาก local storage
+    mysugar.value.iduser = iduser; // เพิ่มข้อมูล user_id ใน mysugar
+
     const response = await fetch(
      `${import.meta.env.VITE_BASE_URL}api/mysugar`,
       {
@@ -103,12 +136,13 @@ const saveData = async () => {
   }
 };
 
+
 /* --------------------------------------------------------------------------------------------------- */
 const edit = (record) => {
   mysugar.value = { ...record };
   openModal();
 };
-
+/* 
 const updateData = async () => {
   try {
     const editrecords = `${import.meta.env.VITE_BASE_URL}api/mysugar/${
@@ -143,7 +177,46 @@ const updateData = async () => {
   } catch (error) {
     console.error("Error deleting data:", error);
   }
+}; */
+const updateData = async () => {
+  try {
+    const iduser = localStorage.getItem('iduser'); // ดึงข้อมูล user_id จาก local storage
+    mysugar.value.iduser = iduser; // เพิ่มข้อมูล user_id ใน mysugar
+
+    const editrecords = `${import.meta.env.VITE_BASE_URL}api/mysugar/${
+      mysugar.value.id
+    }`;
+    // Display confirmation dialog using Swal
+    const confirmationResult = await Swal.fire({
+      title: "คุณแน่ใจหรือไหม",
+      text: "คุณต้องการที่จะแก้ไขการบันทึกค่าน้ำตาล",
+      icon: "warning",
+      confirmButtonText: "ใช่ ,แก้ไขมัน",
+      cancelButtonText: "ยกเลิก",
+      showCancelButton: true,
+      showCloseButton: true
+    });
+
+    if (confirmationResult.isConfirmed) {
+      const response = await fetch(editrecords, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(mysugar.value),
+      });
+
+      if (response.ok) {
+        await MysugarLoad();
+      } else {
+        throw new Error("Failed to delete");
+      }
+    }
+  } catch (error) {
+    console.error("Error deleting data:", error);
+  }
 };
+
 
 /* --------------------------------------------------------------------------------------------------- */
 /* ลบ */
