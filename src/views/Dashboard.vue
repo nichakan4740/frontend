@@ -1,9 +1,10 @@
 <script setup>
 import { useRouter } from "vue-router";
-import { ref, onBeforeMount, computed } from "vue";
+import { ref, onBeforeMount, computed, onMounted } from "vue";
 import Layout from "../layouts/Layout.vue";
 import moment from "moment";
 import Swal from "sweetalert2";
+
 
 /* date-time */
 const selectedDate = ref("");
@@ -49,8 +50,8 @@ const getDateDetails = () => {
   }
 };
 
-const result = ref([]);
 
+const result = ref([]);
 const mysugar = ref({
   id: "",
   sugarValue: "",
@@ -59,19 +60,25 @@ const mysugar = ref({
 });
 
 
-
-
-const MysugarLoad = async () => {
+/* --------------------------------------------------------------------------------------------------- */
+ const MysugarLoad = async () => {
   try {
     const response = await fetch(`${import.meta.env.VITE_BASE_URL}api/mysugar`);
     const data = await response.json();
-    result.value = data;
+    result.value = data
   } catch (error) {
     console.error("Error fetching data:", error);
   }
-};
+}; 
 
-/* --------------------------------------------------------------------------------------------------- */
+
+
+/* ------------------------------------------------------------------------------------------------ */
+
+
+
+
+/* ------------------------------------------------------------------------------------------------ */
 const save = async () => {
   if (mysugar.value.id === "") {
     await saveData();
@@ -80,37 +87,10 @@ const save = async () => {
   }
 };
 
-/* const saveData = async () => {
-  try {
-    const response = await fetch(
-     `${import.meta.env.VITE_BASE_URL}api/mysugar`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(mysugar.value),
-      }
-    );
-    if (response.ok) {
-      alert("Saved");
-      await MysugarLoad();
-      mysugar.value.id = "";
-      mysugar.value.sugarValue = "";
-      mysugar.value.symptom = "";
-      mysugar.value.note = "";
-    } else {
-      throw new Error("Failed to save");
-    }
-  } catch (error) {
-    console.error("Error saving data:", error);
-  }
-}; */
+
+/* ------------------------------------------------------------------------------------------------ */
 const saveData = async () => {
   try {
-    const iduser = localStorage.getItem('iduser'); // ดึงข้อมูล user_id จาก local storage
-    mysugar.value.iduser = iduser; // เพิ่มข้อมูล user_id ใน mysugar
-
     const response = await fetch(
      `${import.meta.env.VITE_BASE_URL}api/mysugar`,
       {
@@ -142,7 +122,7 @@ const edit = (record) => {
   mysugar.value = { ...record };
   openModal();
 };
-/* 
+
 const updateData = async () => {
   try {
     const editrecords = `${import.meta.env.VITE_BASE_URL}api/mysugar/${
@@ -177,46 +157,7 @@ const updateData = async () => {
   } catch (error) {
     console.error("Error deleting data:", error);
   }
-}; */
-const updateData = async () => {
-  try {
-    const iduser = localStorage.getItem('iduser'); // ดึงข้อมูล user_id จาก local storage
-    mysugar.value.iduser = iduser; // เพิ่มข้อมูล user_id ใน mysugar
-
-    const editrecords = `${import.meta.env.VITE_BASE_URL}api/mysugar/${
-      mysugar.value.id
-    }`;
-    // Display confirmation dialog using Swal
-    const confirmationResult = await Swal.fire({
-      title: "คุณแน่ใจหรือไหม",
-      text: "คุณต้องการที่จะแก้ไขการบันทึกค่าน้ำตาล",
-      icon: "warning",
-      confirmButtonText: "ใช่ ,แก้ไขมัน",
-      cancelButtonText: "ยกเลิก",
-      showCancelButton: true,
-      showCloseButton: true
-    });
-
-    if (confirmationResult.isConfirmed) {
-      const response = await fetch(editrecords, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(mysugar.value),
-      });
-
-      if (response.ok) {
-        await MysugarLoad();
-      } else {
-        throw new Error("Failed to delete");
-      }
-    }
-  } catch (error) {
-    console.error("Error deleting data:", error);
-  }
-};
-
+}
 
 /* --------------------------------------------------------------------------------------------------- */
 /* ลบ */
@@ -247,8 +188,10 @@ const remove = async (record) => {
     console.error("Error deleting data:", error);
   }
 };
-// Assuming MysugarLoad function is defined somewhere in your code
-MysugarLoad();
+
+
+// เรียกใช้งาน MysugarLoad เมื่อคอมโพเนนต์ถูกสร้างขึ้น
+onMounted(MysugarLoad);
 
 /* --------------------------------------------------------------------------------------------------- */
 /* model popup */
@@ -261,6 +204,11 @@ const openModal = () => {
 const closeModal = () => {
   isModalOpen.value = false;
 };
+
+
+const userId = computed(() => localStorage.getItem('iduser'));
+console.log(userId.value);
+
 </script>
 
 <template>
@@ -314,15 +262,22 @@ const closeModal = () => {
               <th scope="col" class="px-6 py-4"> อาการผิดปกติ </th>
               <th scope="col" class="px-6 py-4">อื่นๆ</th>
               <th scope="col" class="px-6 py-4"></th>
+               <th scope="col" class="px-6 py-4"></th>
             </tr>
           </thead>
           <tbody>
-            <tr class="border-b dark:border-neutral-500" v-for="sugarRecord in result" :key="sugarRecord.id">
+            <!-- <tr class="border-b dark:border-neutral-500" v-for="sugarRecord in result" :key="sugarRecord.id"> -->
+            <tr v-for="sugarRecord in result" :key="sugarRecord.id" v-show="sugarRecord.user_id == 4">
+
+
+
+
               <td class="whitespace-nowrap px-6 py-4 font-medium"> {{moment(sugarRecord.created_at).format( "DD MMM YYYY, HH:mm")}}</td>
               <td class="whitespace-nowrap px-6 py-4"> {{moment(sugarRecord.updated_at).format("DD MMM YYYY, HH:mm")}}</td>
               <td class="whitespace-nowrap px-6 py-4">{{ sugarRecord.sugarValue }}</td>
               <td class="whitespace-nowrap px-6 py-4">{{ sugarRecord.symptom }}</td>
               <td class="whitespace-nowrap px-6 py-4">{{ sugarRecord.note }}</td>
+              <!-- <td class="whitespace-nowrap px-6 py-4">{{ sugarRecord.user_id }}</td> -->
               <td class="whitespace-nowrap px-6 py-4">
                  <button type="button" 
                          class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
@@ -347,12 +302,8 @@ const closeModal = () => {
             <!-- modal popup -->
             <div>
               <!-- Modal -->
-              <div
-                v-if="isModalOpen"
-                class="fixed inset-0 z-10 flex items-center justify-center"
-              >
+              <div  v-if="isModalOpen" class="fixed inset-0 z-10 flex items-center justify-center" >
                 <div class="fixed inset-0 bg-black opacity-50"></div>
-
                 <div class="bg-white p-8 rounded shadow-md z-20">
                   <h2 class="text-xl font-bold mb-4 text-center">แก้ไขค่าระดับน้ำตาล</h2>
         
@@ -389,6 +340,7 @@ const closeModal = () => {
           </div>
           
                       <button
+                      type="submit"
                        class="ml-9 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
                       >
                         แก้ไขค่าระดับน้ำตาล
