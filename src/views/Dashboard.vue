@@ -10,47 +10,38 @@ import Swal from "sweetalert2";
 const selectedDate = ref("");
 const resultdate = ref("");
 
-const getDateDetails = () => {
-  if (selectedDate.value !== "") {
-    const date = new Date(selectedDate.value);
 
-    const day = date.getDate();
-    const month = date.getMonth() + 1;
-    const year = date.getFullYear();
+const startDate = ref(""); // Hold the start date of the selected time range
+const endDate = ref("");   // Hold the end date of the selected time range
 
-    const weekDayIndex = date.getDay();
-    const daysOfWeek = [
-      "Sunday",
-      "Monday",
-      "Tuesday",
-      "Wednesday",
-      "Thursday",
-      "Friday",
-      "Saturday",
-    ];
-    const dayOfWeek = daysOfWeek[weekDayIndex];
+const clearStartDate = () => {
+  startDate.value = ""; // Clear the start date input
+};
 
-    const monthsOfYear = [
-      "January",
-      "February",
-      "March",
-      "April",
-      "May",
-      "June",
-      "July",
-      "August",
-      "September",
-      "October",
-      "November",
-      "December",
-    ];
-    const monthName = monthsOfYear[date.getMonth()];
+const clearEndDate = () => {
+  endDate.value = ""; // Clear the end date input
+};
 
-    resultdate.value = `วันที่: ${day} เดือน: ${month} ปี: ${year} วัน: ${dayOfWeek}<br> เดือน: ${monthName}`;
+const filterData = () => {
+  if (startDate.value && endDate.value) {
+    const filteredData = result.value.filter(sugarRecord => {
+      const recordDate = moment(sugarRecord.updated_at);
+      return recordDate.isBetween(startDate.value, endDate.value, null, "[]");
+    });
+    result.value = filteredData;
   }
 };
 
+// Call filterData when component is mounted to initially filter data if start and end dates are set
+onMounted(() => {
+  filterData();
+});
 
+
+
+
+
+/* การใช้งาน API  */
 const result = ref([]);
 const mysugar = ref({
   id: "",
@@ -78,7 +69,7 @@ const MysugarLoad = async () => {
     const response = await fetch(`${import.meta.env.VITE_BASE_URL}api/mysugar/${userId}`);
     const data = await response.json();
     result.value = data;
-    console.log(data);
+    /* console.log(data); */
   } catch (error) {
     console.error("Error fetching data:", error);
   }
@@ -245,17 +236,32 @@ const closeModal = () => {
           class="box-content p-8 bg-white shadow-lg shadow-gray-300/50 mt-8 ml-5 mr-5 rounded-lg"
         >
           <p>เลือกช่วงเวลาที่ต้องการ</p>
-          <!-- <div>
-            <form>
-              <label for="dateInput">เลือกวันที่:</label>
-              <input type="date" v-model="selectedDate" />
-              <button type="button" @click="getDateDetails">
-                แสดงรายละเอียด
-              </button>
-            </form>
+        
 
-            <p v-if="resultdate !== ''" v-html="resultdate"></p>
-          </div> -->
+        <div>
+  <div>
+            <label for="startDate">Start Date:</label>
+            <input type="date" v-model="startDate" @change="filterData" />
+            <button class="bg-red-500 text-white py-1 px-2 ml-2" @click="clearStartDate">Clear</button>
+            <label for="endDate">End Date:</label>
+            <input type="date" v-model="endDate" @change="filterData" />
+            <button class="bg-red-500 text-white py-1 px-2 ml-2" @click="clearEndDate">Clear</button>
+            <button class="bg-blue-500 text-white py-1 px-2 ml-2" @click="filterData">Search</button>
+          </div>
+        </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
         </div>
 
         <div
@@ -300,7 +306,7 @@ const closeModal = () => {
               </td>
 
 
-              <td class="whitespace-nowrap px-6 py-4">{{ sugarRecord.sugarValue }}
+              <td class="whitespace-nowrap px-6 py-4">{{ sugarRecord.sugarValue }} mg/dl
               <div class="w-full rounded-full h-2.5 mb-4 dark:bg-gray-300 ">
               <div class="bg-gray-600 h-2.5 rounded-full " :style="{ 'max-width':  sugarRecord.sugarValue + '%' }"
                :class="{'bg-red-500': sugarRecord.sugarValue > 125,
