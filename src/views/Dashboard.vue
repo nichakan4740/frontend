@@ -61,15 +61,28 @@ const mysugar = ref({
 
 
 /* --------------------------------------------------------------------------------------------------- */
- const MysugarLoad = async () => {
+/*  const MysugarLoad = async () => {
   try {
     const response = await fetch(`${import.meta.env.VITE_BASE_URL}api/mysugar`);
     const data = await response.json();
-    result.value = data
+    result.value = data;
+       console.log(data);
   } catch (error) {
     console.error("Error fetching data:", error);
   }
 }; 
+ */
+const MysugarLoad = async () => {
+  try {
+    const userId = localStorage.getItem('iduser');
+    const response = await fetch(`${import.meta.env.VITE_BASE_URL}api/mysugar/${userId}`);
+    const data = await response.json();
+    result.value = data;
+    console.log(data);
+  } catch (error) {
+    console.error("Error fetching data:", error);
+  }
+};
 
 
 
@@ -205,10 +218,6 @@ const closeModal = () => {
   isModalOpen.value = false;
 };
 
-
-const userId = computed(() => localStorage.getItem('iduser'));
-console.log(userId.value);
-
 </script>
 
 <template>
@@ -267,7 +276,7 @@ console.log(userId.value);
           </thead>
           <tbody>
             <!-- <tr class="border-b dark:border-neutral-500" v-for="sugarRecord in result" :key="sugarRecord.id"> -->
-            <tr v-for="sugarRecord in result" :key="sugarRecord.id" v-show="sugarRecord.user_id == 4">
+            <tr  class="border-b dark:border-neutral-500" v-for="sugarRecord in result" :key="sugarRecord.id" >
 
 
 
@@ -277,7 +286,7 @@ console.log(userId.value);
               <td class="whitespace-nowrap px-6 py-4">{{ sugarRecord.sugarValue }}</td>
               <td class="whitespace-nowrap px-6 py-4">{{ sugarRecord.symptom }}</td>
               <td class="whitespace-nowrap px-6 py-4">{{ sugarRecord.note }}</td>
-              <!-- <td class="whitespace-nowrap px-6 py-4">{{ sugarRecord.user_id }}</td> -->
+              <td class="whitespace-nowrap px-6 py-4">{{ sugarRecord.user_id }}</td>
               <td class="whitespace-nowrap px-6 py-4">
                  <button type="button" 
                          class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
