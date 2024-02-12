@@ -218,6 +218,15 @@ const closeModal = () => {
   isModalOpen.value = false;
 };
 
+
+
+
+/* ---------------------------------------------------------------------- */
+
+
+
+
+
 </script>
 
 <template>
@@ -265,7 +274,6 @@ const closeModal = () => {
         <table class="min-w-full text-left text-sm font-light">
           <thead class="border-b font-medium dark:border-neutral-500">
             <tr >
-              <th scope="col" class="px-6 py-4">วันที่บันทึก</th>
               <th scope="col" class="px-6 py-4">วันที่เปลี่ยนแปลงการบันทึก</th>
               <th scope="col" class="px-6 py-4">  ระดับน้ำตาลในเลือด  </th>
               <th scope="col" class="px-6 py-4"> อาการผิดปกติ </th>
@@ -277,16 +285,41 @@ const closeModal = () => {
           <tbody>
             <!-- <tr class="border-b dark:border-neutral-500" v-for="sugarRecord in result" :key="sugarRecord.id"> -->
             <tr  class="border-b dark:border-neutral-500" v-for="sugarRecord in result" :key="sugarRecord.id" >
+              <td class="whitespace-nowrap px-6 py-4"> {{moment(sugarRecord.updated_at).format("DD MMM YYYY")}}
+              <!--แสดงข้อความตามเงื่อนไขของค่าน้ำตาล / แสดงข้อความตามเงื่อนไขของค่าน้ำตาล -->
+                 <br>
+                 <span :class="{
+                        'text-yellow-500': sugarRecord.sugarValue < 70,
+                        'text-green-500': sugarRecord.sugarValue >= 70 && sugarRecord.sugarValue <= 125,
+                        'text-red-500': sugarRecord.sugarValue > 125
+                  }">
+                  <span v-if="sugarRecord.sugarValue < 70">น้ำตาลต่ำ</span>
+                  <span v-else-if="sugarRecord.sugarValue >= 70 && sugarRecord.sugarValue <= 125">น้ำตาลปกติ</span>
+                  <span v-else>น้ำตาลสูง</span>
+                  </span>
+              </td>
 
 
-
-
-              <td class="whitespace-nowrap px-6 py-4 font-medium"> {{moment(sugarRecord.created_at).format( "DD MMM YYYY, HH:mm")}}</td>
-              <td class="whitespace-nowrap px-6 py-4"> {{moment(sugarRecord.updated_at).format("DD MMM YYYY, HH:mm")}}</td>
-              <td class="whitespace-nowrap px-6 py-4">{{ sugarRecord.sugarValue }}</td>
+              <td class="whitespace-nowrap px-6 py-4">{{ sugarRecord.sugarValue }}
+              <div class="w-full rounded-full h-2.5 mb-4 dark:bg-gray-300 ">
+              <div class="bg-gray-600 h-2.5 rounded-full " :style="{ 'max-width':  sugarRecord.sugarValue + '%' }"
+               :class="{'bg-red-500': sugarRecord.sugarValue > 125,
+                            'bg-green-500': sugarRecord.sugarValue >= 70 && sugarRecord.sugarValue <= 125,
+                            'bg-yellow-500': sugarRecord.sugarValue < 70
+                           }"
+              ></div>
+              </div>
+              
+              
+              </td>
               <td class="whitespace-nowrap px-6 py-4">{{ sugarRecord.symptom }}</td>
               <td class="whitespace-nowrap px-6 py-4">{{ sugarRecord.note }}</td>
-              <td class="whitespace-nowrap px-6 py-4">{{ sugarRecord.user_id }}</td>
+        
+ 
+
+
+
+              <!-- ปุ่มแก้ไข/ปุ่มลบ -->
               <td class="whitespace-nowrap px-6 py-4">
                  <button type="button" 
                          class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
@@ -299,6 +332,7 @@ const closeModal = () => {
                      ลบการบันทึก
                 </button>
               </td>
+              <!-- ----------------------------------------------------------------- -->
             </tr>
           </tbody>
         </table>
@@ -369,6 +403,10 @@ const closeModal = () => {
         </div>
       </div>
     </div>
+
+
+
+     
   </Layout>
 </template>
 
