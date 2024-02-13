@@ -11,6 +11,10 @@ import Swal from "sweetalert2";
 const selectedDate = ref("");
 const resultdate = ref("");
 
+const startDate = ref('');
+const endDate = ref('');
+
+
 /* การใช้งาน API  */
 const mysugar = ref({
   id: "",
@@ -47,7 +51,7 @@ const MysugarLoad = async () => {
 onMounted(MysugarLoad);
 
 /* ------------------------------------------------------------------------------------------------ */
-// Function to filter records by selected date
+/* // Function to filter records by selected date
 const filterBySelectedDate = (data) => {
   if (selectedDate.value) {
     return data.filter(record => moment(record.updated_at).format('YYYY-MM-DD') === selectedDate.value);
@@ -59,7 +63,37 @@ const filterBySelectedDate = (data) => {
 // Watcher for selected date changes
 watch(selectedDate, (newVal, oldVal) => {
   result.value = filterBySelectedDate(originalData.value);
+}); */
+const filterBySelectedDate = (data, startDate, endDate) => {
+  if (startDate && endDate) {
+    return data.filter(record => {
+      const recordDate = moment(record.updated_at).format('YYYY-MM-DD');
+      return moment(recordDate).isBetween(startDate, endDate, 'days', '[]');
+    });
+  } else {
+    return data;
+  }
+};
+
+watch([startDate, endDate], ([newStartDate, newEndDate], [oldStartDate, oldEndDate]) => {
+  if (newStartDate && newEndDate) {
+    result.value = filterBySelectedDate(originalData.value, newStartDate, newEndDate);
+  } else {
+    result.value = originalData.value;
+  }
 });
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 /* ------------------------------------------------------------------------------------------------ */
@@ -213,10 +247,14 @@ const closeModal = () => {
 
         <!-- ---------------------------------------------------------- -->
         <!-- Input for selecting date -->
-      <div class="mt-5 mx-5">
-        <label for="selectedDate" class="text-lg text-gray-800">เลือกวันที่:</label>
-        <input type="date" id="selectedDate" v-model="selectedDate" class="mt-2 px-4 py-2 border rounded-md">
-      </div>
+       <div class="mt-5 mx-5">
+            <label for="startDate" class="text-lg text-gray-800">เลือกวันที่เริ่มต้น:</label>
+            <input type="date" id="startDate" v-model="startDate" class="mt-2 px-4 py-2 border rounded-md">
+       </div>
+       <div class="mt-5 mx-5">
+            <label for="endDate" class="text-lg text-gray-800">เลือกวันที่สิ้นสุด:</label>
+            <input type="date" id="endDate" v-model="endDate" class="mt-2 px-4 py-2 border rounded-md">
+       </div>
 
         <!-- ---------------------------------------------------------- -->
         
