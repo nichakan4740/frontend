@@ -1,48 +1,17 @@
 <script setup>
 import { useRouter } from "vue-router";
-import { ref, onBeforeMount, computed, onMounted } from "vue";
+import { ref, onBeforeMount, computed, onMounted ,watch } from "vue";
 import Layout from "../layouts/Layout.vue";
 import moment from "moment";
 import Swal from "sweetalert2";
+
 
 
 /* date-time */
 const selectedDate = ref("");
 const resultdate = ref("");
 
-
-const startDate = ref(""); // Hold the start date of the selected time range
-const endDate = ref("");   // Hold the end date of the selected time range
-
-const clearStartDate = () => {
-  startDate.value = ""; // Clear the start date input
-};
-
-const clearEndDate = () => {
-  endDate.value = ""; // Clear the end date input
-};
-
-const filterData = () => {
-  if (startDate.value && endDate.value) {
-    const filteredData = result.value.filter(sugarRecord => {
-      const recordDate = moment(sugarRecord.updated_at);
-      return recordDate.isBetween(startDate.value, endDate.value, null, "[]");
-    });
-    result.value = filteredData;
-  }
-};
-
-// Call filterData when component is mounted to initially filter data if start and end dates are set
-onMounted(() => {
-  filterData();
-});
-
-
-
-
-
 /* การใช้งาน API  */
-const result = ref([]);
 const mysugar = ref({
   id: "",
   sugarValue: "",
@@ -50,36 +19,47 @@ const mysugar = ref({
   note: "",
 });
 
+const originalData = ref([]); // Store original data
 
 /* --------------------------------------------------------------------------------------------------- */
-/*  const MysugarLoad = async () => {
-  try {
-    const response = await fetch(`${import.meta.env.VITE_BASE_URL}api/mysugar`);
-    const data = await response.json();
-    result.value = data;
-       console.log(data);
-  } catch (error) {
-    console.error("Error fetching data:", error);
-  }
-}; 
- */
-const MysugarLoad = async () => {
+/* const MysugarLoad = async () => {
   try {
     const userId = localStorage.getItem('iduser');
     const response = await fetch(`${import.meta.env.VITE_BASE_URL}api/mysugar/${userId}`);
     const data = await response.json();
     result.value = data;
-    /* console.log(data); */
   } catch (error) {
     console.error("Error fetching data:", error);
   }
 };
-
-
+onMounted(MysugarLoad); */
+const MysugarLoad = async () => {
+  try {
+    const userId = localStorage.getItem('iduser');
+    const response = await fetch(`${import.meta.env.VITE_BASE_URL}api/mysugar/${userId}`);
+    const data = await response.json();
+    originalData.value = data; // Store original data
+    result.value = filterBySelectedDate(data); // Filter and set result
+  } catch (error) {
+    console.error('Error fetching data:', error);
+  }
+};
+onMounted(MysugarLoad);
 
 /* ------------------------------------------------------------------------------------------------ */
+// Function to filter records by selected date
+const filterBySelectedDate = (data) => {
+  if (selectedDate.value) {
+    return data.filter(record => moment(record.updated_at).format('YYYY-MM-DD') === selectedDate.value);
+  } else {
+    return data;
+  }
+};
 
-
+// Watcher for selected date changes
+watch(selectedDate, (newVal, oldVal) => {
+  result.value = filterBySelectedDate(originalData.value);
+});
 
 
 /* ------------------------------------------------------------------------------------------------ */
@@ -192,10 +172,10 @@ const remove = async (record) => {
     console.error("Error deleting data:", error);
   }
 };
+const result = ref([]);
 
 
-// เรียกใช้งาน MysugarLoad เมื่อคอมโพเนนต์ถูกสร้างขึ้น
-onMounted(MysugarLoad);
+
 
 /* --------------------------------------------------------------------------------------------------- */
 /* model popup */
@@ -208,10 +188,6 @@ const openModal = () => {
 const closeModal = () => {
   isModalOpen.value = false;
 };
-
-
-
-
 /* ---------------------------------------------------------------------- */
 
 
@@ -225,28 +201,28 @@ const closeModal = () => {
     <!-- content -->
 
     <div class="container mx-auto">
-      <div
-        class="box-content p-3 ml-5 mr-5 mt-10 bg-gradient-to-b from-blue-900 to-blue-800 shadow-lg shadow-slate-500/50 rounded-lg"
-      >
+      <div class="box-content p-3 ml-5 mr-5 mt-10 bg-gradient-to-b from-blue-900 to-blue-800 shadow-lg shadow-slate-500/50 rounded-lg">
         <h2 class="font-semibold text-xl text-center text-slate-200">สถิติ</h2>
       </div>
 
       <div class="grid grid-cols-2 gap-2 mt-5">
-        <div
-          class="box-content p-8 bg-white shadow-lg shadow-gray-300/50 mt-8 ml-5 mr-5 rounded-lg"
-        >
+        <div class="box-content p-8 bg-white shadow-lg shadow-gray-300/50 mt-8 ml-5 mr-5 rounded-lg" >
           <p>เลือกช่วงเวลาที่ต้องการ</p>
+        <div>
+      <div>
+
+        <!-- ---------------------------------------------------------- -->
+        <!-- Input for selecting date -->
+      <div class="mt-5 mx-5">
+        <label for="selectedDate" class="text-lg text-gray-800">เลือกวันที่:</label>
+        <input type="date" id="selectedDate" v-model="selectedDate" class="mt-2 px-4 py-2 border rounded-md">
+      </div>
+
+        <!-- ---------------------------------------------------------- -->
         
 
-        <div>
-  <div>
-            <label for="startDate">Start Date:</label>
-            <input type="date" v-model="startDate" @change="filterData" />
-            <button class="bg-red-500 text-white py-1 px-2 ml-2" @click="clearStartDate">Clear</button>
-            <label for="endDate">End Date:</label>
-            <input type="date" v-model="endDate" @change="filterData" />
-            <button class="bg-red-500 text-white py-1 px-2 ml-2" @click="clearEndDate">Clear</button>
-            <button class="bg-blue-500 text-white py-1 px-2 ml-2" @click="filterData">Search</button>
+
+
           </div>
         </div>
 
@@ -263,7 +239,6 @@ const closeModal = () => {
 
 
         </div>
-
         <div
           class="box-content p-8 bg-white shadow-lg shadow-gray-300/50 mt-8 ml-5 mr-5 rounded-lg"
         ></div>
@@ -291,7 +266,7 @@ const closeModal = () => {
           <tbody>
             <!-- <tr class="border-b dark:border-neutral-500" v-for="sugarRecord in result" :key="sugarRecord.id"> -->
             <tr  class="border-b dark:border-neutral-500" v-for="sugarRecord in result" :key="sugarRecord.id" >
-              <td class="whitespace-nowrap px-6 py-4"> {{moment(sugarRecord.updated_at).format("DD MMM YYYY")}}
+              <td class="whitespace-nowrap px-6 py-4"> {{moment(sugarRecord.updated_at).format("DD MMM YYYY: HH:mm" )}}
               <!--แสดงข้อความตามเงื่อนไขของค่าน้ำตาล / แสดงข้อความตามเงื่อนไขของค่าน้ำตาล -->
                  <br>
                  <span :class="{
