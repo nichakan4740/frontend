@@ -10,7 +10,7 @@ import Swal from "sweetalert2";
 /* date-time */
 const selectedDate = ref("");
 const resultdate = ref("");
-
+const originalData = ref([]); // Store original data
 const startDate = ref('');
 const endDate = ref('');
 
@@ -23,20 +23,9 @@ const mysugar = ref({
   note: "",
 });
 
-const originalData = ref([]); // Store original data
+
 
 /* --------------------------------------------------------------------------------------------------- */
-/* const MysugarLoad = async () => {
-  try {
-    const userId = localStorage.getItem('iduser');
-    const response = await fetch(`${import.meta.env.VITE_BASE_URL}api/mysugar/${userId}`);
-    const data = await response.json();
-    result.value = data;
-  } catch (error) {
-    console.error("Error fetching data:", error);
-  }
-};
-onMounted(MysugarLoad); */
 const MysugarLoad = async () => {
   try {
     const userId = localStorage.getItem('iduser');
@@ -50,20 +39,7 @@ const MysugarLoad = async () => {
 };
 onMounted(MysugarLoad);
 
-/* ------------------------------------------------------------------------------------------------ */
-/* // Function to filter records by selected date
-const filterBySelectedDate = (data) => {
-  if (selectedDate.value) {
-    return data.filter(record => moment(record.updated_at).format('YYYY-MM-DD') === selectedDate.value);
-  } else {
-    return data;
-  }
-};
-
-// Watcher for selected date changes
-watch(selectedDate, (newVal, oldVal) => {
-  result.value = filterBySelectedDate(originalData.value);
-}); */
+/* ------ filter------------------------------------------------------------------------------------------ */
 const filterBySelectedDate = (data, startDate, endDate) => {
   if (startDate && endDate) {
     return data.filter(record => {
@@ -84,14 +60,23 @@ watch([startDate, endDate], ([newStartDate, newEndDate], [oldStartDate, oldEndDa
 });
 
 
-
-
-
-
-
-
-
-
+/* รายวัน------------------------------------------------------------------------------------------ */
+const filterByDaily = (data, selectedDate) => {
+  if (selectedDate) {
+    return data.filter(record => {
+      const recordDate = moment(record.updated_at).format('YYYY-MM-DD');
+      return moment(recordDate).isSame(selectedDate, 'day');
+    });
+  } else {
+    return data;
+  }
+};
+watch(selectedDate, (newSelectedDate, oldSelectedDate) => {
+  result.value = filterByDaily(originalData.value, newSelectedDate);
+});
+const filterDataByDate = () => {
+  result.value = filterByDaily(originalData.value, selectedDate.value);
+};
 
 
 
@@ -256,6 +241,15 @@ const closeModal = () => {
             <input type="date" id="endDate" v-model="endDate" class="mt-2 px-4 py-2 border rounded-md">
        </div>
 
+
+        <div class="mt-5 mx-5">
+            <label for="endDate" class="text-lg text-gray-800">เลือกวันที่ต้องการแบบรายวัน :</label>
+            <input type="date" id="selectedDate" v-model="selectedDate" @change="filterDataByDate" class="mt-2 px-4 py-2 border rounded-md">
+       </div>
+     
+       
+
+
         <!-- ---------------------------------------------------------- -->
         
 
@@ -263,18 +257,6 @@ const closeModal = () => {
 
           </div>
         </div>
-
-
-
-
-
-
-
-
-
-
-
-
 
         </div>
         <div
@@ -294,7 +276,7 @@ const closeModal = () => {
           <thead class="border-b font-medium dark:border-neutral-500">
             <tr >
               <th scope="col" class="px-6 py-4">วันที่เปลี่ยนแปลงการบันทึก</th>
-              <th scope="col" class="px-6 py-4">  ระดับน้ำตาลในเลือด  </th>
+              <th scope="col" class="px-6 py-4 ">  ระดับน้ำตาลในเลือด  </th>
               <th scope="col" class="px-6 py-4"> อาการผิดปกติ </th>
               <th scope="col" class="px-6 py-4">อื่นๆ</th>
               <th scope="col" class="px-6 py-4"></th>
@@ -343,12 +325,17 @@ const closeModal = () => {
                  <button type="button" 
                          class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
                  @click="edit(sugarRecord)">
-                       แก้ไขค่าระดับน้ำตาล
+                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6">
+                 <path d="M21.731 2.269a2.625 2.625 0 0 0-3.712 0l-1.157 1.157 3.712 3.712 1.157-1.157a2.625 2.625 0 0 0 0-3.712ZM19.513 8.199l-3.712-3.712-12.15 12.15a5.25 5.25 0 0 0-1.32 2.214l-.8 2.685a.75.75 0 0 0 .933.933l2.685-.8a5.25 5.25 0 0 0 2.214-1.32L19.513 8.2Z" />
+                 </svg>
+
                  </button>
                  <button type="button" 
                  class="focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900" 
                  @click="remove(sugarRecord)" >
-                     ลบการบันทึก
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6">
+                    <path fill-rule="evenodd" d="M16.5 4.478v.227a48.816 48.816 0 0 1 3.878.512.75.75 0 1 1-.256 1.478l-.209-.035-1.005 13.07a3 3 0 0 1-2.991 2.77H8.084a3 3 0 0 1-2.991-2.77L4.087 6.66l-.209.035a.75.75 0 0 1-.256-1.478A48.567 48.567 0 0 1 7.5 4.705v-.227c0-1.564 1.213-2.9 2.816-2.951a52.662 52.662 0 0 1 3.369 0c1.603.051 2.815 1.387 2.815 2.951Zm-6.136-1.452a51.196 51.196 0 0 1 3.273 0C14.39 3.05 15 3.684 15 4.478v.113a49.488 49.488 0 0 0-6 0v-.113c0-.794.609-1.428 1.364-1.452Zm-.355 5.945a.75.75 0 1 0-1.5.058l.347 9a.75.75 0 1 0 1.499-.058l-.346-9Zm5.48.058a.75.75 0 1 0-1.498-.058l-.347 9a.75.75 0 0 0 1.5.058l.345-9Z" clip-rule="evenodd" />
+                    </svg>
                 </button>
               </td>
               <!-- ----------------------------------------------------------------- -->
