@@ -225,7 +225,7 @@ const  backloginpatient = () => appRouter.push({ name: "homerole" });
            
 
            <div class="box-content pt-3 pb-3" >
-            <p>อาการผิดปกติ (ถ้ามี)</p>
+            <p>อาการผิดปกติ (ถ้าไม่มี ใส่ -)</p>
               <input type="text" v-model="mysugar.symptom" 
               class="block w-full rounded-md border-0 py-10 pl-7 pr-20 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400"
               placeholder="กรุณากรอกข้อมูลเมื่อพบอาการผิดปกติ">
@@ -234,20 +234,20 @@ const  backloginpatient = () => appRouter.push({ name: "homerole" });
 
 
           <div class="box-content pt-3 pb-3 ">
-             <p>อื่นๆ</p>
+             <p>ข้อมูลอื่นๆ</p>
             <div class="box-content">
               <input type="text" v-model="mysugar.note" 
               class="block w-full rounded-md border-0 py-10 pl-7 pr-20 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400"
-               placeholder="กรุณากรอกข้อมูลอื่นๆที่อยากบอกเรา เช่น เมื่อคืนรับประทานอะไรไปบ้าง ">
+               placeholder="กรุณากรอกข้อมูลอื่นๆที่อยากบอกเรา เช่น เมื่อคืนรับประทานอะไรไปบ้าง การออกกำลังกาย ฯลฯ">
             </div>
           </div>
             
 
              <div class="box-content pt-3 pb-3   ">
               <button
-            :disabled="!mysugar.sugarValue || !mysugar.symptom"
+            :disabled="!mysugar.sugarValue"
             class="block w-full bg-blue-900 text-white font-bold py-2 px-4 border rounded"
-            :class="{ 'bg-blue-800': !mysugar.sugarValue || !mysugar.symptom }"
+            :class="{ 'bg-blue-800': !mysugar.sugarValue }"
           >
             บันทึกค่าน้ำตาล
           </button>

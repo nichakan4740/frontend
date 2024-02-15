@@ -6,7 +6,7 @@ import Swal from "sweetalert2";
 const fname = ref("");
 const lname = ref("");
 const allergic_drug = ref("");
-const my_druga = ref("");
+const my_drug = ref("");
 const idcard = ref("");
 const password = ref("");
 const passwordcheck = ref("");
@@ -23,7 +23,7 @@ const registerpatient = async () => {
         fname: fname.value,
         lname: lname.value,
         allergic_drug : allergic_drug.value,
-        my_druga :  my_druga .value,
+        my_drug :  my_drug .value,
         idcard:  idcard.value,
         password: password.value,
       }),
@@ -160,12 +160,12 @@ const close = () => appRouter.push({ name: "loginPatient" });
                 type="text"
                 class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:placeholder-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500"
                 placeholder="xxxxxxxxxx"
-                v-model.trim=" my_druga"
+                v-model.trim=" my_drug"
                 maxlength="100"
               />
-              <p v-if=" my_druga.length" class="input-count">{{ my_druga.length }}/100 </p>
-              <p v-show="my_druga.length < 1"> * Please input your name <span></span> </p>
-              <p v-show="my_druga.length > 100">* Characters must not exceed 100</p>
+              <p v-if=" my_drug.length" class="input-count">{{ my_drug.length }}/100 </p>
+              <p v-show="my_drug.length < 1"> * Please input your name <span></span> </p>
+              <p v-show="my_drug.length > 100">* Characters must not exceed 100</p>
             </div>
   <!-- --------------------------------------------------------------------------- -->
 
@@ -227,14 +227,14 @@ const close = () => appRouter.push({ name: "loginPatient" });
             <button
               class="block w-full bg-blue-900 hover:bg-blue-800 text-white font-bold py-2 px-4 mb-4 border rounded"
               @click.prevent="registerpatient " 
-              :disabled="!fname || !lname || !allergic_drug || !my_druga || !idcard || !password "
+              :disabled="!fname || !lname || !allergic_drug || !my_drug || !idcard || !password "
               :class="{ 'bg-blue-900': !idcard || !password }"> สร้างบัญชี
               
             </button>
 
 
             <div class="text-center">
-              <router-link :to="{ name: 'loginNurse' }">
+              <router-link :to="{ name: 'loginPatient' }">
                 <p class="text-sm font-medium text-gray-500">
                   คุณมีบัญชีอยู่แล้ว?  
                  <a class="font-bold text-primary-600 hover:underline text-indigo-800">เข้าสู่ระบบ ที่นี้</a >

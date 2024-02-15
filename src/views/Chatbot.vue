@@ -15,8 +15,9 @@ import Layout from "../layouts/Layout.vue";
 
       <div
         class="box-content bg-white shadow-lg shadow-gray-300/50 mt-10 ml-5 mr-5 pt-1 pb-6 pl-20 pr-20 mb-5 rounded-lg">
-        <iframe src="https://www.chatbase.co/chatbot-iframe/ZChp_k0YKpu1BPQ6P8K8u" width="100%"
-          style="height: 100%; min-height: 700px" frameborder="0"></iframe>
+        <iframe src="https://www.chatbase.co/chatbot-iframe/2ZD0Ya4vIQNlG8lowAn8m" width="100%"
+          style="height: 100%; min-height: 500px" frameborder="0"></iframe>
+
       </div>
 
       <div class="mb-8 ml-2 mr-4">

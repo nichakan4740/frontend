@@ -189,7 +189,7 @@ const close = () => appRouter.push({ name: "loginNurse" });
                   <div class="text-center">
               <router-link :to="{ name: 'loginNurse' }">
                 <p class="text-sm font-medium text-gray-500">
-                   คุณมีบัชีอยู่แล้ว? 
+                   คุณมีบัญชีอยู่แล้ว? 
                   <a
                     class="font-bold text-primary-600 hover:underline text-indigo-800"
                     >เข้าสู่ระบบ ที่นี้</a
