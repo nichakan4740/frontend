@@ -2,53 +2,61 @@
 import { useRouter } from "vue-router";
 import { ref, onBeforeMount } from "vue";
 import Swal from "sweetalert2";
+import Spinner from "./Spinner.vue"
 
 const professional_id = ref('');
 const password = ref('');
+const loading = ref(false);
+
 const loginnurse = async () => {
-  const res = await fetch(`${import.meta.env.VITE_BASE_URL}api/nurse/login`, {
-    method: "POST",
-    headers: {
-      "Content-type": "application/json",
-    },
-    body: JSON.stringify({
-      professional_id: professional_id.value,
-      password: password.value,
-    }),
-  });
+  loading.value = true;
+  try {
+    const res = await fetch(`${import.meta.env.VITE_BASE_URL}api/nurse/login`, {
+      method: "POST",
+      headers: {
+        "Content-type": "application/json",
+      },
+      body: JSON.stringify({
+        professional_id: professional_id.value,
+        password: password.value,
+      }),
+    });
 
-  if (res.status === 200) {
-    const response = await res.json();
-    localStorage.setItem("professional_id", response.user.professional_id);
-    localStorage.setItem("accesstoken", response.authorisation.token);
-    /* localStorage.setItem('refreshtoken', jwt.refreshToken) */
-    console.log(response);
-    Swal.fire({
-      icon: "success",
-      title: "เข้าสู่ระบบสำเร็จ!",
-      showConfirmButton: false,
-    });
-    setTimeout(() => {
-      close();
-      console.log("You login success");
-    }, 1000); 
-  }
+    if (res.status === 200) {
+      const response = await res.json();
+      localStorage.setItem("professional_id", response.user.professional_id);
+      localStorage.setItem("accesstoken", response.authorisation.token);
 
-  if (res.status === 404) {
-    Swal.fire({
-      icon: "error",
-      title: "ขอโทษ!!!",
-      text: "เลขประกอบวิชาชีพไม่ถูกต้อง!",
-    });
-    console.log("The professional number is incorrect.");
-  }
-  if (res.status === 401) {
-    Swal.fire({
-      icon: "error",
-      title: "ขอโทษ !!!",
-      text: "รหัสผ่านไม่ถูกต้อง โปรดใส่ใหม่",
-    });
-    console.log("Password Not Matched");
+      Swal.fire({
+        icon: "success",
+        title: "เข้าสู่ระบบสำเร็จ!",
+        showConfirmButton: false,
+      });
+
+      setTimeout(() => {
+        close();
+        Swal.close(); // Close the current popup
+        loading.value = false; // Set loading to false after successful login
+      }, 2000);
+    } else if (res.status === 404) {
+      Swal.fire({
+        icon: "error",
+        title: "ขอโทษ!!!",
+        text: "เลขประกอบวิชาชีพไม่ถูกต้อง!",
+      });
+      console.log("The professional number is incorrect.");
+    } else if (res.status === 401) {
+      Swal.fire({
+        icon: "error",
+        title: "ขอโทษ !!!",
+        text: "รหัสผ่านไม่ถูกต้อง โปรดใส่ใหม่",
+      });
+      console.log("Password Not Matched");
+    }
+  } catch (error) {
+    console.error('Error during login:', error);
+  } finally {
+    loading.value = false;
   }
 };
 
@@ -111,7 +119,8 @@ const close = () => appRouter.push({ name: "home" });
               <button
                 @click.prevent="loginnurse"
                 class="block w-full bg-blue-900 hover:bg-blue-800 text-white font-bold py-2 px-4 mb-4 border rounded"
-              >
+                :disabled="!professional_id || !password" :class="{ 'bg-blue-900': !idcard || !password }">
+              
                 เข้าสู่ระบบ
               </button>
             </div>
@@ -132,6 +141,12 @@ const close = () => appRouter.push({ name: "home" });
       </div>
     </div>
   </div>
+  <Spinner :loading="loading"></Spinner>
 </template>
 
-<style></style>
+<style>
+.bg-blue-900:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  /* เปลี่ยนเป็น cursor ปีกหลุดเพื่อแสดงว่าปุ่มไม่สามารถคลิกได้ */
+}</style>

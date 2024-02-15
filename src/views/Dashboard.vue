@@ -32,7 +32,7 @@ const MysugarLoad = async () => {
     const response = await fetch(`${import.meta.env.VITE_BASE_URL}api/mysugar/${userId}`);
     const data = await response.json();
     originalData.value = data; // Store original data
-    result.value = filterBySelectedDate(data); // Filter and set result
+        result.value = filterBySelectedDate(data); // Filter and set result
   } catch (error) {
     console.error('Error fetching data:', error);
   }

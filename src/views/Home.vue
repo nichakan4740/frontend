@@ -244,8 +244,13 @@ const  backloginpatient = () => appRouter.push({ name: "homerole" });
             
 
              <div class="box-content pt-3 pb-3   ">
-             <button  class=" block w-full bg-blue-900 hover:bg-blue-800 text-white font-bold py-2 px-4 border  rounded">
-               บันทึกค่าน้ำตาล</button>
+              <button
+            :disabled="!mysugar.sugarValue || !mysugar.symptom"
+            class="block w-full bg-blue-900 text-white font-bold py-2 px-4 border rounded"
+            :class="{ 'bg-blue-800': !mysugar.sugarValue || !mysugar.symptom }"
+          >
+            บันทึกค่าน้ำตาล
+          </button>
             </div>
           </form>
         </div>
@@ -267,5 +272,12 @@ const  backloginpatient = () => appRouter.push({ name: "homerole" });
 </template>
 
 <style>
-
+.bg-blue-900:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  /* เปลี่ยนเป็น cursor ปีกหลุดเพื่อแสดงว่าปุ่มไม่สามารถคลิกได้ */
+}
+.form-container {
+  overflow-y: auto;
+}
 </style>
