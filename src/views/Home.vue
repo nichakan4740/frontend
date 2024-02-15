@@ -218,26 +218,26 @@ const  backloginpatient = () => appRouter.push({ name: "homerole" });
             <p>น้ำตาลในเลือด (mg/dL) *</p>
            <div class="box-content ">
               <input type="text" v-model="mysugar.sugarValue"  
-              class="block w-full rounded-md border-0 py-10 pl-7 pr-20 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400"
+              class="block w-full rounded-md border-0 py-5 pl-7 pr-20 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400"
               placeholder="กรอกเฉพาะตัวเลข เช่น 260 ">
             </div>
           </div>
            
 
            <div class="box-content pt-3 pb-3" >
-            <p>อาการผิดปกติ (ถ้าไม่มี ใส่ -)</p>
+            <p>อาการผิดปกติ (ถ้ามี)</p>
               <input type="text" v-model="mysugar.symptom" 
-              class="block w-full rounded-md border-0 py-10 pl-7 pr-20 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400"
+              class="block w-full rounded-md border-0 py-5 pl-7 pr-20 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400"
               placeholder="กรุณากรอกข้อมูลเมื่อพบอาการผิดปกติ">
           </div>
 
 
 
           <div class="box-content pt-3 pb-3 ">
-             <p>ข้อมูลอื่นๆ</p>
+             <p>ข้อมูลอื่นๆ (ถ้ามี)</p>
             <div class="box-content">
               <input type="text" v-model="mysugar.note" 
-              class="block w-full rounded-md border-0 py-10 pl-7 pr-20 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400"
+              class="block w-full rounded-md border-0 py-5 pl-7 pr-20 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400"
                placeholder="กรุณากรอกข้อมูลอื่นๆที่อยากบอกเรา เช่น เมื่อคืนรับประทานอะไรไปบ้าง การออกกำลังกาย ฯลฯ">
             </div>
           </div>

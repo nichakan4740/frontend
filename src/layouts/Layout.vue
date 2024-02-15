@@ -1,28 +1,59 @@
 <script setup>
 import { ref } from "vue";
+import { useRouter } from "vue-router";
 import Sidebar from "../components/Sidebar.vue";
+// import {  logout, logoutpatient } from "@/../views/Home.vue"
+
+// const handleClick = () => {
+//   // เรียกใช้ function เมื่อปุ่มถูกคลิก
+//   logout();
+// };
+const showMenu = ref(false);
+
+const toggleMenu = () => {
+  showMenu.value = !showMenu.value;
+};
 </script>
 
 <template>
-  <div >
-    <nav class="bg-white  shadow-slate-300/60 sticky top-0  ">
+  <div>
+    <nav class="bg-white shadow-lg shadow-slate-300/60 sticky top-0  ">
       <!-- Primary Navigation Menu -->
+      <!-- user -->
+      <button class="float-right">
+
+        <img src="/user.png" class="w-10 h-10  mr-10 mt-3 shadow-md rounded-full" @click="toggleMenu" />
+      </button>
+
+      <!-- Hamburger Menu -->
+      <div v-if="showMenu" class="menu">
+        <!-- เพิ่มเนื้อหาของเมนูที่นี่ -->
+        <p>Profile</p>
+        <p>Sign out</p>
+        <p>Sign out nurse</p>
+      </div>
+
+      <router-link :to="{ name: 'home' }">
+        <button type="button"
+          class="float-right shadow-xs text-blue-800 border border-blue-800 bg-white hover:bg-blue-800 hover:text-white focus:outline-none focus:ring-2 focus:ring-blue-300 font-medium rounded-lg text-sm px-3 py-2.5 text-center mt-3 mr-8 me-2 mb-2 dark:bg-blue-600 :hover:bg-white dark:focus:ring-blue-800">
+          เพิ่มการบันทึก
+        </button>
+      </router-link>
+
       <div>
-    
+
         <div class="flex justify-between h-16">
-       
-        <!-- sidebar-->
+
+          <!-- sidebar-->
           <Sidebar/>
           <div class="hidden sm:flex sm:items-center sm:ml-6">
 
-            
-            <!-- Settings Dropdown -->
-            <div class="ml-3 relative">  </div>
-          </div>
-           
 
-          <!-- Hamburger จอเล็ก -->
-          <div class="-mr-2 flex items-center sm:hidden">
+            <!-- Settings Dropdown -->
+            <div class="ml-3 relative"> </div>
+          </div>
+           <!-- Hamburger จอเล็ก -->
+           <div class="-mr-2 flex items-center sm:hidden">
             <button class="bg-blue-100 text-tahiti rounded">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -41,25 +72,39 @@ import Sidebar from "../components/Sidebar.vue";
           </div>
         </div>
       </div>
-      
- 
+
+
     </nav>
     <!-- Page Heading -->
-        <header class="bg-white shadow" v-if="$slots.header">
-            <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-                <slot name="header" />
-            </div>
-        </header>
+    <header class="bg-white shadow" v-if="$slots.header">
+      <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+        <slot name="header" />
+      </div>
+    </header>
 
-        <!-- Page Content -->
-        <main>
-            <slot/>
-        </main>
+    <!-- Page Content -->
+    <main>
+      <slot />
+    </main>
 
-        
+
 
 
   </div>
 </template>
 
-<style></style>
+<style>
+.menu {
+  position: absolute;
+  top: 50px;
+  /* ปรับตำแหน่งตามที่คุณต้องการ */
+  right: 10px;
+  background-color: white;
+  border: 1px solid #ccc;
+  border-radius: 8%;
+  box-shadow: 8px;
+  padding: 10px;
+  z-index: 1000;
+  /* ให้เป็นหน้ากว่า */
+}
+</style>
