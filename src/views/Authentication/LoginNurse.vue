@@ -61,7 +61,7 @@ const loginnurse = async () => {
 };
 
 const appRouter = useRouter();
-const close = () => appRouter.push({ name: "home" });
+const close = () => appRouter.push({ name: "nursehome" });
 </script>
 
 <template>

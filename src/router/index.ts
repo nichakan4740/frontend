@@ -1,10 +1,18 @@
 import { createRouter, createWebHistory } from 'vue-router'
-
+/* หน้าผู้ป้วย */
 import Home from '../views/Home.vue'
 import Dashboard from '../views/Dashboard.vue'
 import Chatbot from '../views/Chatbot.vue'
 import SugarValue from '../views/SugarValue.vue';
 import Knowledge from '../views/Knowledge.vue';
+/* ------------------------------------------------------------------------------------- */
+
+/* หน้าพยาบาล */
+import NurseHome from '../views/NurseHome.vue'
+import NurseDashboard from '../views/NurseDashboard.vue'
+import Chat from '../views/Chat.vue'
+
+
 
  /* login-register พยาบาล */
 import LoginNurse from '../views/Authentication/LoginNurse.vue';
@@ -15,8 +23,6 @@ import LoginPatient from '../views/Authentication/LoginPatient.vue';
 import RegisterPatient from '../views/Authentication/RegisterPatient.vue';
 
 import HomeRole from '../views/HomeRole.vue';
-
-
 
 const history = createWebHistory(`${import.meta.env.VITE_BASE_URL}`)
 
@@ -56,7 +62,6 @@ const routes = [
     component: HomeRole,
   },
 
-
   {
     path: '/home',
     name: 'home',
@@ -82,7 +87,25 @@ const routes = [
     name: 'knowledge',
     component: Knowledge,
   },
- 
+
+  /* หน้าพยาบาล------------------------------------------------------------------------------------------ */
+  {
+    path: '/nurse-home',
+    name: 'nursehome',
+    component: NurseHome,
+  },
+
+  {
+    path: '/nurse-dashboard',
+    name: 'nursedashboard',
+    component: NurseDashboard,
+  },
+
+  {
+    path: '/chat',
+    name: 'chat',
+    component: Chat,
+  },
 
 ]
 const router = createRouter({ history, routes })

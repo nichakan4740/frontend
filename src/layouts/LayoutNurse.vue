@@ -1,7 +1,7 @@
 <script setup>
 import { ref } from "vue";
 import { useRouter } from "vue-router";
-import Sidebar from "../components/Sidebar.vue";
+import SidebarNurse from "../components/SidebarNurse.vue";
 // import {  logout, logoutpatient } from "@/../views/Home.vue"
 
 // const handleClick = () => {
@@ -33,19 +33,19 @@ const toggleMenu = () => {
         <p>Sign out nurse</p>
       </div>
 
-      <router-link :to="{ name: 'home' }">
+    <!--   <router-link :to="{ name: 'home' }">
         <button type="button"
           class="float-right shadow-xs text-blue-800 border border-blue-800 bg-white hover:bg-blue-800 hover:text-white focus:outline-none focus:ring-2 focus:ring-blue-300 font-medium rounded-lg text-sm px-3 py-2.5 text-center mt-3 mr-8 me-2 mb-2 dark:bg-blue-600 :hover:bg-white dark:focus:ring-blue-800">
           เพิ่มการบันทึก
         </button>
-      </router-link>
+      </router-link> -->
 
       <div>
 
         <div class="flex justify-between h-16">
 
           <!-- sidebar-->
-          <Sidebar/>
+          <SidebarNurse/>
           <div class="hidden sm:flex sm:items-center sm:ml-6">
 
 
@@ -97,6 +97,7 @@ const toggleMenu = () => {
 .menu {
   position: absolute;
   top: 50px;
+  /* ปรับตำแหน่งตามที่คุณต้องการ */
   right: 10px;
   background-color: white;
   border: 1px solid #ccc;
@@ -104,5 +105,6 @@ const toggleMenu = () => {
   box-shadow: 8px;
   padding: 10px;
   z-index: 1000;
+  /* ให้เป็นหน้ากว่า */
 }
 </style>
