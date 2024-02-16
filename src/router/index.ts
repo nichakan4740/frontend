@@ -15,12 +15,12 @@ import Chat from '../views/Chat.vue'
 
 
  /* login-register พยาบาล */
-import LoginNurse from '../views/Authentication/LoginNurse.vue';
-import RegisterNurse from '../views/Authentication/RegisterNurse.vue';
+import LoginNurse from '../Authentication/LoginNurse.vue';
+import RegisterNurse from '../Authentication/RegisterNurse.vue';
 
  /* login-register ผู้ป่วย */
-import LoginPatient from '../views/Authentication/LoginPatient.vue';
-import RegisterPatient from '../views/Authentication/RegisterPatient.vue';
+import LoginPatient from '../Authentication/LoginPatient.vue';
+import RegisterPatient from '../Authentication/RegisterPatient.vue';
 
 import HomeRole from '../views/HomeRole.vue';
 

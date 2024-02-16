@@ -26,20 +26,6 @@ const mysugar = ref({
 
 
 /* --------------------------------------------------------------------------------------------------- */
-/* const MysugarLoad = async () => {
-  try {
-    const userId = localStorage.getItem('iduser');
-    const response = await fetch(`${import.meta.env.VITE_BASE_URL}api/mysugar/${userId}`);
-    const data = await response.json();
-        originalData.value = []; // Example: If no data is fetched, set originalData to empty array
-        result.value = originalData.value; // Set result accordingly
-        result.value = filterBySelectedDate(data); // Filter and set result
-  } catch (error) {
-    console.error('Error fetching data:', error);
-  }
-};
-onMounted(MysugarLoad); */
-
 const MysugarLoad = async () => {
   try {
     const userId = localStorage.getItem('iduser');
@@ -47,12 +33,12 @@ const MysugarLoad = async () => {
     if (response.ok) {
       const data = await response.json();
       originalData.value = data;
-      result.value = originalData.value; // Set result accordingly
-      result.value = filterBySelectedDate(data); // Filter and set result
+      result.value = originalData.value; 
+      result.value = filterBySelectedDate(data); 
     } else if (response.status === 404) {
       // Handle case when no data is found
       console.log('No data found');
-      result.value = []; // Set result to empty array
+      result.value = []; 
     } else {
       throw new Error('Failed to fetch data');
     }
@@ -61,17 +47,6 @@ const MysugarLoad = async () => {
   }
 };
 onMounted(MysugarLoad);
-
-
-
-
-
-
-
-
-
-
-
 
 
 /* ------ filter------------------------------------------------------------------------------------------ */
@@ -244,10 +219,6 @@ const closeModal = () => {
 };
 /* ---------------------------------------------------------------------- */
 
-
-
-
-
 </script>
 
 <template>
@@ -303,18 +274,6 @@ const closeModal = () => {
         <div class="box-content p-8 bg-white shadow-lg shadow-gray-300/50 mt-8 ml-5 mr-5 mb-10 rounded-lg" >
         <h2 class="text-center text-2xl font-bold mb-5">รายละเอียดค่าน้ำตาลช่วง</h2>
 <!-- ---------------------------------------------------------------------------------------------------------------------- -->
-           <div class="flex flex-col" v-if="result.length > 0">
-           <!-- Data table -->
-           </div>
-           <div v-else class="text-center text-gray-500">ไม่มีข้อมูล</div>
-
-
-
-
-
-
-
-
 
 <div class="flex flex-col">
   <div class="overflow-x-auto sm:-mx-6 lg:-mx-8">
@@ -364,7 +323,7 @@ const closeModal = () => {
               <td class="whitespace-nowrap px-6 py-4">{{ sugarRecord.symptom }}</td>
               <td class="whitespace-nowrap px-6 py-4">{{ sugarRecord.note }}</td>
         
- 
+              
 
 
 
@@ -390,6 +349,14 @@ const closeModal = () => {
             </tr>
           </tbody>
         </table>
+
+            <!-- ไม่มีข้อมูล -->
+           <div class="flex flex-col" v-if="result.length > 0">
+           </div>
+           <div v-else class="text-center text-gray-500 ">  
+           <br>
+             ไม่มีข้อมูล</div>
+           <!-- --------------------------------------------------------------- -->
       </div>
     </div>
   </div>

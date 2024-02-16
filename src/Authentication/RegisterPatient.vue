@@ -2,6 +2,7 @@
 import { useRouter } from "vue-router";
 import { ref } from "vue";
 import Swal from "sweetalert2";
+import Header from '../layouts/Header.vue';
 
 const fname = ref("");
 const lname = ref("");
@@ -80,6 +81,7 @@ const close = () => appRouter.push({ name: "loginPatient" });
 
 <template>
   <div class="container mx-auto ">
+    <Header></Header>
     <div class="flex flex-col items-center justify-center px-6 py-8 mx-auto mt-10 mb-10 lg:py-0">
       <div class="w-full rounded-xl shadow dark:border md:mt-0 sm:max-w-md xl:p-0 bg-white">
         <div class="p-6 space-y-4 md:space-y-6 sm:p-8 ">

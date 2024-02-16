@@ -2,12 +2,25 @@
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 import SidebarNurse from "../components/SidebarNurse.vue";
-// import {  logout, logoutpatient } from "@/../views/Home.vue"
 
-// const handleClick = () => {
-//   // เรียกใช้ function เมื่อปุ่มถูกคลิก
-//   logout();
-// };
+// ฟังก์ชันสำหรับการ logout พยาบาล
+const router = useRouter();
+const logout = () => {
+  localStorage.removeItem('professional_id');
+  localStorage.removeItem('accesstoken');
+  localStorage.removeItem('idadmin');
+  localStorage.removeItem('name');
+  backloginnurse()
+};
+const appRouter = useRouter();
+const  backloginnurse = () => appRouter.push({ name: "homerole" });
+
+// ดึงข้อมูล name จาก Local Storage
+const name = localStorage.getItem("name");
+
+
+
+
 const showMenu = ref(false);
 
 const toggleMenu = () => {
@@ -29,17 +42,10 @@ const toggleMenu = () => {
       <div v-if="showMenu" class="menu">
         <!-- เพิ่มเนื้อหาของเมนูที่นี่ -->
         <p>Profile</p>
-        <p>Sign out</p>
-        <p>Sign out nurse</p>
+        <p @click="logout">Sign out nurse</p>
       </div>
 
-    <!--   <router-link :to="{ name: 'home' }">
-        <button type="button"
-          class="float-right shadow-xs text-blue-800 border border-blue-800 bg-white hover:bg-blue-800 hover:text-white focus:outline-none focus:ring-2 focus:ring-blue-300 font-medium rounded-lg text-sm px-3 py-2.5 text-center mt-3 mr-8 me-2 mb-2 dark:bg-blue-600 :hover:bg-white dark:focus:ring-blue-800">
-          เพิ่มการบันทึก
-        </button>
-      </router-link> -->
-
+       
       <div>
 
         <div class="flex justify-between h-16">
@@ -48,6 +54,8 @@ const toggleMenu = () => {
           <SidebarNurse/>
           <div class="hidden sm:flex sm:items-center sm:ml-6">
 
+        <div>{{ name }} </div>
+     
 
             <!-- Settings Dropdown -->
             <div class="ml-3 relative"> </div>
@@ -78,7 +86,7 @@ const toggleMenu = () => {
     <!-- Page Heading -->
     <header class="bg-white shadow" v-if="$slots.header">
       <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-        <slot name="header" />
+        <slot name="header"/>
       </div>
     </header>
 
