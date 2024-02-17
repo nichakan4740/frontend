@@ -108,8 +108,6 @@ const close = () => appRouter.push({ name: "loginNurse" });
 
                   </div>
 
-                  
-
                     <div>
                       <label 
                       class="block mb-2 text-sm font-medium text-gray-900">เลขใบประกอบวิชาชีพ</label>
