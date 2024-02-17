@@ -2,12 +2,6 @@
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 import Sidebar from "../components/Sidebar.vue";
-// import {  logout, logoutpatient } from "@/../views/Home.vue"
-
-// const handleClick = () => {
-//   // เรียกใช้ function เมื่อปุ่มถูกคลิก
-//   logout();
-// };
 const showMenu = ref(false);
 
 const toggleMenu = () => {

@@ -15,6 +15,7 @@ const startDate = ref('');
 const endDate = ref('');
 
 
+
 /* การใช้งาน API  */
 const mysugar = ref({
   id: "",
@@ -22,8 +23,6 @@ const mysugar = ref({
   symptom: "",
   note: "",
 });
-
-
 
 /* --------------------------------------------------------------------------------------------------- */
 const MysugarLoad = async () => {
@@ -56,6 +55,13 @@ const filterBySelectedDate = (data, startDate, endDate) => {
       const recordDate = moment(record.updated_at).format('YYYY-MM-DD');
       return moment(recordDate).isBetween(startDate, endDate, 'days', '[]');
     });
+     // คำนวณค่าเฉลี่ยและคืนค่า
+    averageLowSugar.value = calculateAverageSugar('low', filteredData);
+    averageNormalSugar.value = calculateAverageSugar('normal', filteredData);
+    averageHighSugar.value = calculateAverageSugar('high', filteredData);    
+    
+    return filteredData;
+
   } else {
     return data;
   }
@@ -100,7 +106,6 @@ const save = async () => {
   }
 };
 
-
 /* ------------------------------------------------------------------------------------------------ */
 const saveData = async () => {
   try {
@@ -128,7 +133,6 @@ const saveData = async () => {
     console.error("Error saving data:", error);
   }
 };
-
 
 /* --------------------------------------------------------------------------------------------------- */
 const edit = (record) => {
@@ -219,6 +223,32 @@ const closeModal = () => {
 };
 /* ---------------------------------------------------------------------- */
 
+/* function ค่าเฉลี่ย-------------------------------------------------------- */
+const calculateAverageSugar = (category, data) => {
+  const filteredData = data.filter(record => {
+    if (category === 'low') {
+      return record.sugarValue < 70;
+    } else if (category === 'normal') {
+      return record.sugarValue >= 70 && record.sugarValue <= 125;
+    } else if (category === 'high') {
+      return record.sugarValue > 125;
+    }
+  });
+  const sum = filteredData.reduce((total, record) => total + record.sugarValue, 0);
+  const average = sum / filteredData.length;
+  return isNaN(average) ? 0 : average; 
+};
+
+const averageLowSugar = computed(() => calculateAverageSugar('low', result.value));
+const averageNormalSugar = computed(() => calculateAverageSugar('normal', result.value));
+const averageHighSugar = computed(() => calculateAverageSugar('high', result.value));
+
+
+/* นับจำนวน---------------------------------------------------------------------------------------------------- */
+const countLowSugar = computed(() => result.value.filter(record => record.sugarValue < 70).length);
+const countNormalSugar = computed(() => result.value.filter(record => record.sugarValue >= 70 && record.sugarValue <= 125).length);
+const countHighSugar = computed(() => result.value.filter(record => record.sugarValue > 125).length);
+
 </script>
 
 <template>
@@ -256,15 +286,15 @@ const closeModal = () => {
         <!-- ---------------------------------------------------------- -->
           </div>
         </div>
-
-
-
-
-        </div>
-        <div class="box-content p-8 bg-white shadow-lg shadow-gray-300/50 mt-8 ml-5 mr-5 rounded-lg" ></div>
         </div>
 
-
+        <!-- ค่าเฉลี่ย -->
+        <div class="box-content p-8 bg-white shadow-lg shadow-gray-300/50 mt-8 ml-5 mr-5 rounded-lg" >
+          <p>{{averageLowSugar}}%  น้ำตาลในเลือดต่ำ: {{ countLowSugar }} </p>
+          <p>{{averageNormalSugar}}% น้ำตาลในเลือดปกติ: {{ countNormalSugar }}</p>
+          <p>{{averageHighSugar}}% น้ำตาลในเลือดสูง: {{ countHighSugar }}</p>
+        </div>
+        </div>
       <div>
 
 
@@ -280,7 +310,7 @@ const closeModal = () => {
           <thead class="border-b font-medium dark:border-neutral-500">
             <tr >
               <th scope="col" class="px-6 py-4">วันที่เปลี่ยนแปลงการบันทึก</th>
-              <th scope="col" class="px-6 py-4 ">  ระดับน้ำตาลในเลือด  </th>
+              <th scope="col" class="px-6 py-4 "> ระดับน้ำตาลในเลือด</th>
               <th scope="col" class="px-6 py-4"> อาการผิดปกติ </th>
               <th scope="col" class="px-6 py-4">อื่นๆ</th>
               <th scope="col" class="px-6 py-4"></th>
@@ -290,7 +320,7 @@ const closeModal = () => {
           <tbody>
             <!-- <tr class="border-b dark:border-neutral-500" v-for="sugarRecord in result" :key="sugarRecord.id"> -->
             <tr  class="border-b dark:border-neutral-500" v-for="sugarRecord in result" :key="sugarRecord.id" >
-              <td class="whitespace-nowrap px-6 py-4"> {{moment(sugarRecord.updated_at).format("DD MMM YYYY: HH:mm" )}}
+              <td class="whitespace-nowrap px-6 py-4"> {{moment(sugarRecord.updated_at).format("DD MMM YYYY" )}}
               <!--แสดงข้อความตามเงื่อนไขของค่าน้ำตาล / แสดงข้อความตามเงื่อนไขของค่าน้ำตาล -->
                  <br>
                  <span :class="{
@@ -332,8 +362,10 @@ const closeModal = () => {
                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6">
                  <path d="M21.731 2.269a2.625 2.625 0 0 0-3.712 0l-1.157 1.157 3.712 3.712 1.157-1.157a2.625 2.625 0 0 0 0-3.712ZM19.513 8.199l-3.712-3.712-12.15 12.15a5.25 5.25 0 0 0-1.32 2.214l-.8 2.685a.75.75 0 0 0 .933.933l2.685-.8a5.25 5.25 0 0 0 2.214-1.32L19.513 8.2Z" />
                  </svg>
-
                  </button>
+
+
+                 
                  <button type="button" 
                  class="focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900" 
                  @click="remove(sugarRecord)" >

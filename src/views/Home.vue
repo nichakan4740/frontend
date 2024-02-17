@@ -180,6 +180,19 @@ MysugarLoad();
 
 
 
+// ฟังก์ชันสำหรับการ logout ของ ผู้ป่วย
+const logoutpatient = () => {
+  // ลบ JWT จาก localStorage หรือตำแหน่งที่คุณเก็บ token
+  localStorage.removeItem('idcard');
+  localStorage.removeItem('accesstoken');
+  localStorage.removeItem('name');
+ localStorage.removeItem('iduser');
+  backloginpatient()
+};
+const appRouter = useRouter();
+const  backloginpatient = () => appRouter.push({ name: "homerole" });
+
+
 </script>
 
 <template >
