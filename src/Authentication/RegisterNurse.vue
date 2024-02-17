@@ -112,22 +112,26 @@ const close = () => appRouter.push({ name: "loginNurse" });
 
                     <div>
                       <label 
-                      class="block mb-2 text-sm font-medium text-gray-900">เลขใบประกอบวิชาชีพ</label>
+                      class="block mb-2 text-sm font-medium text-gray-900">เลขใบประกอบวิชาชีพ
+                      &nbsp;
+                      <span style="font-size: 10px; color: rgb(177, 109, 241)">
+                      ( ตัวอักษรต้องไม่เกิน 10 ตัวอักษร )
+                      </span></label>
                       <input 
                       type="text"
                       v-model.trim="professional_id"
                       placeholder="xxxxxxxx" 
-                      maxlength="11"
+                      maxlength="10"
                       class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:placeholder-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500"
                       >
                        <p v-if="professional_id.length" class="input-count">
-                      {{ professional_id.length }}/11
+                      {{ professional_id.length }}/10
                       </p>
                        <p v-show="professional_id.length < 1" >
                       * Please input your professional_id  <span></span>
                       </p>
                       <p v-show="professional_id.length > 100" >
-                      * Characters must not exceed 11
+                      * Characters must not exceed 10
                       </p>
                       </div>
 

@@ -48,6 +48,22 @@ const MysugarLoad = async () => {
 };
 
 const save = async () => {
+  if (!mysugar.value.sugarValue || isNaN(parseInt(mysugar.value.sugarValue))) {
+    Swal.fire({
+      icon: 'error',
+      title: 'กรุณาระบุค่าน้ำตาลเป็นตัวเลข',
+    });
+    return;
+  }
+
+  if (parseInt(mysugar.value.sugarValue) > 1000) {
+    Swal.fire({
+      icon: 'error',
+      title: 'น้ำตาลในเลือดต้องไม่เกิน 1000 mg/dL',
+    });
+    return;
+  }
+
   if (mysugar.value.id === '') {
     await saveData();
   } else {
@@ -164,22 +180,6 @@ MysugarLoad();
 
 
 
-
-
-
-// ฟังก์ชันสำหรับการ logout ของ ผู้ป่วย
-const logoutpatient = () => {
-  // ลบ JWT จาก localStorage หรือตำแหน่งที่คุณเก็บ token
-  localStorage.removeItem('idcard');
-  localStorage.removeItem('accesstoken');
-  localStorage.removeItem('name');
- localStorage.removeItem('iduser');
-  backloginpatient()
-};
-const appRouter = useRouter();
-const  backloginpatient = () => appRouter.push({ name: "homerole" });
-
-
 </script>
 
 <template >
@@ -211,7 +211,7 @@ const  backloginpatient = () => appRouter.push({ name: "homerole" });
           <form @submit.prevent="save">
 
           <div class="box-content  pt-3 pb-3  " >
-            <p>น้ำตาลในเลือด (mg/dL) *</p>
+            <p>น้ำตาลในเลือด (mg/dL) <span class="text-red-500">*</span></p>
            <div class="box-content ">
               <input type="text" v-model="mysugar.sugarValue"  
               class="block w-full rounded-md border-0 py-5 pl-7 pr-20 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400"
@@ -253,9 +253,7 @@ const  backloginpatient = () => appRouter.push({ name: "homerole" });
     </div>
   </div>
 
-     <button @click="  logoutpatient"  class="box-content p-3  ml-5 mr-5 mt-10 bg-gradient-to-b from-blue-900 to-blue-800  shadow-lg shadow-slate-500/50  rounded-lg">
-            <h2 class="font-semibold text-xl text-center text-slate-200 ">ออก ผู้ป่วย</h2>
-    </button>
+    
   
                
     </Layout>

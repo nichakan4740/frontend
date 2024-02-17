@@ -23,12 +23,27 @@ import LoginPatient from '../Authentication/LoginPatient.vue';
 import RegisterPatient from '../Authentication/RegisterPatient.vue';
 
 import HomeRole from '../views/HomeRole.vue';
+import Features from '../views/Features.vue';
+import WhatIs from '../views/WhatIs.vue';
 
 const history = createWebHistory(`${import.meta.env.VITE_BASE_URL}`)
 
 const routes = [
 
  
+  {
+    path: '/features',
+    name: 'features',
+    component:  Features ,
+  },
+
+  {
+    path: '/what-is',
+    name: 'what-is',
+    component:  WhatIs ,
+  },
+
+
   /* login-register พยาบาล */
   {
     path: '/login/nurse',

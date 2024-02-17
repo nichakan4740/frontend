@@ -4,7 +4,10 @@ import { ref } from "vue";
 import { Dialog, DialogPanel } from "@headlessui/vue";
 import { Bars3Icon, XMarkIcon } from "@heroicons/vue/24/outline";
 
-const navigation = [{ name: "หน้าหลัก", href: "/" }];
+const navigation = [ 
+  { name: "หน้าหลัก", href: "/" },
+  { name: "Tele-Nursing คืออะไร", href: "/what-is" },
+  { name: "ฟีเจอร์แนะนำ", href: "/Features" }];
 const mobileMenuOpen = ref(false);
 </script>
 
