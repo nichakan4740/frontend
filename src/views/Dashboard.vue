@@ -289,10 +289,41 @@ const countHighSugar = computed(() => result.value.filter(record => record.sugar
         </div>
 
         <!-- ค่าเฉลี่ย -->
+
         <div class="box-content p-8 bg-white shadow-lg shadow-gray-300/50 mt-8 ml-5 mr-5 rounded-lg" >
-          <p>{{averageLowSugar}}%  น้ำตาลในเลือดต่ำ: {{ countLowSugar }} </p>
-          <p>{{averageNormalSugar}}% น้ำตาลในเลือดปกติ: {{ countNormalSugar }}</p>
-          <p>{{averageHighSugar}}% น้ำตาลในเลือดสูง: {{ countHighSugar }}</p>
+          <p>ค่าน้ำตาลเฉลี่ยช่วง</p>
+           <div class="mt-5 mx-5" v-if="startDate && endDate">
+            <p>{{ moment(startDate).format('DD MMM YYYY') }} - {{ moment(endDate).format('DD MMM YYYY') }}</p>
+          </div>
+          
+
+<div class="relative overflow-x-auto">
+    <table class="w-full text-sm text-left rtl:text-right text-gray-500">
+        <tbody>
+            <tr class="bg-white">  
+                <td class="px-6 py-4 content-center">
+                    <div class="box-border h-20 w-20 p-4  bg-amber-200  text-lg pt-8 text-white text-center rounded-full">{{averageLowSugar}}% </div>
+                    <br>
+                    <p class="text-center">{{ countLowSugar }} ครั้ง</p>
+                </td>
+                <td class="px-6 py-4 content-center ">
+                    <div class="box-border h-20 w-20 p-4 bg-green-500 pt-8  text-lg text-white text-center  rounded-full">{{averageNormalSugar}}% </div>
+                    <br>
+                    <p class="text-center"> {{ countNormalSugar }} ครั้ง</p>
+                </td>
+                 <td class="px-6 py-4 content-center">
+                    <div class="box-border h-20 w-20 p-4 bg-red-500 pt-8 text-lg  text-white text-center rounded-full">{{averageHighSugar}}%  </div> 
+                    <br>
+                    <p class="text-center">{{ countHighSugar }} ครั้ง </p>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+      
+  
+  <!-- --------------------------------------------------------------- -->
         </div>
         </div>
       <div>
