@@ -20,66 +20,40 @@ const logout = () => {
   backloginnurse();
 };
 const backloginnurse = () => appRouter.push({ name: "homerole" });
-
-/* -------------------------------------------------------------------------------- */
-// แสดงข้อมูลผู้ป่วย
-const getPatient = async () => {
-  try {
-    const accessToken = localStorage.getItem('accesstoken');
-    if (!accessToken) {
-      throw new Error('Access token not found');
-    }
-    const response = await fetch(`${import.meta.env.VITE_BASE_URL}api/patient/getProfile`, {
-      method: "GET",
-      headers: {
-        'Authorization': `Bearer ${accessToken}`
-      }
-    });
-    if (!response.ok) {
-      throw new Error('Failed to fetch patient profile');
-    }
-    const patientData = await response.json();
-    return patientData;
-  } catch (error) {
-    console.error('Error fetching patient profile:', error.message);
-    Swal.fire({
-      icon: 'error',
-      title: 'Error',
-      text: 'Failed to fetch patient profile. Please try again later.',
-    });
-    return null;
-  }
-};
-// Fetch patient profile when component is mounted
-const patientProfile = ref(null);
-onMounted(async () => {
-  patientProfile.value = await getPatient();
-});
-onUnmounted(() => {
-});
 /* -------------------------------------------------------------------------------------------------------- */
-const MysugarLoad = async () => {
-  try {
-    // Accessing patientProfile.value to get the user object
-    const userId = 1; 
+/* ดึงข้อมูลล่าสุด */
+const filterLatestSugarRecords = (data) => {
+    // Group sugar records by user id
+    const groupedData = data.reduce((acc, record) => {
+        if (!acc[record.user_id] || moment(acc[record.user_id].updated_at) < moment(record.updated_at)) {
+            acc[record.user_id] = record;
+        }
+        return acc;
+    }, {});
 
-    const response = await fetch(`${import.meta.env.VITE_BASE_URL}api/mysugar/${userId}`);
-    if (response.ok) {
-      const data = await response.json();
-      originalData.value = data;
-      result.value = originalData.value; 
-    } else if (response.status === 404) {
-      // Handle case when no data is found
-      console.log('No data found');
-      result.value = []; 
-    } else {
-      throw new Error('Failed to fetch data');
-    }
-  } catch (error) {
-    console.error('Error fetching data:', error);
-  }
+    // Convert grouped data object back to array
+    const filteredData = Object.values(groupedData);
+    return filteredData;
 };
-
+const MysugarLoad = async () => {
+    try {
+        const response = await fetch(`${import.meta.env.VITE_BASE_URL}api/mysugar`);
+        if (response.ok) {
+            const data = await response.json();
+            // Filter the data to keep only the latest sugar records for each user
+            const filteredData = filterLatestSugarRecords(data);
+            // Update the result ref with the filtered data
+            result.value = filteredData;
+        } else if (response.status === 404) {
+            console.log('No data found');
+            result.value = []; 
+        } else {
+            throw new Error('Failed to fetch data');
+        }
+    } catch (error) {
+        console.error('Error fetching data:', error);
+    }
+};
 onMounted(MysugarLoad);
 const originalData = ref([]);
 const result = ref([]);
@@ -130,7 +104,8 @@ const adduser = async () => {
     });
   }
 };
-
+// นับจำนวน user
+const totalUsers = computed(() => result.value.length);
 
 /* model- popup --------------------------------------------------------------------------------------------- */
 const isModalOpen = ref(false);
@@ -140,7 +115,24 @@ const openModal = () => {
 const closeModal = () => {
   isModalOpen.value = false;
 };
+/* ------------------------------------------------------------------------------------------------------------ */
 
+
+// Search function
+const searchInput = ref('');
+const filteredResult = computed(() => {
+  const query = searchInput.value.toLowerCase();
+  return result.value.filter(record => {
+    const thaiName = `${record.user.fname} ${record.user.lname}`;
+    const englishName = `${record.user.fname_en} ${record.user.lname_en}`;
+    return thaiName.toLowerCase().includes(query) || englishName.toLowerCase().includes(query);
+  });
+});
+
+// Function to reset search input
+const resetSearch = () => {
+  searchInput.value = '';
+};
 </script>
 <template>
  <LayoutNurse class="bg-gradient-to-b from-blue-100">
@@ -155,10 +147,12 @@ const closeModal = () => {
     <!-- boxcontent -->
     <div class="grid grid-cols-2 gap-2  mt-5  ">
      <div class="box-content"></div>
- 
- 
      <div class="box-content p-8 bg-white shadow-lg shadow-gray-300/50 mt-8 ml-5 mr-5  rounded-lg  ">
-     <p>เวลาปัจจุบัน: {{ currentTime }}</p>
+      <!-- Search input -->
+      <input type="text" v-model="searchInput" placeholder="ค้นหารายชื่อผู้ป่วย" class="bg-gray-200 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-400">
+      <button @click="resetSearch" class="bg-gray-300 rounded-lg px-3 py-1 ml-2 focus:outline-none focus:ring-2 focus:ring-blue-400">คืนค่า</button>
+  
+
      </div>
      </div>
         <!-- ----------------------------------------------------------------------------------------------------------------------------- -->
@@ -166,29 +160,37 @@ const closeModal = () => {
 
         <!-- boxcontent แสดงรายละเอียด --------------------------------------------------------------------- -->
          <div class="box-content p-8 bg-white shadow-lg shadow-gray-300/50 mt-8 ml-5 mr-5 mb-10 rounded-lg">
-        <h2 class="text-center text-2xl font-bold mb-5">รายละเอียดค่าน้ำตาลช่วง</h2>
+        <h2 class="text-left text-2xl font-bold mb-5">รายชื่อคนไข้ทั้งหมด ({{totalUsers}})</h2>
         
     <!-- --------------------------------------------------------------------------------------------------------------------------- -->  
-   <table class="min-w-full text-left text-sm font-light">
-          <thead class="border-b font-medium dark:border-neutral-500">
-            <tr >
+
+        
+<div class="relative overflow-x-auto">
+    <table class="w-full text-sm text-left rtl:text-right text-gray-500 ">
+        <thead class="text-xs text-gray-700 uppercase bg-gray-50 ">
+            <tr>
               <th scope="col" class="px-6 py-4">รายชื่อ</th>
               <th scope="col" class="px-6 py-4 ">สถานะ</th>
               <th scope="col" class="px-6 py-4"> ตรวจล่าสุด </th>
               <th scope="col" class="px-6 py-4">(mg/dl)</th>
-               <th scope="col" class="px-6 py-4">พูดคุย</th>
+              <th scope="col" class="px-6 py-4">พูดคุย</th>
               <th scope="col" class="px-6 py-4"></th>
             </tr>
-          </thead>
-          <tbody>
-              <tr class="border-b dark:border-neutral-500" v-for="user in patientProfile" :key="user.id" >
-              <td class="whitespace-nowrap px-6 py-4">{{ user.fname }} {{ user.lname }}</td>
-              <td class="whitespace-nowrap px-6 py-4">{{ user.id }}</td>
-              <td class="whitespace-nowrap px-6 py-4"></td>
-              <!-- ------------------------------------------------------------------------------------------ -->
-            </tr>
-          </tbody>
-        </table>
+        </thead>
+        <tbody>
+            <tr class="bg-white border-b"  v-for="sugarRecord in filteredResult" :key="sugarRecord.id">
+                <td class="px-6 py-4">{{sugarRecord.user.fname}} {{sugarRecord.user.lname}}</td>
+                <td class="px-6 py-4"></td>
+                <td class="px-6 py-4">
+                     {{ moment(sugarRecord.updated_at).format("DD MMM YYYY") }}
+                      <br>
+                      {{ moment(sugarRecord.updated_at).format("HH:mm")}}
+                </td>
+                <td class="px-6 py-4">{{sugarRecord.sugarValue}}</td>            
+           </tr>  
+        </tbody>
+    </table>
+</div>
 
 <br>
  <!-- เมื่อคลิกที่ปุ่มนี้โมดัลจะปรากฎ-------------------------------------------------------------------------------------- -->
@@ -353,9 +355,7 @@ const closeModal = () => {
 
           <!-- ---------------------------------------------------------------------------------------------------- -->
 
-
-
-           <!-- ปุ่มปิดโมดัล -->
+           <!-- ปุ่มปิด Modal -->
           <div class="sm:flex sm:items-start">
             <button @click="closeModal" type="button" class="inline-flex justify-center w-full rounded-md border border-transparent px-4 py-2 bg-red-600 text-base font-medium text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:text-sm">
               ปิด
@@ -368,40 +368,7 @@ const closeModal = () => {
     </div>
   </div>
 </div>
-
        <!-- ------------------------------------------------------------------------------------ -->
-
-    
-        <table class="min-w-full text-left text-sm font-light">
-          <thead class="border-b font-medium dark:border-neutral-500">
-            <tr >
-              <th scope="col" class="px-6 py-4">วันที่เปลี่ยนแปลงการบันทึก</th>
-              <th scope="col" class="px-6 py-4 ">  ระดับน้ำตาลในเลือด  </th>
-              <th scope="col" class="px-6 py-4"> อาการผิดปกติ </th>
-              <th scope="col" class="px-6 py-4">อื่นๆ</th>
-              <th scope="col" class="px-6 py-4"></th>
-               <th scope="col" class="px-6 py-4"></th>
-            </tr>
-          </thead>
-          <tbody>
-            <!-- <tr class="border-b dark:border-neutral-500" v-for="sugarRecord in result" :key="sugarRecord.id"> -->
-            <tr  class="border-b dark:border-neutral-500" v-for="sugarRecord in result" :key="sugarRecord.id" >
-              <td class="whitespace-nowrap px-6 py-4"> {{moment(sugarRecord.updated_at).format("DD MMM YYYY: HH:mm" )}}
-              </td>
-                </tr>
-          </tbody>
-        </table>
-
-
-
-
-
-
-
-
-
-
-
 
     </div>   
 
