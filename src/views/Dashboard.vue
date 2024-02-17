@@ -15,6 +15,7 @@ const startDate = ref('');
 const endDate = ref('');
 
 
+
 /* การใช้งาน API  */
 const mysugar = ref({
   id: "",
@@ -57,7 +58,8 @@ const filterBySelectedDate = (data, startDate, endDate) => {
      // คำนวณค่าเฉลี่ยและคืนค่า
     averageLowSugar.value = calculateAverageSugar('low', filteredData);
     averageNormalSugar.value = calculateAverageSugar('normal', filteredData);
-    averageHighSugar.value = calculateAverageSugar('high', filteredData);
+    averageHighSugar.value = calculateAverageSugar('high', filteredData);    
+    
     return filteredData;
 
   } else {
@@ -103,7 +105,6 @@ const save = async () => {
     await updateData();
   }
 };
-
 
 /* ------------------------------------------------------------------------------------------------ */
 const saveData = async () => {
@@ -222,7 +223,7 @@ const closeModal = () => {
 };
 /* ---------------------------------------------------------------------- */
 
-/* function ค่าเฉลี่ย */
+/* function ค่าเฉลี่ย-------------------------------------------------------- */
 const calculateAverageSugar = (category, data) => {
   const filteredData = data.filter(record => {
     if (category === 'low') {
@@ -243,15 +244,10 @@ const averageNormalSugar = computed(() => calculateAverageSugar('normal', result
 const averageHighSugar = computed(() => calculateAverageSugar('high', result.value));
 
 
-
-
-
-
-
-
-
-
-
+/* นับจำนวน---------------------------------------------------------------------------------------------------- */
+const countLowSugar = computed(() => result.value.filter(record => record.sugarValue < 70).length);
+const countNormalSugar = computed(() => result.value.filter(record => record.sugarValue >= 70 && record.sugarValue <= 125).length);
+const countHighSugar = computed(() => result.value.filter(record => record.sugarValue > 125).length);
 
 </script>
 
@@ -294,9 +290,9 @@ const averageHighSugar = computed(() => calculateAverageSugar('high', result.val
 
         <!-- ค่าเฉลี่ย -->
         <div class="box-content p-8 bg-white shadow-lg shadow-gray-300/50 mt-8 ml-5 mr-5 rounded-lg" >
-          <p>{{averageLowSugar}}</p>
-          <p>{{averageNormalSugar}}</p>
-          <p>{{averageHighSugar}}</p>
+          <p>{{averageLowSugar}}%  น้ำตาลในเลือดต่ำ: {{ countLowSugar }} </p>
+          <p>{{averageNormalSugar}}% น้ำตาลในเลือดปกติ: {{ countNormalSugar }}</p>
+          <p>{{averageHighSugar}}% น้ำตาลในเลือดสูง: {{ countHighSugar }}</p>
         </div>
         </div>
       <div>
@@ -314,7 +310,7 @@ const averageHighSugar = computed(() => calculateAverageSugar('high', result.val
           <thead class="border-b font-medium dark:border-neutral-500">
             <tr >
               <th scope="col" class="px-6 py-4">วันที่เปลี่ยนแปลงการบันทึก</th>
-              <th scope="col" class="px-6 py-4 ">  ระดับน้ำตาลในเลือด  </th>
+              <th scope="col" class="px-6 py-4 "> ระดับน้ำตาลในเลือด</th>
               <th scope="col" class="px-6 py-4"> อาการผิดปกติ </th>
               <th scope="col" class="px-6 py-4">อื่นๆ</th>
               <th scope="col" class="px-6 py-4"></th>
@@ -450,9 +446,6 @@ const averageHighSugar = computed(() => calculateAverageSugar('high', result.val
                       </button>
                     </form>
                   </div>
-
-
-
                
               </div>
             </div>
