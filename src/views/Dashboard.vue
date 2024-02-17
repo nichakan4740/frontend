@@ -54,6 +54,12 @@ const filterBySelectedDate = (data, startDate, endDate) => {
       const recordDate = moment(record.updated_at).format('YYYY-MM-DD');
       return moment(recordDate).isBetween(startDate, endDate, 'days', '[]');
     });
+     // คำนวณค่าเฉลี่ยและคืนค่า
+    averageLowSugar.value = calculateAverageSugar('low', filteredData);
+    averageNormalSugar.value = calculateAverageSugar('normal', filteredData);
+    averageHighSugar.value = calculateAverageSugar('high', filteredData);
+    return filteredData;
+
   } else {
     return data;
   }
@@ -126,7 +132,6 @@ const saveData = async () => {
     console.error("Error saving data:", error);
   }
 };
-
 
 /* --------------------------------------------------------------------------------------------------- */
 const edit = (record) => {
@@ -217,6 +222,37 @@ const closeModal = () => {
 };
 /* ---------------------------------------------------------------------- */
 
+/* function ค่าเฉลี่ย */
+const calculateAverageSugar = (category, data) => {
+  const filteredData = data.filter(record => {
+    if (category === 'low') {
+      return record.sugarValue < 70;
+    } else if (category === 'normal') {
+      return record.sugarValue >= 70 && record.sugarValue <= 125;
+    } else if (category === 'high') {
+      return record.sugarValue > 125;
+    }
+  });
+  const sum = filteredData.reduce((total, record) => total + record.sugarValue, 0);
+  const average = sum / filteredData.length;
+  return isNaN(average) ? 0 : average; 
+};
+
+const averageLowSugar = computed(() => calculateAverageSugar('low', result.value));
+const averageNormalSugar = computed(() => calculateAverageSugar('normal', result.value));
+const averageHighSugar = computed(() => calculateAverageSugar('high', result.value));
+
+
+
+
+
+
+
+
+
+
+
+
 </script>
 
 <template>
@@ -254,15 +290,15 @@ const closeModal = () => {
         <!-- ---------------------------------------------------------- -->
           </div>
         </div>
-
-
-
-
-        </div>
-        <div class="box-content p-8 bg-white shadow-lg shadow-gray-300/50 mt-8 ml-5 mr-5 rounded-lg" ></div>
         </div>
 
-
+        <!-- ค่าเฉลี่ย -->
+        <div class="box-content p-8 bg-white shadow-lg shadow-gray-300/50 mt-8 ml-5 mr-5 rounded-lg" >
+          <p>{{averageLowSugar}}</p>
+          <p>{{averageNormalSugar}}</p>
+          <p>{{averageHighSugar}}</p>
+        </div>
+        </div>
       <div>
 
 
@@ -288,7 +324,7 @@ const closeModal = () => {
           <tbody>
             <!-- <tr class="border-b dark:border-neutral-500" v-for="sugarRecord in result" :key="sugarRecord.id"> -->
             <tr  class="border-b dark:border-neutral-500" v-for="sugarRecord in result" :key="sugarRecord.id" >
-              <td class="whitespace-nowrap px-6 py-4"> {{moment(sugarRecord.updated_at).format("DD MMM YYYY: HH:mm" )}}
+              <td class="whitespace-nowrap px-6 py-4"> {{moment(sugarRecord.updated_at).format("DD MMM YYYY" )}}
               <!--แสดงข้อความตามเงื่อนไขของค่าน้ำตาล / แสดงข้อความตามเงื่อนไขของค่าน้ำตาล -->
                  <br>
                  <span :class="{
