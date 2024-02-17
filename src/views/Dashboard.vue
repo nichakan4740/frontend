@@ -253,24 +253,21 @@ const closeModal = () => {
             <input type="date" id="selectedDate" v-model="selectedDate" @change="filterDataByDate" class="mt-2 px-4 py-2 border rounded-md">
        </div>
      
-       
-
-
         <!-- ---------------------------------------------------------- -->
-        
-
-
-
           </div>
         </div>
 
+
+
+
         </div>
-        <div
-          class="box-content p-8 bg-white shadow-lg shadow-gray-300/50 mt-8 ml-5 mr-5 rounded-lg"
-        ></div>
-      </div>
+        <div class="box-content p-8 bg-white shadow-lg shadow-gray-300/50 mt-8 ml-5 mr-5 rounded-lg" ></div>
+        </div>
+
 
       <div>
+
+
         <div class="box-content p-8 bg-white shadow-lg shadow-gray-300/50 mt-8 ml-5 mr-5 mb-10 rounded-lg" >
         <h2 class="text-center text-2xl font-bold mb-5">รายละเอียดค่าน้ำตาลช่วง</h2>
 <!-- ---------------------------------------------------------------------------------------------------------------------- -->
@@ -424,10 +421,6 @@ const closeModal = () => {
         </div>
       </div>
     </div>
-
-
-
-     
   </Layout>
 </template>
 

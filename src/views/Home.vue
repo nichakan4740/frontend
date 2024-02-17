@@ -205,6 +205,8 @@ const  backloginpatient = () => appRouter.push({ name: "homerole" });
 
 <div>
 
+  
+
     <div  class="box-content   bg-white shadow-lg shadow-gray-300/50 mt-10 ml-5 mr-5 pt-6 pb-6 pl-20 pr-20  mb-10  rounded-lg ">
           <form @submit.prevent="save">
 

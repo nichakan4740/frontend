@@ -56,7 +56,6 @@ const toggleMenu = () => {
 
         <div>{{ name }} </div>
      
-
             <!-- Settings Dropdown -->
             <div class="ml-3 relative"> </div>
           </div>
