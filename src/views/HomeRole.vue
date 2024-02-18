@@ -49,7 +49,7 @@ import Footer from '../layouts/Footer.vue';
             Tele-Nursing System  ระบบพยาบาลทางไกล
           </h1>
           <p class="mt-6 text-lg leading-8 text-gray-600">
-            โปรดเลือกงาน
+            โปรดเลือกใช้งาน
           </p>
           <div class="mt-10 flex items-center justify-center gap-x-6">
          
