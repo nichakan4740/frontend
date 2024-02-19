@@ -37,7 +37,7 @@ const filterLatestSugarRecords = (data) => {
 };
 const MysugarLoad = async () => {
     try {
-        const response = await fetch(`${import.meta.env.VITE_BASE_URL}api/mysugar`);
+        const response = await fetch(`http://cp23ssa2.sit.kmutt.ac.th:8000/api/mysugar`);
         if (response.ok) {
             const data = await response.json();
             // Filter the data to keep only the latest sugar records for each user
@@ -71,7 +71,7 @@ const idcard = ref("");
 const password = ref("telenursing");
 const adduser = async () => {
   const res = await fetch(
-    `${import.meta.env.VITE_BASE_URL}api/patient/register`,
+    `http://cp23ssa2.sit.kmutt.ac.th:8000/api/patient/register`,
     {
       method: "POST",
       headers: {
@@ -145,7 +145,7 @@ const resetSearch = () => {
     
  
     <!-- boxcontent -->
-    <div class="grid grid-cols-2 gap-2  mt-5  ">
+    <div class="grid grid-cols-2 gap-2  mt-5 ">
      <div class="box-content"></div>
      <div class="box-content p-8 bg-white shadow-lg shadow-gray-300/50 mt-8 ml-5 mr-5  rounded-lg  ">
       <!-- Search input -->
@@ -165,7 +165,9 @@ const resetSearch = () => {
     <!-- --------------------------------------------------------------------------------------------------------------------------- -->  
 
         
-<div class="relative overflow-x-auto">
+<div class="overflow-x-auto">
+  <div class="inline-block min-w-full py-2 sm:px-6 lg:px-8">
+   <div class="overflow-hidden">
     <table class="w-full text-sm text-left rtl:text-right text-gray-500 ">
         <thead class="text-xs text-gray-700 uppercase bg-gray-50 ">
             <tr>
@@ -190,6 +192,8 @@ const resetSearch = () => {
            </tr>  
         </tbody>
     </table>
+</div>
+</div>
 </div>
 
 <br>

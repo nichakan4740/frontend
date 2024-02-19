@@ -11,10 +11,6 @@ const toggle = () => {
 
 </script>
 
-
-
-
-
 <template>
     <div class="relative flex h-screen  sticky top-0">
         <!-- Sidebar -->
