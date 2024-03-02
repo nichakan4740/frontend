@@ -9,9 +9,9 @@ const appRouter = useRouter();
 
 
 /* โหลดข้อมูล------------------------------------------------------------------------------------------------------ */
-const MysugarLoad = async () => {
+const MysugarLoad = async () => {  
     try {
-        const response = await fetch(`http://cp23ssa2.sit.kmutt.ac.th:8000/api/mysugar`);
+        const response = await fetch(`${import.meta.env.VITE_BASE_URL}api/mysugar`);
         if (response.ok) {
             const data = await response.json();
             result.value = data;

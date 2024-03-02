@@ -37,7 +37,7 @@ const filterLatestSugarRecords = (data) => {
 };
 const MysugarLoad = async () => {
     try {
-        const response = await fetch(`http://cp23ssa2.sit.kmutt.ac.th:8000/api/mysugar`);
+        const response = await fetch(`${import.meta.env.VITE_BASE_URL}api/mysugar`);
         if (response.ok) {
             const data = await response.json();
             // Filter the data to keep only the latest sugar records for each user
@@ -71,7 +71,7 @@ const idcard = ref("");
 const password = ref("telenursing");
 const adduser = async () => {
   const res = await fetch(
-    `http://cp23ssa2.sit.kmutt.ac.th:8000/api/patient/register`,
+    `${import.meta.env.VITE_BASE_URL}api/patient/register`,
     {
       method: "POST",
       headers: {
