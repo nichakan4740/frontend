@@ -6,8 +6,9 @@ import { Bars3Icon, XMarkIcon } from "@heroicons/vue/24/outline";
 
 const navigation = [ 
   { name: "หน้าหลัก", href: "/" },
-  { name: "Tele-Nursing คืออะไร", href: "/what-is" },
-  { name: "ฟีเจอร์แนะนำ", href: "/Features" }];
+  // { name: "Tele-Nursing คืออะไร", href: "/what-is" },
+  // { name: "ฟีเจอร์แนะนำ", href: "/Features" }
+];
 const mobileMenuOpen = ref(false);
 </script>
 
@@ -40,7 +41,25 @@ const mobileMenuOpen = ref(false);
       </div>
 
       <!-- คอม  -->
+
+
       <div class="hidden lg:flex lg:flex-1 lg:justify-end">
+        <router-link :to="{ name: 'what-is' }">
+          <button
+            type="button"
+            class="text-sm font-semibold leading-6 text-gray-900 mr-6"
+          >
+          Tele-Nursing คืออะไร
+          </button>
+        </router-link>
+        <router-link :to="{ name: 'features' }">
+          <button
+            type="button"
+            class="text-sm font-semibold leading-6 text-gray-900 mr-6"
+          >
+          ฟีเจอร์แนะนำ
+          </button>
+        </router-link>
         <router-link :to="{ name: 'loginNurse' }">
           <button
             type="button"
@@ -95,6 +114,23 @@ const mobileMenuOpen = ref(false);
 
             <!-- สำหรับโทรศัพท์ -->
             <div class="py-6">
+              <router-link :to="{ name: 'what-is' }">
+                <button
+                  type="button"
+                  class="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
+                >
+                Tele-Nursing คืออะไร
+                </button>
+              </router-link>
+
+              <router-link :to="{ name: 'features' }">
+                <button
+                  type="button"
+                  class="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
+                >
+                ฟีเจอร์แนะนำ
+                </button>
+              </router-link>
               <router-link :to="{ name: 'loginNurse' }">
                 <button
                   type="button"
