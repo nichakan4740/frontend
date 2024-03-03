@@ -5,6 +5,8 @@ import Dashboard from '../views/Dashboard.vue'
 import Chatbot from '../views/Chatbot.vue'
 import SugarValue from '../views/SugarValue.vue';
 import Knowledge from '../views/Knowledge.vue';
+import HealthUser  from '../views/HealthUser.vue';
+import InformationUser  from '../views/InformationUser.vue';
 /* ------------------------------------------------------------------------------------- */
 
 /* หน้าพยาบาล */
@@ -22,6 +24,9 @@ import RegisterNurse from '../Authentication/RegisterNurse.vue';
 import LoginPatient from '../Authentication/LoginPatient.vue';
 import RegisterPatient from '../Authentication/RegisterPatient.vue';
 
+
+
+/* หน้าแสดงผล */
 import HomeRole from '../views/HomeRole.vue';
 import Features from '../views/Features.vue';
 import WhatIs from '../views/WhatIs.vue';
@@ -102,6 +107,19 @@ const routes = [
     name: 'knowledge',
     component: Knowledge,
   },
+
+  {
+    path: '/healthUser',
+    name: 'healthUser',
+    component: HealthUser,
+  },
+
+  {
+    path: '/informationUser',
+    name: 'informationUser',
+    component: InformationUser,
+  },
+
 
   /* หน้าพยาบาล------------------------------------------------------------------------------------------ */
   {

@@ -1,6 +1,8 @@
 <script setup>
 import { ref } from "vue";
 import { useRouter } from "vue-router";
+import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue'
+import { ChevronDownIcon } from '@heroicons/vue/20/solid'
 const open = ref(false);
 /* const dimmer = ref(true);
 const right = ref(false); */
@@ -34,9 +36,6 @@ pusherScript.onload = () => {
 </script>
 
 
-
-
-
 <template>
     <div class="relative flex h-screen  sticky top-0">
         <!-- Sidebar -->
@@ -56,7 +55,7 @@ pusherScript.onload = () => {
 
             <nav>
                 <a
-                    class="flex item-center space-x-2 py-3 px-4 hover:bg-indigo-500 rounded transition duration-200"
+                    class="flex item-center space-x-2 py-3 px-4 hover:bg-indigo-500 transition duration-200"
                 >
                     <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -76,7 +75,7 @@ pusherScript.onload = () => {
                 <!-- ------------------------------------------------------------------------------- -->
                 <a
                    
-                    class="flex item-center space-x-2 py-3 px-4 hover:bg-indigo-500 rounded transition duration-200"
+                    class="flex item-center space-x-2 py-3 px-4 hover:bg-indigo-500  transition duration-200"
                 >
                     <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -94,7 +93,7 @@ pusherScript.onload = () => {
                 </a>
                 <!-- ------------------------------------------------------------------------------- -->
                 <a
-                    class="flex item-center space-x-2 py-3 px-4 hover:bg-indigo-500 rounded transition duration-200"
+                    class="flex item-center space-x-2 py-3 px-4 hover:bg-indigo-500  transition duration-200"
                 >
                     <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -116,7 +115,7 @@ pusherScript.onload = () => {
                 <!-- ------------------------------------------------------------------------------- -->
                 <a
                     href=""
-                    class="flex item-center space-x-2 py-3 px-4 hover:bg-indigo-500 rounded transition duration-200"
+                    class="flex item-center space-x-2 py-3 px-4 hover:bg-indigo-500  transition duration-200"
                 >
                     <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -133,27 +132,47 @@ pusherScript.onload = () => {
                     </svg>
                     <router-link  :to="{ name: 'knowledge' }" class="text-slate-300">สาระความรู้</router-link>
                 </a>
+
+
+
                 <!-- ------------------------------------------------------------------------------- -->
-                <a
-                    href=""
-                    class="flex item-center space-x-2 py-3 px-4 hover:bg-indigo-500 rounded transition duration-200"
-                >
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 20 14"
-                        fill="currentColor"
-                        class="w-5 h-5"
-                    >
-                        <path
-                            fill-rule="evenodd"
-                            d="M1 6a3 3 0 013-3h12a3 3 0 013 3v8a3 3 0 01-3 3H4a3 3 0 01-3-3V6zm4 1.5a2 2 0 114 0 2 2 0 01-4 0zm2 3a4 4 0 00-3.665 2.395.75.75 0 00.416 1A8.98 8.98 0 007 14.5a8.98 8.98 0 003.249-.604.75.75 0 00.416-1.001A4.001 4.001 0 007 10.5zm5-3.75a.75.75 0 01.75-.75h2.5a.75.75 0 010 1.5h-2.5a.75.75 0 01-.75-.75zm0 6.5a.75.75 0 01.75-.75h2.5a.75.75 0 010 1.5h-2.5a.75.75 0 01-.75-.75zm.75-4a.75.75 0 000 1.5h2.5a.75.75 0 000-1.5h-2.5z"
-                            clip-rule="evenodd"
-                            fill="#A8B4CD"
-                        />
-                    </svg>
-                    <span class="text-slate-300">จัดการข้อมูล</span>
-                </a>
-                <!-- ------------------------------------------------------------------------------- -->
+            
+
+    <Menu as="div" class="flex item-center space-x-2 py-3 px-4 hover:bg-indigo-500  transition duration-200">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" fill="currentColor" class="w-5 h-5 inline-flex " >
+        <path fill-rule="evenodd" d="M1 6a3 3 0 013-3h12a3 3 0 013 3v8a3 3 0 01-3 3H4a3 3 0 01-3-3V6zm4 1.5a2 2 0 114 0 2 2 0 01-4 0zm2 3a4 4 0 00-3.665 2.395.75.75 0 00.416 1A8.98 8.98 0 007 14.5a8.98 8.98 0 003.249-.604.75.75 0 00.416-1.001A4.001 4.001 0 007 10.5zm5-3.75a.75.75 0 01.75-.75h2.5a.75.75 0 010 1.5h-2.5a.75.75 0 01-.75-.75zm0 6.5a.75.75 0 01.75-.75h2.5a.75.75 0 010 1.5h-2.5a.75.75 0 01-.75-.75zm.75-4a.75.75 0 000 1.5h2.5a.75.75 0 000-1.5h-2.5z" clip-rule="evenodd" fill="#A8B4CD"/></svg>
+    <div>
+      <MenuButton class="inline-flex text-slate-300 ">
+         จัดการข้อมูล
+        <ChevronDownIcon class="-mr-1 h-5 w-5 text-gray-300 ml-20  " aria-hidden="true" />
+      </MenuButton>
+    </div>
+
+     <div>
+      <MenuItems class=" bg-indigo-50 absolute inset-x-0 mt-9 w-64  ">
+        <div>
+
+          <MenuItem v-slot="{ active }">
+            <router-link :to="{ name: 'informationUser' }"  :class="[active ? ' text-gray-900' : 'text-slate-400', 'block px-4 py-4 text-sm h-12']">ข้อมูลส่วนบุคคล</router-link>
+            
+          </MenuItem>
+
+          <MenuItem v-slot="{ active }">
+            <router-link :to="{ name: 'healthUser' }"  :class="[active ? ' text-gray-900' : 'text-slate-400', 'block px-4 py-4 text-sm h-12 ']">ข้อมูลสุขภาพ</router-link>
+          </MenuItem>
+
+        </div>
+      </MenuItems>
+      </div>
+   
+  </Menu>
+    
+    <!-- ------------------------------------------------------------------------------- -->
+
+            
+            
+            
+            
             </nav>
         </div>
     
