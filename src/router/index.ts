@@ -31,6 +31,11 @@ import HomeRole from '../views/HomeRole.vue';
 import Features from '../views/Features.vue';
 import WhatIs from '../views/WhatIs.vue';
 
+
+/* chat */
+import GroupsChat from '../views/GroupsChat.vue';
+
+
 const history = createWebHistory(`${import.meta.env.VITE_BASE_URL}`)
 
 const routes = [
@@ -139,6 +144,16 @@ const routes = [
     name: 'chat',
     component: Chat,
   },
+
+
+
+  /* chat */
+  {
+    path: '/groupschat',
+    name: 'groupschat',
+    component: GroupsChat,
+  },
+
 
 ]
 const router = createRouter({ history, routes })

@@ -23,7 +23,6 @@ onUnmounted(() => {
 });
 
 
-
 /* แสดงค่าน้ำตาล */
 const result = ref([]);
 const mysugar = ref({
@@ -191,6 +190,32 @@ const logoutpatient = () => {
 };
 const appRouter = useRouter();
 const  backloginpatient = () => appRouter.push({ name: "homerole" });
+
+
+/* เพิ่มข้อมูลยา */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 </script>

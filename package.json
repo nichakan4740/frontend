@@ -14,7 +14,9 @@
     "@vue-hero-icons/outline": "^1.7.2",
     "axios": "^1.6.2",
     "cors": "^2.8.5",
+    "laravel-echo": "^1.16.0",
     "moment": "^2.29.4",
+    "pusher-js": "^8.4.0-rc2",
     "sweetalert2": "^11.10.1",
     "vue": "^3.3.8",
     "vue-router": "^4.2.5"
