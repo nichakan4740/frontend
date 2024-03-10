@@ -75,7 +75,7 @@ const close = () => appRouter.push({ name: "nursehome" });
   <div class="container mx-auto">
     <Header></Header>
     <div
-      class="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0"
+      class="flex flex-col items-center justify-center px-6 py-8 mx-auto my-8 md:h-screen lg:py-0"
     >
       <div
         class="w-full rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 bg-white"
