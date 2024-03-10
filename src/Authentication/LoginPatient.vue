@@ -8,6 +8,8 @@ const idcard = ref('');
 const password = ref('');
 const loading = ref(false);
 
+
+
 const loginpatient = async () => {
   loading.value = true;
   try {
@@ -27,6 +29,7 @@ const loginpatient = async () => {
       localStorage.setItem("idcard", response.user.idcard);
       localStorage.setItem("iduser", response.user.id);
       localStorage.setItem("name", response.user.fname);
+      localStorage.setItem("lname", response.user.lname);
       localStorage.setItem("accesstoken", response.authorisation.token);
 
       Swal.fire({

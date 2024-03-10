@@ -30,8 +30,9 @@ const loginnurse = async () => {
       localStorage.setItem("professional_id", response.user.professional_id);
       localStorage.setItem("idadmin", response.user.id);
       localStorage.setItem("name", response.user.name);
+      localStorage.setItem("lname", response.user.lname);
       localStorage.setItem("accesstoken", response.authorisation.token);
-      
+      console.log(localStorage);
 
       Swal.fire({
         icon: "success",
