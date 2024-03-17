@@ -40,6 +40,35 @@ onMounted(Mydrug );
 
 
 const appRouter = useRouter();
+
+
+const allergic_drug = ref("");
+const my_drug = ref("");
+
+const add_drug = async () => {
+  const res = await fetch(
+    `${import.meta.env.VITE_BASE_URL}api/drug`,
+    {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+      },
+      body: JSON.stringify({
+        allergic_drug : allergic_drug.value,
+        my_drug :  my_drug.value,
+      }),
+    }
+  );
+  }
+
+// ให้ปุ่มเปลี่ยนสี
+const isButtonClicked = ref(false);
+
+const handleButtonClick = () => {
+   // Toggle the state when the button is clicked
+   isButtonClicked.value = !isButtonClicked.value;
+};
+
 </script>
  
 <template>
@@ -50,6 +79,45 @@ const appRouter = useRouter();
        <div  class="box-content p-3  ml-5 mr-5 mt-10 bg-gradient-to-b from-blue-900 to-blue-800  shadow-lg shadow-slate-500/50  rounded-lg">
             <h2 class="font-semibold text-xl text-center text-slate-200 ">ข้อมูลสุขภาพ</h2>
        </div>
+
+       <div class=" bg-white dark:bg-gray-900 box-conten shadow-lg shadow-gray-300/50 mt-10 ml-5 mr-5 pt-6 pb-6 pl-6 pr-6  mb-10  rounded-lg ">
+                           <h1 class="text-gray-500 dark:text-gray-300">เลือกเพื่อดูข้อมูล</h1>
+
+                           <div class="mt-3 md:flex md:items-center md:-mx-2">
+                            <router-link :to="{ name: 'informationUser' }">
+                              <button
+                              @click="handleButtonClick" 
+                              :class="{ 'bg-blue-500 text-white': isButtonClicked }"
+                                 class="flex justify-center w-full px-6 py-3 mt-4 text-blue-500 border border-blue-500 rounded-md md:mt-0 md:w-auto md:mx-2 dark:border-blue-400 dark:text-blue-400 focus:outline-none">
+                                 <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24"
+                                    stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                       d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                 </svg>
+
+                                 <span class="mx-2">
+                                    ข้อมูลส่วนบุคคล
+                                 </span>
+                              </button></router-link>
+
+                              
+                              <button 
+                                 
+                                 
+                                 class="flex justify-center w-full px-6 py-3 text-white bg-blue-500 rounded-md md:w-auto md:mx-2 focus:outline-none">
+                                 <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24"
+                                    stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                       d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                 </svg>
+
+                                 <span class="mx-2">
+                                    ข้อมูลสุขภาพ
+                                 </span>
+                              </button>
+                           
+                           </div>
+                        </div>
     
         <!-- boxcontent ข้อมูลสุขภาพ  --------------------------------------------------------------------- -->
          <div class="box-content p-8 bg-white shadow-lg shadow-gray-300/50 mt-8 ml-5 mr-5 mb-10 rounded-lg"
@@ -97,7 +165,19 @@ const appRouter = useRouter();
             <!-- ------------------------------------------------------------------------------------------- -->
 
     
+            <button
+                              class="flex items-center justify-between w-full px-6 py-3 text-sm tracking-wide text-white capitalize transition-colors duration-300 transform bg-blue-500 rounded-md hover:bg-blue-400 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-50">
+                              <span>บันทึกข้อมูลยา</span>
 
+                              <svg xmlns="http://www.w3.org/2000/svg" 
+                              class="w-5 h-5 rtl:-scale-x-100"
+                              @click.prevent="add_drug"
+                                 viewBox="0 0 20 20" fill="currentColor">
+                                 <path fill-rule="evenodd"
+                                    d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                                    clip-rule="evenodd" />
+                              </svg>
+                           </button>
 
         </div>
     <!-- --------------------------------------------------------------------------------------------------------------------------- -->  

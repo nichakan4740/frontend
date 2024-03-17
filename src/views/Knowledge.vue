@@ -3,6 +3,7 @@ import { useRouter } from "vue-router";
 import { ref, onBeforeMount, computed, onMounted, onUnmounted } from "vue";
 import Layout from '../layouts/Layout.vue';
 
+
 </script>
  
 <template>
@@ -31,29 +32,29 @@ import Layout from '../layouts/Layout.vue';
                 <br> -->
 
 
-                <div class="grid grid-cols-1 gap-2 sm:grid-cols-2 pl-8 ">
-                    <div class="ml-2 pb-6 ">
+                <div class=" grid grid-cols-1 gap-2 sm:grid-cols-2 pl-8 ">
+                    <div class=" ml-2 pb-6 ">
                         <iframe src="https://www.youtube.com/embed/lcN3aSoDF2M" frameborder="0" allowfullscreen
-                            class="drop-shadow-md rounded-md w-4/5 h-64 "></iframe>
+                            class="rounded-md w-4/5 h-64 "></iframe>
                         <!-- <iframe width="450" height="260" src="https://www.youtube.com/embed/Vj48SNcUPXY" frameborder="0" allowfullscreen> -->
                         <p class="font-semibold text-lg">1. รู้จักเบาหวานใน 3 นาที</p>
                         <p class="font-light">Cr. Thonburi Hospital channel</p>
                     </div>
                     <div class="ml-2 pb-6">
                         <iframe src="https://www.youtube.com/embed/7mw04nvCScg" frameborder="0" allowfullscreen
-                            class="drop-shadow-md rounded-md w-4/5 h-64"></iframe>
+                            class="rounded-md w-4/5 h-64"></iframe>
                         <p class="font-semibold text-lg">2. โรคร้าย ที่มากับเบาหวาน </p>
                         <p class="font-light">Cr. Thonburi Hospital channel</p>
                     </div>
                     <div class="ml-2 pb-6">
                         <iframe src="https://www.youtube.com/embed/IZanRzm79uk" frameborder="0" allowfullscreen
-                            class="drop-shadow-md rounded-md w-4/5 h-64"></iframe>
+                            class="rounded-md w-4/5 h-64"></iframe>
                         <p class="font-semibold text-lg">3. การรับประทานอาหารสำหรับผู้ป่วยโรคเบาหวาน</p>
                         <p class="font-light">Cr. โรงพยาบาลรามคําแหง</p>
                     </div>
                     <div class="ml-2 pb-6">
                         <iframe src="https://www.youtube.com/embed/2tP14jlCq9Q" frameborder="0" allowfullscreen
-                            class="drop-shadow-md rounded-md w-4/5 h-64"></iframe>
+                            class="rounded-md w-4/5 h-64"></iframe>
                         <p class="font-semibold text-lg">4. ออกกำลังกายพิชิตโรคเบาหวาน</p>
                         <p class="font-light">Cr. Thonburi Hospital channel</p>
                     </div>
@@ -76,4 +77,6 @@ import Layout from '../layouts/Layout.vue';
     </Layout>
 </template>
  
-<style></style>
+<style>
+
+</style>

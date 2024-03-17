@@ -30,8 +30,9 @@ const loginnurse = async () => {
       localStorage.setItem("professional_id", response.user.professional_id);
       localStorage.setItem("idadmin", response.user.id);
       localStorage.setItem("name", response.user.name);
+      localStorage.setItem("lname", response.user.lname);
       localStorage.setItem("accesstoken", response.authorisation.token);
-      
+      console.log(localStorage);
 
       Swal.fire({
         icon: "success",
@@ -75,7 +76,7 @@ const close = () => appRouter.push({ name: "nursehome" });
   <div class="container mx-auto">
     <Header></Header>
     <div
-      class="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0"
+      class="flex flex-col items-center justify-center px-6 py-8 mx-auto my-8 md:h-screen lg:py-0"
     >
       <div
         class="w-full rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 bg-white"

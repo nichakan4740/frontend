@@ -8,6 +8,8 @@ const idcard = ref('');
 const password = ref('');
 const loading = ref(false);
 
+
+
 const loginpatient = async () => {
   loading.value = true;
   try {
@@ -27,6 +29,7 @@ const loginpatient = async () => {
       localStorage.setItem("idcard", response.user.idcard);
       localStorage.setItem("iduser", response.user.id);
       localStorage.setItem("name", response.user.fname);
+      localStorage.setItem("lname", response.user.lname);
       localStorage.setItem("accesstoken", response.authorisation.token);
 
       Swal.fire({
@@ -75,7 +78,7 @@ const close = () => appRouter.push({ name: "home" });
 <template>
   <div class="container mx-auto">
      <Header></Header>
-    <div class="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
+    <div class="flex flex-col items-center justify-center px-6 py-8 mx-auto my-8 md:h-screen lg:py-0">
       <div class="w-full rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 bg-white">
         <div class="p-6 space-y-4 md:space-y-6 sm:p-8">
           <h1 class="text-xl font-bold text-center leading-tight tracking-tight text-gray-900 md:text-2xl">

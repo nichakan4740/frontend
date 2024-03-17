@@ -74,7 +74,7 @@ const close = () => appRouter.push({ name: "loginNurse" });
 <template>
  <div class="container mx-auto">
    <Header></Header>
-  <div class="flex flex-col items-center justify-center px-6 py-8 mx-auto lg:py-0">
+  <div class="flex flex-col items-center justify-center px-6 py-8 mx-auto my-28 lg:py-0">
       <div class="w-full rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 bg-white">
         <div class="p-6 space-y-4 md:space-y-6 sm:p-8">
               <h1  class="text-xl font-bold text-center leading-tight tracking-tight text-gray-900 md:text-2xl">
