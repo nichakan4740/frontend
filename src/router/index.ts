@@ -10,9 +10,8 @@ import InformationUser  from '../views/InformationUser.vue';
 /* ------------------------------------------------------------------------------------- */
 
 /* หน้าพยาบาล */
-import NurseHome from '../views/NurseHome.vue'
-import NurseDashboard from '../views/NurseDashboard.vue'
-import Chat from '../views/Chat.vue'
+import NurseHome from '../views/NurseHome.vue';
+import NurseDashboard from '../views/NurseDashboard.vue';
 
 
 
@@ -33,7 +32,13 @@ import WhatIs from '../views/WhatIs.vue';
 
 
 /* chat */
-import GroupsChat from '../views/GroupsChat.vue';
+import GroupsChatUser from '../views/GroupsChatUser.vue';
+import CreateGroupChat from '../views/CreateGroupChat.vue';
+import GroupChatNurse from '../views/GroupChatNurse.vue'
+
+
+
+
 
 
 const history = createWebHistory(`${import.meta.env.VITE_BASE_URL}`)
@@ -142,7 +147,7 @@ const routes = [
   {
     path: '/chat',
     name: 'chat',
-    component: Chat,
+    component: GroupChatNurse,
   },
 
 
@@ -151,8 +156,15 @@ const routes = [
   {
     path: '/groupschat',
     name: 'groupschat',
-    component: GroupsChat,
+    component: GroupsChatUser,
   },
+
+  {
+    path: '/creategroupchat',
+    name: 'creategroupchat',
+    component: CreateGroupChat,
+  },
+
 
 
 ]
