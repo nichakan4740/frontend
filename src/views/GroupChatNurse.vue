@@ -3,7 +3,7 @@ import { useRouter } from "vue-router";
 import LayoutNurse from '../layouts/LayoutNurse.vue';
 import moment from "moment";
 import Swal from "sweetalert2";
-import Echo from 'laravel-echo';
+import Pusher from 'pusher-js';
 import { ref, onMounted } from "vue";
 
 
@@ -19,7 +19,7 @@ const store = () => {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            Authorization: 'Bearer ' + 'YOUR_API_TOKEN'
+            'Accept': 'application/json'
         },
         body: JSON.stringify({ 
             message: message.value, 
@@ -32,38 +32,28 @@ const store = () => {
     .then(data => {
         message.value = '';
         conversations.value.push(data);
+        // เมื่อส่งข้อความสำเร็จ ให้ส่งข้อความใหม่ผ่าน Pusher
+        pusher.trigger(`conversations.${group_id}`, 'NewMessage', data);
     })
     .catch(error => {
         console.error('Error:', error);
     });
 };
 
+
+
+
+
+const pusher = new Pusher('c38b6cfa9a4f7e26bf76', {
+    cluster: 'ap1',
+    encrypted: true
+});
+
 const listenForNewMessage = () => {
-    const echo = new Echo({
-        broadcaster: 'pusher',
-        key: 'c38b6cfa9a4f7e26bf76',
-        cluster: 'ap1',
-        encrypted: true,
-        authEndpoint: '/broadcasting/auth',
-        auth: {
-            headers: {
-                Authorization: 'Bearer ' + 'YOUR_API_TOKEN'
-            }
-        }
-    });
-
-    // ฟังก์ชันที่จะเรียกเมื่อมีข้อความใหม่
-    const handleNewMessage = (data) => {
+    const channel = pusher.subscribe(`conversations.${group_id}`);
+    channel.bind('NewMessage', data => {
         conversations.value.push(data);
-    };
-
-    // Listen to private channel for the current user
-    echo.private(`users.${userId}`)
-        .listen('.NewMessage', handleNewMessage);
-
-    // Listen to private channel for the admin
-    echo.private(`admins.${adminId}`)
-        .listen('.NewMessage', handleNewMessage);
+    });
 };
 
 onMounted(() => {
