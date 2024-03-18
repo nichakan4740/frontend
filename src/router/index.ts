@@ -159,11 +159,6 @@ const routes = [
     component: GroupsChatUser,
   },
 
-  {
-    path: '/creategroupchat',
-    name: 'creategroupchat',
-    component: CreateGroupChat,
-  },
 
 
 

@@ -9,7 +9,7 @@ import Layout from "../layouts/Layout.vue";
       <div
         class="box-content-small p-3 ml-5 mr-5 mt-10 bg-gradient-to-b from-blue-900 to-blue-800 shadow-lg shadow-slate-500/50 rounded-lg">
         <h2 class="font-semibold text-xl text-center text-slate-200">
-          คุยกับเรา
+          สอบถามข้อสงสัยเบื้องต้น
         </h2>
       </div>
 
