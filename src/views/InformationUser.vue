@@ -184,4 +184,8 @@ const handleButtonClick = () => {
    </div>
 </template>
 
-<style></style>
+<style>
+.grid-container {
+
+    height: 100vh; /* ทำให้ container มีความสูงเต็มหน้าจอ */
+  }</style>
