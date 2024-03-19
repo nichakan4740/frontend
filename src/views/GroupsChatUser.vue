@@ -33,6 +33,8 @@ const store = () => {
     })
     .then(response => response.json())
     .then(data => {
+         
+        console.log(data); // เพิ่มบรรทัดนี้เพื่อดูข้อมูลที่ได้จากการเรียก API
         message.value = '';
         conversations.value.push(data);
         
@@ -47,6 +49,7 @@ const store = () => {
 const listenForNewMessage = () => {
     const channel = pusher.subscribe('conversations');
     channel.bind('NewMessage', data => {
+         console.log(data); // เพิ่มบรรทัดนี้เพื่อแสดงค่าที่มาจากอีเวนต์ในคอนโซล
         conversations.value.push(data);
     });
 };
@@ -56,6 +59,7 @@ onMounted(() => {
       const savedConversations = localStorage.getItem('conversations');
     if (savedConversations) {
         conversations.value = JSON.parse(savedConversations);
+       
     }
 });
 /* ------------------------------------------------------------------------------ */

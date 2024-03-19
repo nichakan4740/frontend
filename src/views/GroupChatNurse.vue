@@ -23,16 +23,28 @@ const pusher = new Pusher('c38b6cfa9a4f7e26bf76', {
 // รับข้อมูลจากช่องการสื่อสาร 'conversation' ที่ส่งมาจากเซิร์ฟเวอร์
 const channel = pusher.subscribe('conversation');
 
-// จัดการข้อมูลที่ได้รับเมื่อมีการส่งข้อความใหม่
+// รับข้อมูลจากช่องการสื่อสาร 'conversation' ที่ส่งมาจากเซิร์ฟเวอร์
 channel.bind('new-message', data => {
-  // เพิ่มข้อมูลใหม่ลงใน messages
+  console.log('ข้อมูลที่ได้รับมา:', data);
+  // ตรวจสอบว่าข้อมูลที่ได้รับมาเป็นอาร์เรย์หรือไม่
+  if (Array.isArray(data)) {
+    // เพิ่มข้อมูลใหม่ลงใน messages
+    messages.value.push(...data);
+  } else {
+    // กรณีที่ข้อมูลไม่ใช่แบบอาร์เรย์
+    console.error('ข้อมูลที่ได้รับมาไม่ใช่แบบอาร์เรย์:', data);
+  }
+
+  // นำข้อมูลใหม่ที่ได้รับมาแสดงผลในหน้าเว็บทันที
   messages.value.push(data);
 });
 
 // เมื่อ component ถูก mount
 onMounted(async () => {
   try {
-    const response = await fetch(`${import.meta.env.VITE_BASE_URL}api/conversation/showMessageUser`);
+    // ดึงค่า admin_id จาก Local Storage
+    const adminId = localStorage.getItem('idadmin');
+    const response = await fetch(`${import.meta.env.VITE_BASE_URL}api/conversation/showMessageUser/${adminId}`);
     const data = await response.json();
     // นำข้อมูลที่ได้รับมาเก็บไว้ใน messages
     messages.value = data.messages;
@@ -65,9 +77,11 @@ onMounted(async () => {
     <div v-else>
       <div v-for="message in messages" :key="message.id">
         <!-- แสดงข้อมูลข้อความ -->
-        <p>{{ message.message }}</p>
-        <!-- แสดงเวลา -->
-        <p>{{ formatTime(message.createdAt) }}</p>
+        
+        <p>{{ message.user.fname }}   {{ formatTime(message.createdAt) }} </p>
+        <p>{{ message.message }} </p>
+        
+
       </div>
     </div>
 
