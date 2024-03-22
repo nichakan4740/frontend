@@ -88,7 +88,7 @@ pusherScript.onload = () => {
                             fill="#A8B4CD"
                         />
                     </svg>
-                    <router-link  :to="{ name: 'dashboard' }" class="text-slate-300">สถิติ</router-link>
+                    <router-link  :to="{ name: 'dashboard' }" class="text-slate-300">สถิติระดับค่าน้ำตาล</router-link>
                    
                 </a>
                 <!-- ------------------------------------------------------------------------------- -->

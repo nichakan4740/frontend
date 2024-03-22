@@ -14,7 +14,7 @@ const idcard = localStorage.getItem("idcard");
 const dob = ref('-');
 const age = ref('-');
 const phone = ref('-');
-const address = ref('123/2 ต.บ้านโป่ง อ.บ้านโป่ง จ.ราชบุรี 70110');
+const address = ref('-');
 
 console.log(localStorage);
 
@@ -131,13 +131,13 @@ const handleButtonClick = () => {
                                  {{ dob }}
                               </div>
                            </div>
-                           <div>
+                           <!-- <div>
                               <label class="block mb-2 text-sm text-gray-600 dark:text-gray-200">อายุ</label>
                               <div type="text"
                                  class="block w-full px-5 py-3 mt-2 text-gray-700 bg-white border border-gray-200 rounded-md dark:placeholder-gray-600 dark:bg-gray-900 dark:text-gray-300 dark:border-gray-700 focus:border-blue-400 dark:focus:border-blue-400 focus:ring-blue-400 focus:outline-none focus:ring focus:ring-opacity-40">
                                  {{ age }}
                               </div>
-                           </div>
+                           </div> -->
                            <div>
                               <label class="block mb-2 text-sm text-gray-600 dark:text-gray-200">เบอร์โทร</label>
                               <div type="text"
