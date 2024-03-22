@@ -1,109 +1,72 @@
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, provide, inject } from "vue";
 import LayoutNurse from '../layouts/LayoutNurse.vue';
 import moment from "moment";
 import Swal from "sweetalert2";
 import Pusher from 'pusher-js';
 
-// สร้างตัวแปร ref เพื่อเก็บข้อมูล
-const messages = ref([]);
 const isLoading = ref(true);
+const messages = ref([]); // เปลี่ยนจาก import { ref } เป็น const messages = ref([])
 
-// ฟังก์ชันสำหรับการจัดรูปแบบเวลา
 const formatTime = (time) => {
   return moment(time).format('YYYY-MM-DD HH:mm:ss');
 };
 
-// เชื่อมต่อกับ Pusher
 const pusher = new Pusher('c38b6cfa9a4f7e26bf76', {
   cluster: 'ap1',
   encrypted: true
 });
 
-// รับข้อมูลจากช่องการสื่อสาร 'conversation' ที่ส่งมาจากเซิร์ฟเวอร์
-const channel = pusher.subscribe('conversation');
+const channel = pusher.subscribe('live-chat');
 
-// รับข้อมูลจากช่องการสื่อสาร 'conversation' ที่ส่งมาจากเซิร์ฟเวอร์
-channel.bind('new-message', data => {
+channel.bind('message', data => {
   console.log('ข้อมูลที่ได้รับมา:', data);
-  // ตรวจสอบว่าข้อมูลที่ได้รับมาเป็นอาร์เรย์หรือไม่
   if (Array.isArray(data)) {
-    // เพิ่มข้อมูลใหม่ลงใน messages
-    messages.value.push(...data);
+    data.forEach(message => {
+      messages.value.push(message);
+    });
   } else {
-    // กรณีที่ข้อมูลไม่ใช่แบบอาร์เรย์
     console.error('ข้อมูลที่ได้รับมาไม่ใช่แบบอาร์เรย์:', data);
   }
-
-  // นำข้อมูลใหม่ที่ได้รับมาแสดงผลในหน้าเว็บทันที
-  messages.value.push(data);
 });
 
-// เมื่อ component ถูก mount
-onMounted(async () => {
-  try {
-    // ดึงค่า admin_id จาก Local Storage
-    const adminId = localStorage.getItem('idadmin');
-    const response = await fetch(`${import.meta.env.VITE_BASE_URL}api/conversation/showMessageUser/${adminId}`);
-    const data = await response.json();
-    // นำข้อมูลที่ได้รับมาเก็บไว้ใน messages
-    messages.value = data.messages;
-    isLoading.value = false; // เมื่อโหลดข้อมูลเสร็จแล้ว
-  } catch (error) {
-    console.error('เกิดข้อผิดพลาดในการดึงข้อมูล:', error);
-  }
-});
+provide('messages', messages); // ส่ง messages ผ่านทาง provide
 </script>
- 
+
 <template>
 <LayoutNurse class="bg-gradient-to-b from-blue-100">
+  <!-- content -->
+  <div class="container mx-auto">
+    <div class="box-content-small p-3 ml-5 mr-5 mt-10 bg-gradient-to-b from-blue-900 to-blue-800 shadow-lg shadow-slate-500/50 rounded-lg">
+      <h2 class="font-semibold text-xl text-center text-slate-200">
+        คุยกับเรา
+      </h2>
+    </div>
 
-<!-- content -->
-<div class="container mx-auto">
-
-  <div class="box-content-small p-3 ml-5 mr-5 mt-10 bg-gradient-to-b from-blue-900 to-blue-800 shadow-lg shadow-slate-500/50 rounded-lg">
-    <h2 class="font-semibold text-xl text-center text-slate-200">
-      คุยกับเรา
-    </h2>
-  </div>
-
-  <!-- -------------------------------------------------------------- -->
-
-  <!-- กล่องแชท -->
-  <div class="box-content bg-white shadow-lg shadow-gray-300/50 mt-10 ml-5 mr-5 pt-1 pb-6 pl-20 pr-20 mb-5 rounded-lg">
-    <iframe width="100%" style="height: 100%; min-height: 500px" frameborder="0"></iframe>
- 
-   <div v-if="isLoading">กำลังโหลดข้อมูล...</div>
-    <div v-else>
-      <div v-for="message in messages" :key="message.id">
-        <!-- แสดงข้อมูลข้อความ -->
-        
-        <p>{{ message.user.fname }}   {{ formatTime(message.createdAt) }} </p>
-        <p>{{ message.message }} </p>
-        
-
+    <!-- กล่องแชท -->
+    <div class="box-content bg-white shadow-lg shadow-gray-300/50 mt-10 ml-5 mr-5 pt-1 pb-6 pl-20 pr-20 mb-5 rounded-lg">
+      <iframe width="100%" style="height: 100%; min-height: 500px" frameborder="0"></iframe>
+      <div>
+        <!-- ใช้ messages ที่ถูกส่งมาจากภายนอก -->
+        <div v-if="isLoading">กำลังโหลดข้อมูล...</div>
+        <div v-else>
+          <ul>
+            <li v-for="message in messages" :key="message.id">{{ message.text }}</li>
+          </ul>
+        </div>
       </div>
     </div>
 
-
-
-    <!-- ------------------------------------------------------------------------------ -->
-
+    <!-- --------------------------------------------------------------------------------------------------------- -->
   </div>
 
-  <!-- --------------------------------------------------------------------------------------------------------- -->
-</div>
-
-<div class="mb-8 ml-2 mr-4">
-  <p class="text">
-    **ขออภัย กำลังอยู่ในช่วงพัฒนา**
-  </p>
-</div>
-
+  <div class="mb-8 ml-2 mr-4">
+    <p class="text">
+      **ขออภัย กำลังอยู่ในช่วงพัฒนา**
+    </p>
+  </div>
 </LayoutNurse>
-
 </template>
- 
-<style>
 
+<style>
 </style>
