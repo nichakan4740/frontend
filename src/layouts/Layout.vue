@@ -29,7 +29,7 @@ const name = localStorage.getItem("name");
     <nav class="bg-white shadow-lg shadow-slate-300/60 sticky top-0  ">
       <!-- Primary Navigation Menu -->
       <!-- user -->
-      <button class="float-right">
+      <button class="float-right mr-2">
 
         <img src="/user.png" class="w-10 h-10  mr-10 mt-3 shadow-md rounded-full" @click="toggleMenu" />
       </button>
@@ -63,12 +63,12 @@ const name = localStorage.getItem("name");
           <!-- Hamburger จอเล็ก -->
           <div class="-mr-2 flex items-center sm:hidden">
             <button class="bg-blue-100 text-tahiti rounded">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-7 h-7">
+              <!-- <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-7 h-7">
                 <path
                   d="M10 8a3 3 0 100-6 3 3 0 000 6zM3.465 14.493a1.23 1.23 0 00.41 1.412A9.957 9.957 0 0010 18c2.31 0 4.438-.784 6.131-2.1.43-.333.604-.903.408-1.41a7.002 7.002 0 00-13.074.003z" />
                 <path
                   d="M10 8a3 3 0 100-6 3 3 0 000 6zM3.465 14.493a1.23 1.23 0 00.41 1.412A9.957 9.957 0 0010 18c2.31 0 4.438-.784 6.131-2.1.43-.333.604-.903.408-1.41a7.002 7.002 0 00-13.074.003z" />
-              </svg>
+              </svg> -->
             </button>
           </div>
         </div>

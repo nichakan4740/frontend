@@ -32,7 +32,7 @@ const MysugarLoad = async () => {
     if (response.ok) {
       const data = await response.json();
       originalData.value = data;
-      result.value = originalData.value; 
+      result.value = originalData.value.sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at));
       result.value = filterBySelectedDate(data); 
     } else if (response.status === 404) {
       // Handle case when no data is found
@@ -257,11 +257,11 @@ const countHighSugar = computed(() => result.value.filter(record => record.sugar
 
     <div class="container mx-auto">
       <div class="box-content p-3 ml-5 mr-5 mt-10 bg-gradient-to-b from-blue-900 to-blue-800 shadow-lg shadow-slate-500/50 rounded-lg">
-        <h2 class="font-semibold text-xl text-center text-slate-200">สถิติ</h2>
+        <h2 class="font-semibold text-xl text-center text-slate-200">สถิติระดับค่าน้ำตาล</h2>
       </div>
 
       <div class="grid grid-cols-2 gap-2 mt-5">
-        <div class="box-content p-8 bg-white shadow-lg shadow-gray-300/50 mt-8 ml-5 mr-5 rounded-lg" >
+        <div class="flex flex-col box-content p-8 bg-white shadow-lg shadow-gray-300/50 mt-8 ml-5 mr-5 rounded-lg" >
           <p>เลือกช่วงเวลาที่ต้องการ</p>
         <div>
       <div>
@@ -269,17 +269,17 @@ const countHighSugar = computed(() => result.value.filter(record => record.sugar
         <!-- ---------------------------------------------------------- -->
         <!-- Input for selecting date -->
        <div class="mt-5 mx-5">
-            <label for="startDate" class="text-lg text-gray-800">เลือกวันที่เริ่มต้น:</label>
+            <label for="startDate" class="text-lg text-gray-800">เลือกวันที่เริ่มต้น: </label>
             <input type="date" id="startDate" v-model="startDate" class="mt-2 px-4 py-2 border rounded-md">
        </div>
        <div class="mt-5 mx-5">
-            <label for="endDate" class="text-lg text-gray-800">เลือกวันที่สิ้นสุด:</label>
+            <label for="endDate" class="text-lg text-gray-800">เลือกวันที่สิ้นสุด: </label>
             <input type="date" id="endDate" v-model="endDate" class="mt-2 px-4 py-2 border rounded-md">
        </div>
 
 
         <div class="mt-5 mx-5">
-            <label for="endDate" class="text-lg text-gray-800">เลือกวันที่ต้องการแบบรายวัน :</label>
+            <label for="endDate" class="text-lg text-gray-800">เลือกวันที่ต้องการแบบรายวัน: </label>
             <input type="date" id="selectedDate" v-model="selectedDate" @change="filterDataByDate" class="mt-2 px-4 py-2 border rounded-md">
        </div>
      
@@ -293,11 +293,14 @@ const countHighSugar = computed(() => result.value.filter(record => record.sugar
         <div class="box-content p-8 bg-white shadow-lg shadow-gray-300/50 mt-8 ml-5 mr-5 rounded-lg" >
           <p>ค่าน้ำตาลเฉลี่ยช่วง</p>
            <div class="mt-5 mx-5" v-if="startDate && endDate">
-            <p>{{ moment(startDate).format('DD MMM YYYY') }} - {{ moment(endDate).format('DD MMM YYYY') }}</p>
+            <p>{{ moment(startDate).format('DD MMMM YYYY') }} - {{ moment(endDate).format('DD MMMM YYYY') }}</p>
+          </div>
+          <div class="mt-5 mx-5" v-if="selectedDate">
+            <p>{{ moment(selectedDate).format('DD MMMM YYYY') }}</p>
           </div>
           
 
-<div class="relative overflow-x-auto">
+<div class="overflow-x-auto flex-grow">
     <table class="w-full text-sm text-left rtl:text-right text-gray-500">
         <tbody>
             <tr class="bg-white">  
@@ -388,9 +391,9 @@ const countHighSugar = computed(() => result.value.filter(record => record.sugar
               <!-- ปุ่มแก้ไข/ปุ่มลบ -->
               <td class="whitespace-nowrap px-6 py-4">
                  <button type="button" 
-                         class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+                         class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-3 py-2 me-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
                  @click="edit(sugarRecord)">
-                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6">
+                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-4">
                  <path d="M21.731 2.269a2.625 2.625 0 0 0-3.712 0l-1.157 1.157 3.712 3.712 1.157-1.157a2.625 2.625 0 0 0 0-3.712ZM19.513 8.199l-3.712-3.712-12.15 12.15a5.25 5.25 0 0 0-1.32 2.214l-.8 2.685a.75.75 0 0 0 .933.933l2.685-.8a5.25 5.25 0 0 0 2.214-1.32L19.513 8.2Z" />
                  </svg>
                  </button>
@@ -398,9 +401,9 @@ const countHighSugar = computed(() => result.value.filter(record => record.sugar
 
                  
                  <button type="button" 
-                 class="focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900" 
+                 class="focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-3 py-2 me-2 ml-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900" 
                  @click="remove(sugarRecord)" >
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-4">
                     <path fill-rule="evenodd" d="M16.5 4.478v.227a48.816 48.816 0 0 1 3.878.512.75.75 0 1 1-.256 1.478l-.209-.035-1.005 13.07a3 3 0 0 1-2.991 2.77H8.084a3 3 0 0 1-2.991-2.77L4.087 6.66l-.209.035a.75.75 0 0 1-.256-1.478A48.567 48.567 0 0 1 7.5 4.705v-.227c0-1.564 1.213-2.9 2.816-2.951a52.662 52.662 0 0 1 3.369 0c1.603.051 2.815 1.387 2.815 2.951Zm-6.136-1.452a51.196 51.196 0 0 1 3.273 0C14.39 3.05 15 3.684 15 4.478v.113a49.488 49.488 0 0 0-6 0v-.113c0-.794.609-1.428 1.364-1.452Zm-.355 5.945a.75.75 0 1 0-1.5.058l.347 9a.75.75 0 1 0 1.499-.058l-.346-9Zm5.48.058a.75.75 0 1 0-1.498-.058l-.347 9a.75.75 0 0 0 1.5.058l.345-9Z" clip-rule="evenodd" />
                     </svg>
                 </button>

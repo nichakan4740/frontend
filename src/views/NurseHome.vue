@@ -184,7 +184,7 @@ const resetSearch = () => {
                 <td class="px-6 py-4">{{sugarRecord.user.fname}} {{sugarRecord.user.lname}}</td>
                 <td class="px-6 py-4"></td>
                 <td class="px-6 py-4">
-                     {{ moment(sugarRecord.updated_at).format("DD MMM YYYY") }}
+                     {{ moment(sugarRecord.updated_at).format("DD MMMM YYYY") }}
                       <br>
                       {{ moment(sugarRecord.updated_at).format("HH:mm")}}
                 </td>

@@ -316,21 +316,24 @@ onMounted(MyDrugLoad);
         <div class="card-body">
           <form @submit.prevent="saveDrug">
             <div class="box-content pt-3 pb-3">
-              <p>ยาที่แพ้</p>
+              <p>ยาที่แพ้ <span style="font-size: 13px; color: rgb(177, 109, 241)">( ถ้าไม่มีพิมพ์ว่า ' ไม่มี ' หรือ ' - ' )</span></p>
               <div class="box-content">
-                <input type="text" v-model="mydrug.allergic_drug" class="block w-full rounded-md border-0 py-10 pl-7 pr-20 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400" placeholder="กรอกเฉพาะตัวเลข เช่น 260">
+                <input type="text" v-model="mydrug.allergic_drug" class="block w-full rounded-md border-0 py-10 pl-7 pr-20 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400" placeholder="กรุณากรอกชื่อยาที่แพ้">
               </div>
             </div>
             <div class="box-content pt-3 pb-3">
-              <p>ยาที่ใช้ประจำ</p>
-              <input type="text" v-model="mydrug.my_drug" class="block w-full rounded-md border-0 py-10 pl-7 pr-20 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400" placeholder="กรุณากรอกข้อมูลเมื่อพบอาการผิดปกติ">
+              <p>ยาที่ใช้ประจำ <span style="font-size: 13px; color: rgb(177, 109, 241)">( ถ้าไม่มีพิมพ์ว่า ' ไม่มี ' หรือ ' - ' )</span></p>
+              <input type="text" v-model="mydrug.my_drug" class="block w-full rounded-md border-0 py-10 pl-7 pr-20 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400" placeholder="กรุณากรอกยาที่ใช้ประจำ">
             </div>
-            <button type="submit" class="ml-9 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">
-              บันทึกข้อมูล
-            </button>
-            <button @click="closeModal" class="focus:outline-none text-white bg-yellow-400 hover:bg-yellow-500 focus:ring-4 focus:ring-yellow-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:focus:ring-yellow-900">
-              ไว้คราวหน้า
-            </button>
+            <p class="text-sm text-gray-500 mt-2">** เมื่อกด 'ข้าม' ฟอร์มนี้จะแสดงในครั้งถัดไปเมื่อมีการเข้ามาหน้า Home อีกครั้ง</p>
+            <div class="flex justify-center mt-3">
+              <button type="submit" class=" text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-6 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">
+                บันทึกข้อมูล
+              </button>
+              <button @click="closeModal" class="focus:outline-none text-white bg-gray-400 hover:bg-gray-500 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-12 py-2.5  me-2 mb-2 dark:focus:ring-yellow-900">
+                ข้าม
+              </button>
+            </div>
           </form>
         </div>
       </div>
