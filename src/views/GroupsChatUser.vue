@@ -4,7 +4,7 @@ import LayoutNurse from '../layouts/LayoutNurse.vue';
 import moment from "moment";
 import Swal from "sweetalert2";
 import Pusher from 'pusher-js';
-import { ref, onMounted } from "vue";
+import { ref, onMounted ,computed} from "vue";
 
 /* ส่งข้อความไปให้ทุกคน--------------------------------------------------------------- */
 const conversations = ref([]);
@@ -16,56 +16,64 @@ const pusher = new Pusher('c38b6cfa9a4f7e26bf76', {
     encrypted: true
 });
 
-// เก็บข้อความลงใน Local Storage เมื่อส่งข้อความ
 const store = () => {
-    // ส่งข้อความไปยังทุก admin ที่อยู่ในระบบ
-    fetch(`${import.meta.env.VITE_BASE_URL}api/conversations`, {
+    sendMessage(userId, message.value);
+};
+
+const listenForNewMessage = () => {
+    const channel = pusher.subscribe('live-chat');
+    channel.bind('message', data => {
+        if (data.iduser === userId) { // ตรวจสอบว่าข้อความเป็นของผู้ใช้ปัจจุบันหรือไม่
+            conversations.value.push(data);
+        }
+    });
+};
+
+const sendMessage = (userId, message) => {
+    fetch(`${import.meta.env.VITE_BASE_URL}api/conversations/${userId}`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
             'Accept': 'application/json'
         },
         body: JSON.stringify({ 
-            message: message.value, 
+            message: message, 
             user_id: userId,
-            admin_id: 'all' // ส่งไปยังทุก admin พร้อมกัน
+            admin_id: 'all'
         })
     })
     .then(response => response.json())
     .then(data => {
-         
-        message.value = '';
-        conversations.value.push(data);
-        
-        // บันทึกข้อมูลลงใน Local Storage
-        localStorage.setItem('conversations', JSON.stringify(conversations.value));
+        if (data.iduser === userId) { // ตรวจสอบว่าข้อความที่ส่งกลับมาเป็นของผู้ใช้ปัจจุบันหรือไม่
+            conversations.value.push(data);
+            localStorage.setItem('conversations', JSON.stringify(conversations.value));
+        }
     })
     .catch(error => {
         console.error('Error:', error);
     });
 };
 
-const listenForNewMessage = () => {
-    const channel = pusher.subscribe('live-chat');
-    channel.bind('message', data => {
-         console.log(data); // เพิ่มบรรทัดนี้เพื่อแสดงค่าที่มาจากอีเวนต์ในคอนโซล
-        conversations.value.push(data);
-    });
-};
+
+
+
 
 onMounted(() => {
     listenForNewMessage();
-      const savedConversations = localStorage.getItem('conversations');
+    const savedConversations = localStorage.getItem('conversations');
     if (savedConversations) {
         conversations.value = JSON.parse(savedConversations);
-       
     }
 });
+
+
+const conversationsFiltered = computed(() => {
+  return conversations.value.filter(conversation => conversation.iduser === userId)
+})
+
 /* ------------------------------------------------------------------------------ */
 
-
 </script>
-
  
 <template>
 <LayoutNurse class="bg-gradient-to-b from-blue-100">
@@ -102,22 +110,23 @@ onMounted(() => {
     <div>
 
       <div style="display: flex; align-items: center;">
-        <input type="text" id="small-input" class="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500"
-          v-model="message">
-        <button @click="store">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6">
-            <path
-              d="M3.478 2.404a.75.75 0 0 0-.926.941l2.432 7.905H13.5a.75.75 0 0 1 0 1.5H4.984l-2.432 7.905a.75.75 0 0 0 .926.94 60.519 60.519 0 0 0 18.445-8.986.75.75 0 0 0 0-1.218A60.517 60.517 0 0 0 3.478 2.404Z" />
-          </svg>
-        </button>
+       <input type="text" id="small-input" class="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500"
+       v-model="message">
+<button @click="() => sendMessage(userId, message)">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6">
+    <path
+      d="M3.478 2.404a.75.75 0 0 0-.926.941l2.432 7.905H13.5a.75.75 0 0 1 0 1.5H4.984l-2.432 7.905a.75.75 0 0 0 .926.94 60.519 60.519 0 0 0 18.445-8.986.75.75 0 0 0 0-1.218A60.517 60.517 0 0 0 3.478 2.404Z" />
+  </svg>
+</button>
       </div>
 
-      <!-- แสดงข้อความ -->
-    <ul>
-        <li v-for="conversation in conversations" :key="conversation.id">
-              {{ conversation.messages}}
-        </li>
-    </ul>
+     <!-- แสดงข้อความ -->
+  <ul>
+    <li v-for="conversation in conversationsFiltered" :key="conversation.id">
+      {{ conversation.messages }}  
+      {{ conversation.iduser }}
+    </li>
+  </ul>
     </div>
     <!-- ------------------------------------------------------------------------------ -->
 
