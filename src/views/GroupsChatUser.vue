@@ -30,7 +30,7 @@ const listenForNewMessage = () => {
 };
 
 const sendMessage = (userId, message) => {
-    fetch(`${import.meta.env.VITE_BASE_URL}api/conversations/${userId}`, {
+    fetch(`${import.meta.env.VITE_BASE_URL}api/conversations`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -53,9 +53,6 @@ const sendMessage = (userId, message) => {
         console.error('Error:', error);
     });
 };
-
-
-
 
 
 onMounted(() => {
