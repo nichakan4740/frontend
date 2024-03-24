@@ -1,6 +1,6 @@
 <script setup>
 import { useRouter } from "vue-router";
-import LayoutNurse from '../layouts/LayoutNurse.vue';
+import Layout from '../layouts/Layout.vue';
 import moment from "moment";
 import Swal from "sweetalert2";
 import Pusher from 'pusher-js';
@@ -111,7 +111,7 @@ const formatTime = (time) => {
 </script>
 
 <template>
-<LayoutNurse class="bg-gradient-to-b from-blue-100">
+<Layout class="bg-gradient-to-b from-blue-100">
     <div class="container mx-auto">
         <div class="box-content-small p-3 ml-5 mr-5 mt-10 bg-gradient-to-b from-blue-900 to-blue-800 shadow-lg shadow-slate-500/50 rounded-lg">
             <h2 class="font-semibold text-xl text-center text-slate-200">คุยกับเรา</h2>
@@ -160,7 +160,7 @@ const formatTime = (time) => {
   </p>
 </div>
 
-</LayoutNurse>
+</Layout>
 
 </template>
  
