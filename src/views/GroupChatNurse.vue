@@ -127,8 +127,6 @@ onMounted(() => {
         replyData.value = JSON.parse(savedReplyData);
     }
 });
-
-
 </script>
 
 
@@ -168,6 +166,7 @@ onMounted(() => {
 </div>
 
   
+  <!-- -------------------------------------------- -->
       <div class="mb-8 ml-2 mr-4">
         <p class="text">
           **ขออภัย กำลังอยู่ในช่วงพัฒนา**
@@ -177,8 +176,6 @@ onMounted(() => {
   </LayoutNurse>
 </template>
 
-
- 
 <style>
 
 </style>

@@ -66,7 +66,7 @@ const conversationsFiltered = computed(() => {
     return conversations.value.filter(conversation => conversation.iduser === userId);
 });
 
-/* ------------------------------------------------------------------------- */
+/* --------------------------------------------------------------------------------------------------------------------  */
 
 const Loading = ref(true);
 const messageFromAdmin = ref([]);
@@ -92,11 +92,13 @@ channelAdmin.bind('message', data => {
         };
         
         messageFromAdmin.value.push(messageAdmin);
-        localStorage.setItem('chatMessagesfromadmin', JSON.stringify(messageFromAdmin.value));
+        // เก็บเฉพาะค่า idadmin ใน localStorage
+        localStorage.setItem('idadmin', data.admin_ids[0]);
     } else {
         console.error('ข้อมูลที่ได้รับมาไม่มี key "text" หรือ "admin_ids":', data);
     }
 });
+
 
 onMounted(() => {
     Loading.value = false;
@@ -109,8 +111,86 @@ onMounted(() => {
 const formatTime = (time) => {
     return moment(time).format('YYYY-MM-DD HH:mm:ss');
 };
+
 /* ------------------------------------------------------------------------------------------------------------- */
-/* ตอบกลับแบบเจาะ id  */
+/* ตอบกลับแบบเจาะจง id admin   */
+const conversationreplyadmin = ref([]);
+const replyadmin = ref('');
+
+
+const pusherreplyadmin = new Pusher('c38b6cfa9a4f7e26bf76', {
+    cluster: 'ap1',
+    encrypted: true
+});
+
+const replyDataAdmin = ref(null); // เพิ่มตัวแปร replyData เพื่อเก็บข้อมูลที่ได้รับจากการส่งข้อความตอบกลับ
+
+const replyAdmin = () => {
+    sendReplyAdmin(userId, replyadmin.value);
+    replyadmin.value = '';
+};
+
+const listenForNewMessagereplyadmin = () => {
+    const channel = pusherreplyadmin.subscribe('reply');
+    channel.bind('message', data => {
+        if (data.id === userId) {
+            conversationreplyadmin.value.push(data);
+        }
+    });
+};
+
+const sendReplyAdmin = (userId, replyadmin) => {
+    // ดึงค่า idadmin จาก localStorage
+    const idadmin = localStorage.getItem('idadmin');
+
+    fetch(`${import.meta.env.VITE_BASE_URL}api/conversation/reply`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+        },
+        body: JSON.stringify({ 
+            message: replyadmin, 
+            admin_id: idadmin,
+            user_id: userId  
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('Response from sendReply:', data);
+        replyDataAdmin.value = data;
+        if (data.user_id === userId ) {
+            conversationreplyadmin.value.push(data);
+            localStorage.setItem('conversationreplyadmin', JSON.stringify(conversationreplyadmin.value));
+
+            // เพิ่มบันทึกค่า replyDataAdmin ลงใน localStorage เมื่อได้รับข้อมูลตอบกลับใหม่
+            localStorage.setItem('replyDataAdmin', JSON.stringify(replyDataAdmin.value));
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+};
+
+
+
+onMounted(() => {
+    listenForNewMessagereplyadmin();
+    const savedConversationsadmin = localStorage.getItem('conversationreplyadmin');
+    if (savedConversationsadmin) {
+        conversationreplyadmin.value = JSON.parse(savedConversationsadmin);
+    }
+
+    // ตรวจสอบว่ามี replyData ใน local storage หรือไม่ และกำหนดค่าให้กับ replyData ในกรณีที่มี
+    const savedReplyDataadmin = localStorage.getItem('replyDataAdmin');
+    if (savedReplyDataadmin) {
+        replyDataAdmin.value = JSON.parse(savedReplyDataadmin);
+    }
+});
+
+
+
+
 
 
 
@@ -142,17 +222,44 @@ const formatTime = (time) => {
                     </button>
                 </div>
                 <ul>
-                    <li v-for="conversation in conversationsFiltered" :key="conversation.id">
-                        {{ conversation.messages }}  
+                    <li class="text-red-800"  v-for="conversation in conversationsFiltered" :key="conversation.id">
+                       
+                       {{ conversation.messages }}    
                         {{ conversation.iduser }}
+                       
                     </li>
                 </ul>
             </div>
-            <div v-for="message in messageFromAdmin" :key="message.id">
-    <p>{{ message.user.name }} {{ formatTime(message.createdAt) }}</p>
-    {{ message.messageadmin }}
-    {{ message.iduser }}
-</div>
+
+<p>--------------------------------------------------</p>
+<!-- แสดงที่ admin ตอบกลับมา -->
+    <!-- <div class="text-yellow-400" v-for="message in messageFromAdmin" :key="message.id">
+    <p>{{ formatTime(message.createdAt) }}</p>
+    <p>{{ message.messageadmin }} </p>
+    <p> {{message.idadmin}}</p> 
+    </div> -->
+      <div class="chat-container p-4 border rounded-md border-gray-300 max-h-96 overflow-y-auto">
+    <!-- เพิ่มเงื่อนไขเพื่อตรวจสอบว่ามีข้อความจากผู้ดูแลระบบหรือไม่ -->
+    <div v-if="messageFromAdmin.length > 0" class="chat-box">
+      <div v-for="message in messageFromAdmin" :key="message.id" class="message p-2 mb-2 bg-gray-100 rounded-lg">
+        <div class="flex justify-between mb-1">
+          <!-- แสดงเวลา -->
+          <span class="text-xs text-gray-500">{{ formatTime(message.createdAt) }}</span>
+          <!-- แสดงชื่อผู้ส่ง -->
+          <span class="text-sm font-semibold">{{ message.user.name }}</span>
+        </div>
+        <!-- แสดงข้อความ -->
+        <div class="text-sm">{{ message.messageadmin }}</div>
+      </div>
+    </div>
+  </div>
+<!-- --------------------------------------------- -->
+    
+
+       <!-- เพิ่มส่วนนี้เพื่อแสดงผลข้อความที่ส่งไป -->
+    <div v-if="replyDataAdmin">
+      <p>ตอบกลับ: {{ replyDataAdmin.message }}</p>
+    </div>
 
     <!-- ------------------------------------------------------------------------------ -->
 
@@ -161,6 +268,15 @@ const formatTime = (time) => {
   <!-- --------------------------------------------------------------------------------------------------------- -->
 </div>
 
+
+
+<!-- -------------------------------- -->
+  <div class="mb-8 ml-2 mr-4">
+ <input type="text" v-model="replyadmin" placeholder="พิมพ์ข้อความตอบกลับ">
+ <button @click="replyAdmin">ส่ง</button>
+</div>
+
+<!-- ----------------------------------------------------- -->
 <div class="mb-8 ml-2 mr-4">
   <p class="text">
     **ขออภัย กำลังอยู่ในช่วงพัฒนา**
