@@ -268,16 +268,7 @@ const mydrug = ref({
   user_id:localStorage.getItem('iduser'),
 });
 
-// const saveDataDrug = async (mydrug) => { // รับ mydrug เข้ามา
-//   try {
-//     const response = await axios.post('/drug', mydrug);
-//     console.log('Drug created successfully:', response.data);
-//     // ทำสิ่งที่ต้องการหลังจากสร้างยาเสร็จสมบูรณ์
-//   } catch (error) {
-//     console.error('Error creating drug:', error);
-//     // ประมวลผลข้อผิดพลาดในการสร้างยา
-//   }
-// };
+
 
 const MyDrugLoad = async () => {
   try {
@@ -337,8 +328,8 @@ onMounted(MyDrugLoad);
           </form>
         </div>
       </div>
-      <!-- ส่วนของ pop-up เพื่อกรอกข้อมูลใหม่ -->
     </div>
+    <!-- ส่วนของ pop-up เพื่อกรอกข้อมูลใหม่ -->
   </div>
 
 

@@ -6,7 +6,7 @@ import moment from "moment";
 import Swal from "sweetalert2";
 
 const name = localStorage.getItem("name") + " " + localStorage.getItem("lname");
-
+const userId = localStorage.getItem('iduser');
 
 const originalData = ref([]); // Store original data
 const result = ref([]);
@@ -33,16 +33,7 @@ const Mydrug = async () => {
 onMounted(Mydrug);
 /* --------------------------------------------------------------------------------------------------- */
 
-
-
-
-
-
-
-
-
 const appRouter = useRouter();
-
 
 const allergic_drug = ref("");
 const my_drug = ref("");
@@ -70,6 +61,59 @@ const handleButtonClick = () => {
   // Toggle the state when the button is clicked
   isButtonClicked.value = !isButtonClicked.value;
 };
+
+// แล้วแสดง pop-up หรือไม่โดยใช้เงื่อนไข
+const showPopup = ref(false);
+const openModal = () => {
+  showPopup.value = true;
+};
+const closeModal = () => {
+  showPopup.value = false;
+};
+
+
+/* การใช้งาน API  */
+const mydrug = ref({
+  id: "",
+  my_drug: "",
+  allergic_drug: "",
+});
+
+
+const updateDrug = async () => {
+  try {
+    const userId = localStorage.getItem('iduser');
+    const editdrug = `${import.meta.env.VITE_BASE_URL}api/drug/${userId}`;
+    // Display confirmation dialog using Swal
+    const confirmationResult = await Swal.fire({
+      title: "คุณแน่ใจหรือไหม",
+      text: "คุณต้องการที่จะแก้ไขการบันทึกค่าน้ำตาล",
+      icon: "warning",
+      confirmButtonText: "ใช่ ,แก้ไขมัน",
+      cancelButtonText: "ยกเลิก",
+      showCancelButton: true,
+      showCloseButton: true
+    });
+
+    if (confirmationResult.isConfirmed) {
+      const response = fetch(editdrug, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(mydrug.value),
+      });
+
+      if (response.ok) {
+        await Mydrug();
+      } else {
+        throw new Error("Failed to delete");
+      }
+    }
+  } catch (error) {
+    console.error("Error deleting data:", error);
+  }
+}
 
 </script>
 
@@ -186,6 +230,7 @@ const handleButtonClick = () => {
 
 
         <button
+        @click="openModal"
           class="flex items-center justify-between w-3/6 mx-auto px-6 py-3 mr-24 mt-4 mb-2 text-sm tracking-wide text-white capitalize transition-colors duration-300 transform bg-blue-500 rounded-md hover:bg-blue-400 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-50">
           <span>แก้ไขข้อมูลสุขภาพ</span>
 
@@ -200,11 +245,38 @@ const handleButtonClick = () => {
       </div>
       <!-- --------------------------------------------------------------------------------------------------------------------------- -->
 
-
-
     </div>
 
-
+ <!-- Pop up กรอกข้อมูลยา -->
+ <div v-if="showPopup" class="fixed inset-0 z-10 flex items-center justify-center">
+      <div class="fixed inset-0 bg-black opacity-50"></div>
+      <div class="bg-white p-8 rounded shadow-md z-20">
+        <h2 class="text-xl font-bold mb-4 text-center">แก้ไขข้อมูลยา</h2>
+        <div class="card-body">
+          <form @submit.prevent="updateDrug">
+            <div class="box-content pt-3 pb-3">
+              <p>ยาที่แพ้ <span style="font-size: 13px; color: rgb(177, 109, 241)">( ถ้าไม่มีพิมพ์ว่า ' ไม่มี ' หรือ ' - ' )</span></p>
+              <div class="box-content">
+                <input type="text" v-model="mydrug.allergic_drug" class="block w-full rounded-md border-0 py-10 pl-7 pr-20 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400" placeholder="กรุณากรอกชื่อยาที่แพ้">
+              </div>
+            </div>
+            <div class="box-content pt-3 pb-3">
+              <p>ยาที่ใช้ประจำ <span style="font-size: 13px; color: rgb(177, 109, 241)">( ถ้าไม่มีพิมพ์ว่า ' ไม่มี ' หรือ ' - ' )</span></p>
+              <input type="text" v-model="mydrug.my_drug" class="block w-full rounded-md border-0 py-10 pl-7 pr-20 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400" placeholder="กรุณากรอกยาที่ใช้ประจำ">
+            </div>
+            <div class="flex justify-center mt-3">
+              <button type="submit" class=" text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-6 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">
+                บันทึกข้อมูล
+              </button>
+              <button @click="closeModal" class="focus:outline-none text-white bg-gray-400 hover:bg-gray-500 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-12 py-2.5  me-2 mb-2 dark:focus:ring-yellow-900">
+                ยกเลิก
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+      <!-- ส่วนของ pop-up เพื่อกรอกข้อมูลใหม่ -->
 
 
   </Layout>
