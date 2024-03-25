@@ -6,7 +6,7 @@ import Swal from "sweetalert2";
 import Pusher from 'pusher-js';
 import { ref, onMounted ,computed} from "vue";
 
-
+/* ส่งหา admin id ทุกคน */
 const conversations = ref([]);
 const message = ref('');
 const userId = localStorage.getItem('iduser');
@@ -80,20 +80,21 @@ const channelAdmin = pusherAdmin.subscribe('reply');
 channelAdmin.bind('message', data => {
     console.log('ข้อมูลที่ได้รับมา:', data);
   
-    if ('text' in data) {
+    if ('text' in data && 'admin_ids' in data) {
         const messageAdmin = {
             user: {
                 name: 'พยาบาล'
             },
             createdAt: new Date(),
             messageadmin: data.text,
-            iduser: data.id
+            iduser: data.id,
+            idadmin: data.admin_ids[0] // ดึงค่า idadmin จาก index แรกของ admin_ids array
         };
         
         messageFromAdmin.value.push(messageAdmin);
         localStorage.setItem('chatMessagesfromadmin', JSON.stringify(messageFromAdmin.value));
     } else {
-        console.error('ข้อมูลที่ได้รับมาไม่มี key "text":', data);
+        console.error('ข้อมูลที่ได้รับมาไม่มี key "text" หรือ "admin_ids":', data);
     }
 });
 
@@ -108,8 +109,8 @@ onMounted(() => {
 const formatTime = (time) => {
     return moment(time).format('YYYY-MM-DD HH:mm:ss');
 };
-
-
+/* ------------------------------------------------------------------------------------------------------------- */
+/* ตอบกลับแบบเจาะ id  */
 
 
 
