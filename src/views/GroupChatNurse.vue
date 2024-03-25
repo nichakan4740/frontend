@@ -96,23 +96,35 @@ const sendReply = (adminId, messagereply) => {
         })
     })
     .then(response => response.json())
-    .then(data => {
-        console.log('Response from sendReply:', data); // แสดงข้อมูลที่ได้รับจากการส่งข้อความตอบกลับ
-        replyData.value = data; // อัพเดตค่าของตัวแปร replyData เพื่อแสดงผลในอินเตอร์เฟซ
-        if (data.admin_id === adminId) {
-          conversationreply.value.push(data);
-        }
-    })
+  .then(data => {
+    console.log('Response from sendReply:', data);
+    replyData.value = data;
+    if (data.admin_id === adminId) {
+        conversationreply.value.push(data);
+        localStorage.setItem('conversationreply', JSON.stringify(conversationreply.value));
+
+        // เพิ่มบันทึกค่า replyData ลงใน localStorage เมื่อได้รับข้อมูลตอบกลับใหม่
+        localStorage.setItem('replyData', JSON.stringify(replyData.value));
+    }
+})
+
     .catch(error => {
         console.error('Error:', error);
     });
 };
+
 
 onMounted(() => {
     listenForNewMessagereply();
     const savedConversations = localStorage.getItem('conversationreply');
     if (savedConversations) {
         conversationreply.value = JSON.parse(savedConversations);
+    }
+
+    // ตรวจสอบว่ามี replyData ใน local storage หรือไม่ และกำหนดค่าให้กับ replyData ในกรณีที่มี
+    const savedReplyData = localStorage.getItem('replyData');
+    if (savedReplyData) {
+        replyData.value = JSON.parse(savedReplyData);
     }
 });
 

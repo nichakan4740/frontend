@@ -29,7 +29,7 @@ const listenForNewMessage = () => {
     });
 };
 
-const sendMessage = (userId, message) => {
+const sendMessage = (userId, message, ) => {
     fetch(`${import.meta.env.VITE_BASE_URL}api/conversations`, {
         method: 'POST',
         headers: {
@@ -67,20 +67,21 @@ const conversationsFiltered = computed(() => {
 });
 
 /* ------------------------------------------------------------------------- */
-const Loading = ref(true);
-const mfromadmin = ref([]);
 
-const pusheradmin = new Pusher('c38b6cfa9a4f7e26bf76', {
+const Loading = ref(true);
+const messageFromAdmin = ref([]);
+
+const pusherAdmin = new Pusher('c38b6cfa9a4f7e26bf76', {
     cluster: 'ap1',
     encrypted: true
 });
 
-const channeladmin = pusheradmin.subscribe('reply');
-channeladmin.bind('message', data => {
+const channelAdmin = pusherAdmin.subscribe('reply');
+channelAdmin.bind('message', data => {
     console.log('ข้อมูลที่ได้รับมา:', data);
   
     if ('text' in data) {
-        const messageadmin = {
+        const messageAdmin = {
             user: {
                 name: 'พยาบาล'
             },
@@ -89,9 +90,8 @@ channeladmin.bind('message', data => {
             iduser: data.id
         };
         
-        mfromadmin.value = [...mfromadmin.value, messageadmin];
-        
-        localStorage.setItem('chatMessagesfromadmin', JSON.stringify(mfromadmin.value));
+        messageFromAdmin.value.push(messageAdmin);
+        localStorage.setItem('chatMessagesfromadmin', JSON.stringify(messageFromAdmin.value));
     } else {
         console.error('ข้อมูลที่ได้รับมาไม่มี key "text":', data);
     }
@@ -99,15 +99,20 @@ channeladmin.bind('message', data => {
 
 onMounted(() => {
     Loading.value = false;
-    const storedMessages = localStorage.getItem('chatMessages');
+    const storedMessages = localStorage.getItem('chatMessagesfromadmin');
     if (storedMessages) {
-        mfromadmin.value = JSON.parse(storedMessages);
+        messageFromAdmin.value = JSON.parse(storedMessages);
     }
 });
 
 const formatTime = (time) => {
-  return moment(time).format('YYYY-MM-DD HH:mm:ss');
+    return moment(time).format('YYYY-MM-DD HH:mm:ss');
 };
+
+
+
+
+
 </script>
 
 <template>
@@ -142,11 +147,12 @@ const formatTime = (time) => {
                     </li>
                 </ul>
             </div>
-            <div v-for="message in mfromadmin" :key="message.id">
-                <p>{{ message.user.name }} {{ formatTime(message.createdAt) }}</p>
-                {{ message.messageadmin}}
-                {{ message.iduser }}
-            </div>
+            <div v-for="message in messageFromAdmin" :key="message.id">
+    <p>{{ message.user.name }} {{ formatTime(message.createdAt) }}</p>
+    {{ message.messageadmin }}
+    {{ message.iduser }}
+</div>
+
     <!-- ------------------------------------------------------------------------------ -->
 
   </div>
