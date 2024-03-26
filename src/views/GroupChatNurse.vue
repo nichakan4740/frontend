@@ -5,9 +5,9 @@ import moment from "moment";
 import Swal from "sweetalert2";
 import Pusher from 'pusher-js';
 
+/* เรียกแสดงข้อความที่ user ส่งมาครั้งแรก */
 const isLoading = ref(true);
 const messages = ref([]);
-
 const pusher = new Pusher('c38b6cfa9a4f7e26bf76', {
   cluster: 'ap1',
   encrypted: true
@@ -35,8 +35,6 @@ channel.bind('message', data => {
     console.error('ข้อมูลที่ได้รับมาไม่มี key "text":', data);
   }
 });
-
-
 onMounted(() => {
   isLoading.value = false;
 
@@ -49,8 +47,50 @@ onMounted(() => {
 const formatTime = (time) => {
   return moment(time).format('YYYY-MM-DD HH:mm:ss');
 };
+/* -------------------------------------------------------------------------------------------------------------- */
+
+/* แสดงการตอบกลับแบบเจาะจงจาก user ให้ admin */
+
+const LoadingFromUser = ref(true);
+const messageFromUser = ref([]);
+
+const pusherUser = new Pusher('c38b6cfa9a4f7e26bf76', {
+    cluster: 'ap1',
+    encrypted: true
+});
 
 
+const channelUser = pusherUser.subscribe('reply');
+channelUser.bind('message', data => {
+    console.log('ข้อมูลที่ได้รับมาจากuser:', data);
+
+    if ('text' in data && 'admin_ids' in data) {
+        const messageUser = {
+            user: {
+                name: 'พยาบาล',
+                nameUser: data.fname
+
+            },
+            createdAt: new Date(),
+            messageadmin: data.text,
+            iduser: data.id,
+            idadmin: data.admin_ids[0] // ดึงค่า idadmin จาก index แรกของ admin_ids array
+        };
+        
+        messageFromUser.value.push(messageUser);
+        // เก็บเฉพาะค่า idadmin ใน localStorage
+        localStorage.setItem('idadmin', data.admin_ids[0]);
+    } else {
+        console.error('ข้อมูลที่ได้รับมาไม่มี key "text" หรือ "admin_ids":', data);
+    }
+});
+onMounted(() => {
+    LoadingFromUser.value = false;
+    const storedMessagesUser = localStorage.getItem('chatMessagesfromUser');
+    if (storedMessagesUser) {
+        messageFromUser.value = JSON.parse(storedMessagesUser);
+    }
+});
 
 
 
@@ -112,8 +152,6 @@ const sendReply = (adminId, messagereply) => {
         console.error('Error:', error);
     });
 };
-
-
 onMounted(() => {
     listenForNewMessagereply();
     const savedConversations = localStorage.getItem('conversationreply');
@@ -127,6 +165,9 @@ onMounted(() => {
         replyData.value = JSON.parse(savedReplyData);
     }
 });
+/* -------------------------------------------------------------------------------------------------------------------------- */
+
+
 </script>
 
 
@@ -151,6 +192,17 @@ onMounted(() => {
             {{ message.message }}
             {{message.iduser}}
           </div>
+
+
+          <!-- -----------แสดงตอบกลับของ user หา admin  -->
+           <div v-for="messageuser in messageFromUser" :key="messageuser.id">
+            <p>{{ messageuser.user.fname }} {{ formatTime(messageuser.createdAt) }}</p>
+            {{ messageuser.messageadmin }}
+            {{messageuser.iduser}}
+          </div>
+
+
+
   
           <!-- เพิ่มส่วนนี้เพื่อแสดงผลข้อความที่ส่งไป -->
     <div v-if="replyData">

@@ -78,12 +78,14 @@ const pusherAdmin = new Pusher('c38b6cfa9a4f7e26bf76', {
 
 const channelAdmin = pusherAdmin.subscribe('reply');
 channelAdmin.bind('message', data => {
-    console.log('ข้อมูลที่ได้รับมา:', data);
+    console.log('ข้อมูลที่ได้รับมาadmin:', data);
   
     if ('text' in data && 'admin_ids' in data) {
         const messageAdmin = {
             user: {
-                name: 'พยาบาล'
+                name: 'พยาบาล',
+                nameUser: data.fname
+
             },
             createdAt: new Date(),
             messageadmin: data.text,
@@ -102,15 +104,24 @@ channelAdmin.bind('message', data => {
 
 onMounted(() => {
     Loading.value = false;
-    const storedMessages = localStorage.getItem('chatMessagesfromadmin');
-    if (storedMessages) {
-        messageFromAdmin.value = JSON.parse(storedMessages);
+    const storedMessagesAdmin = localStorage.getItem('chatMessagesfromadmin');
+    if (storedMessagesAdmin) {
+        messageFromAdmin.value = JSON.parse(storedMessagesAdmin);
     }
 });
 
 const formatTime = (time) => {
     return moment(time).format('YYYY-MM-DD HH:mm:ss');
 };
+
+
+
+
+
+
+
+
+
 
 /* ------------------------------------------------------------------------------------------------------------- */
 /* ตอบกลับแบบเจาะจง id admin   */
@@ -171,8 +182,6 @@ const sendReplyAdmin = (userId, replyadmin) => {
         console.error('Error:', error);
     });
 };
-
-
 
 onMounted(() => {
     listenForNewMessagereplyadmin();
@@ -246,7 +255,7 @@ onMounted(() => {
           <!-- แสดงเวลา -->
           <span class="text-xs text-gray-500">{{ formatTime(message.createdAt) }}</span>
           <!-- แสดงชื่อผู้ส่ง -->
-          <span class="text-sm font-semibold">{{ message.user.name }}</span>
+          <span class="text-sm font-semibold">{{ message.user.name }} {{message.user.nameUser}}</span>
         </div>
         <!-- แสดงข้อความ -->
         <div class="text-sm">{{ message.messageadmin }}</div>
