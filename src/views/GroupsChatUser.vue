@@ -81,7 +81,7 @@ const pusherAdmin = new Pusher("c38b6cfa9a4f7e26bf76", {
   encrypted: true,
 });
 
-const channelAdmin = pusherAdmin.subscribe("reply");
+const channelAdmin = pusherAdmin.subscribe("replyAdmin");
 channelAdmin.bind("message", (data) => {
   console.log("ข้อมูลที่ได้รับมาadmin:", data);
 
@@ -147,7 +147,7 @@ const sendReplyAdmin = (userId, replyadmin) => {
   // ดึงค่า idadmin จาก localStorage
   const idadmin = localStorage.getItem("idadmin");
 
-  fetch(`${import.meta.env.VITE_BASE_URL}api/conversation/reply`, {
+  fetch(`${import.meta.env.VITE_BASE_URL}api/reply/admin`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -197,6 +197,25 @@ onMounted(() => {
     replyDataAdmin.value = JSON.parse(savedReplyDataadmin);
   }
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 </script>
 
 <template>
