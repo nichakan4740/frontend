@@ -74,6 +74,7 @@ const closeModal = () => {
 
 /* การใช้งาน API  */
 const mydrug = ref({
+  userId: localStorage.getItem('iduser'),
   id: "",
   my_drug: "",
   allergic_drug: "",
@@ -96,23 +97,29 @@ const updateDrug = async () => {
     });
 
     if (confirmationResult.isConfirmed) {
-      const response = fetch(editdrug, {
+      var response = await fetch(editdrug, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(mydrug.value),
       });
-
       if (response.ok) {
-        await Mydrug();
-      } else {
-        throw new Error("Failed to delete");
+        Mydrug()
+         Swal.fire({
+            icon: 'success',
+            title: 'Success',
+            text: 'Information updated successfully',
+         });
       }
+      console.log(mydrug.value.allergic_drug ,  mydrug.allergic_drug)
+
+      
     }
   } catch (error) {
     console.error("Error deleting data:", error);
   }
+
 }
 
 </script>

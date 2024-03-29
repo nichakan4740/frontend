@@ -15,6 +15,9 @@ const fullname = localStorage.getItem("name") + " " + localStorage.getItem("lnam
 const fname = localStorage.getItem("name");
 const lname = localStorage.getItem("lname");
 const idcard = localStorage.getItem("idcard");
+const dob = localStorage.getItem("dob");
+const phone = localStorage.getItem("phone");
+const address = localStorage.getItem("address");
 
 // เรียกข้อมูล
 const originalData = ref([]); 
@@ -31,7 +34,10 @@ const myinfo = ref({
 });
 
 const updateinfouser = async () => {
+   console.log(myinfo.value.fname);
+
    try {
+   
       const userId = localStorage.getItem('iduser');
       const response = await fetch(`${import.meta.env.VITE_BASE_URL}api/updateinfo`, {
          method: 'PUT',
@@ -39,17 +45,24 @@ const updateinfouser = async () => {
             'Content-Type': 'application/json',
          },
          body: JSON.stringify({
-            fname: myinfo.fname,
-            lname: myinfo.lname,
-            idcard: myinfo.idcard,
-            dob: myinfo.dob,
-            phone: myinfo.phone,
-            address: myinfo.address,
+            fname: myinfo.value.fname,
+            lname: myinfo.value.lname,
+            idcard: myinfo.value.idcard,
+            dob: myinfo.value.dob,
+            phone: myinfo.value.phone,
+            address: myinfo.value.address,
             user_id: userId,
          }),
       });
       if (response.ok) {
          const data = await response.json();
+         console.log(data.InformationUser);
+      localStorage.setItem("idcard", data.user.idcard);
+      localStorage.setItem("name", data.user.fname);
+      localStorage.setItem("lname", data.user.lname);
+      localStorage.setItem("dob", data.InformationUser.dob);
+      localStorage.setItem("phone", data.InformationUser.phone);
+      localStorage.setItem("address", data.InformationUser.address);
          console.log('Information updated successfully:', data);
          Swal.fire({
             icon: 'success',
@@ -232,7 +245,7 @@ const editinfo = () => {
                               <label class="block mb-2 text-sm text-gray-600 dark:text-gray-200">วันเกิด</label>
                               <div type="text"
                                  class="block w-full px-5 py-3 mt-2 text-gray-700 bg-white border border-gray-200 rounded-md dark:placeholder-gray-600 dark:bg-gray-900 dark:text-gray-300 dark:border-gray-700 focus:border-blue-400 dark:focus:border-blue-400 focus:ring-blue-400 focus:outline-none focus:ring focus:ring-opacity-40">
-                                 {{ myinfo.dob }}
+                                 {{ dob }}
                               </div>
                            </div>
 
@@ -240,14 +253,14 @@ const editinfo = () => {
                               <label class="block mb-2 text-sm text-gray-600 dark:text-gray-200">เบอร์โทร</label>
                               <div type="text"
                                  class="block w-full px-5 py-3 mt-2 text-gray-700 bg-white border border-gray-200 rounded-md dark:placeholder-gray-600 dark:bg-gray-900 dark:text-gray-300 dark:border-gray-700 focus:border-blue-400 dark:focus:border-blue-400 focus:ring-blue-400 focus:outline-none focus:ring focus:ring-opacity-40">
-                                 {{ myinfo.phone }}
+                                 {{ phone }}
                               </div>
                            </div>
                            <div>
                               <label class="block mb-2 text-sm text-gray-600 dark:text-gray-200">ที่อยู่</label>
                               <div type="text"
                                  class="block w-full px-5 py-3 mt-2 text-gray-700 bg-white border border-gray-200 rounded-md dark:placeholder-gray-600 dark:bg-gray-900 dark:text-gray-300 dark:border-gray-700 focus:border-blue-400 dark:focus:border-blue-400 focus:ring-blue-400 focus:outline-none focus:ring focus:ring-opacity-40">
-                                 {{ myinfo.address }}
+                                 {{ address }}
                               </div>
                            </div>
 
