@@ -53,7 +53,7 @@ const formatTime = (time) => {
 /* การตอบกลับข้อความ------------------------------------------------------------------ */
 const LoadingFromUser = ref(true);
 const messageFromUser = ref([]);
-const ShowSendMessageAdmin = ref([]);
+/* const ShowSendMessageAdmin = ref([]); */
 const mergedMessages = ref([]);
 
 const pusher = new Pusher("c38b6cfa9a4f7e26bf76", {
