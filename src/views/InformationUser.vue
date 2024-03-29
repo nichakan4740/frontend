@@ -66,8 +66,8 @@ const updateinfouser = async () => {
          console.log('Information updated successfully:', data);
          Swal.fire({
             icon: 'success',
-            title: 'Success',
-            text: 'Information updated successfully',
+            title: 'บันทึกข้อมูลสำเร็จ',
+            // text: 'Information updated successfully',
          });
       } else {
          const errorMessage = await response.text();
@@ -319,6 +319,7 @@ const editinfo = () => {
                               <p>เลขบัตรประจำตัวประชาชน</p>
                               <div class="box-content ">
                                  <input type="text" v-model="myinfo.idcard"
+                                 maxlength="13" 
                                     class="block w-full rounded-md border-0 py-2 pl-6 pr-20 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400">
                               </div>
                            </div>

@@ -108,12 +108,12 @@ const updateDrug = async () => {
         Mydrug()
          Swal.fire({
             icon: 'success',
-            title: 'Success',
-            text: 'Information updated successfully',
+            title: 'แก้ไขข้อมูลสำเร็จ',
+            // text: 'Information updated successfully',
          });
       }
       console.log(mydrug.value.allergic_drug ,  mydrug.allergic_drug)
-
+      closeModal();
       
     }
   } catch (error) {

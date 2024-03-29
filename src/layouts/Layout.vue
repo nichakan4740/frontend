@@ -37,7 +37,9 @@ const name = localStorage.getItem("name");
       <!-- Hamburger Menu -->
       <div v-if="showMenu" class="menu">
         <!-- เพิ่มเนื้อหาของเมนูที่นี่ -->
-        <p>ข้อมูลส่วนตัว</p>
+        <router-link :to="'/informationUser/'">
+          <p>ข้อมูลส่วนตัว</p>
+        </router-link>
         <p @click="logoutpatient">ออกจากระบบ</p>
       </div>
       
