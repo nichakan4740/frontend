@@ -266,6 +266,8 @@ onMounted(() => {
               </svg>
             </button>
           </div>
+
+          
           <ul>
             <li
               class="text-red-800"
@@ -280,39 +282,6 @@ onMounted(() => {
 
         <p>--------------------------------------------------</p>
         <!-- แสดงที่ admin user ตอบกลับไปมา -->
-     
-<!--   <div class="chat-container p-4 border rounded-md border-gray-300 max-h-96 overflow-y-auto">
-  <template v-for="(message, index) in  mergedMessagesAdminUser" :key="index">
-    <div v-if="message.user.type === 'admin'" class="message flex items-center justify-end mb-4">
-      <div class="flex flex-col">
-        <div class="text-xs text-gray-500">{{ formatTime(message.createdAt) }}</div>
-        <div class="flex items-center justify-end">
-          <div class="mr-2 bg-blue-500 text-white rounded-lg p-2">
-            <span class="text-sm">{{ message.text}}</span>
-          </div>
-          <div class="bg-gray-100 rounded-lg p-2">
-            <span class="text-sm font-semibold">{{ message.user.name }}</span>
-          </div>
-        </div>
-      </div>
-    </div>
-
-
-    <div v-else class="message flex items-center justify-start mb-4">
-      <div class="flex flex-col">
-        <div class="text-xs text-gray-500">{{ formatTime(message.createdAt) }}</div>
-        <div class="flex items-center">
-          <div class="bg-gray-100 rounded-lg p-2">
-            <span class="text-sm font-semibold">{{ message.user.name }}</span>
-          </div>
-          <div class="ml-2 bg-blue-500 text-white rounded-lg p-2">
-            <span class="text-sm">{{ message.text }}</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </template>
-</div> -->
 <div class="chat-container p-4 border rounded-md border-gray-300 max-h-96 overflow-y-auto">
   <template v-for="(message, index) in mergedMessagesAdminUser" :key="index">
     <div v-if="message.user.type === 'admin'" class="message flex items-center justify-start mb-4">
