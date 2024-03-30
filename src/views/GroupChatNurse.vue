@@ -65,9 +65,8 @@ channelUser.bind("message", (data) => {
   if ("text" in data && "admin_ids" in data) {
     const message = {
       user: {
-        type: 'user',
+        type: "user",
         name: data.fname,
-
       },
       createdAt: new Date(),
       text: data.text,
@@ -75,7 +74,10 @@ channelUser.bind("message", (data) => {
       idadmin: data.admin_ids[0],
     };
     mergedMessages.value.push(message);
-    localStorage.setItem("chatMessagesfromuser", JSON.stringify(mergedMessages.value));
+    localStorage.setItem(
+      "chatMessagesfromuser",
+      JSON.stringify(mergedMessages.value)
+    );
     localStorage.setItem("idadmin", data.admin_ids[0]);
   }
 });
@@ -85,7 +87,7 @@ channelSendofAdmin.bind("message", (data) => {
   if ("text" in data && "admin_ids" in data) {
     const message = {
       user: {
-        type: 'admin',
+        type: "admin",
         name: "พยาบาล",
         nameUser: data.fname,
       },
@@ -95,26 +97,20 @@ channelSendofAdmin.bind("message", (data) => {
       idadmin: data.admin_ids[0],
     };
     mergedMessages.value.push(message);
-    localStorage.setItem("chatMessagesfromuser", JSON.stringify(mergedMessages.value));
+    localStorage.setItem(
+      "chatMessagesfromuser",
+      JSON.stringify(mergedMessages.value)
+    );
     localStorage.setItem("idadmin", data.admin_ids[0]);
   }
 });
 
-
 onMounted(() => {
-  const storedMessagesUser = localStorage.getItem("chatMessagesfromuser"); 
+  const storedMessagesUser = localStorage.getItem("chatMessagesfromuser");
   if (storedMessagesUser) {
-    mergedMessages.value = JSON.parse(storedMessagesUser); 
+    mergedMessages.value = JSON.parse(storedMessagesUser);
   }
 });
-
-
-
-
-
-
-
-
 
 /*------------- ส่งข้อความตอบกลับไปหา user ---------------------------------------------- */
 const conversationreply = ref([]);
@@ -190,209 +186,152 @@ onMounted(() => {
 });
 
 /* -------------------------------------------------------------------------------------------------------------------------- */
-
 </script>
 
 <template>
   <LayoutNurse class="bg-gradient-to-b from-blue-100">
     <!-- content -->
-    <div class="container mx-auto ">
-      <div class="box-content-small p-3 ml-5 mr-5 mt-10 bg-gradient-to-b from-blue-900 to-blue-800 shadow-lg shadow-slate-500/50 rounded-lg" >
+    <div class="container mx-auto">
+      <div
+        class="box-content-small p-3 ml-5 mr-5 mt-10 bg-gradient-to-b from-blue-900 to-blue-800 shadow-lg shadow-slate-500/50 rounded-lg"
+      >
         <h2 class="font-semibold text-xl text-center text-slate-200">
           คุยกับผู้ป่วย
         </h2>
       </div>
 
       <!-- กล่องแชท -->
-      <div class="box-content bg-white shadow-lg shadow-gray-300/50 mt-10 ml-5 mr-5 pt-1 pb-6 pl-20 pr-20 mb-5 rounded-lg">
-   
+      <div
+        class="box-content bg-white shadow-lg shadow-gray-300/50 mt-10 ml-5 mr-5 pt-5 pb-5 pl-10 pr-10 rounded-lg"
+      >
+        <div class="flex">
+          <!-- Left -->
+          <div class="w-1/3 border-r-2">
+            <!-- Search -->
+            <div class="bg-grey-lightest mr-6 mb-4">
+              <input
+                type="text"
+                class="w-full px-2 py-2 text-sm"
+                placeholder="Search or start new chat"
+              />
+            </div>
 
+            <!-- ขอความที่ทักเข้ามาตอนแรก -->
+            <div
+              v-for="message in messages"
+              :key="message.id"
+              class="box-content bg-white shadow-lg shadow-gray-300 mr-6 mb-4 p-4"
+            >
+              <div>
+                <img
+                  class="rounded-full w-6 h-6"
+                  src="https://cdn-icons-png.flaticon.com/512/9131/9131529.png"
+                />
+              </div>
 
-
-
-
-
-
-
-
-
-
-
-
-
-   
-        <div >
-         
-
-        
-
-<!-- ----- กล่องข้อความ ------------------------------------------------------------- -->
-
-
-          <!-- เพิ่มส่วนนี้เพื่อแสดงผลข้อความที่ส่งไป -->
-          <div v-if="replyData">
-            <p>ตอบกลับ: {{ replyData.message }}</p>
+              <div>
+                {{ message.user.fname }} {{ formatTime(message.createdAt) }}
+              </div>
+              <div>{{ message.iduser }}</div>
+              <div>{{ message.message }}</div>
+            </div>
           </div>
-          <!-- -------------------------------------------- -->
+          <!-- ------------------------------------------------------------------------------------------------------------------------------------------------------------------ -->
+          <!-- Right -->
+          <div class="w-2/3">
+            <!-- Header -->
+            <div
+              class="py-2 px-3 bg-grey-lighter flex flex-row justify-between items-center"
+            >
+              <div class="flex items-center">
+                <div>
+                  <img
+                    class="w-10 h-10 rounded-full"
+                    src="https://darrenjameseeley.files.wordpress.com/2014/09/expendables3.jpeg"
+                  />
+                </div>
+                <div class="ml-4">
+                  <p class="text-grey-darkest">New Movie! Expendables 4</p>
+                </div>
+              </div>
+              <!-- ----------------------------------------------- -->
+            </div>
 
-    <!-- UI chat  -->
-    <!-- component -->
-                <div class="flex">
+            <!-- Messages -->
+            <div class="flex-1 overflow-y-auto max-h-96 border-y">
+              <div class="py-2 px-3">
+                <div class="chat-container p-4 rounded-md border-gray-300">
+                  <template  v-for="(message, index) in mergedMessages" :key="index" >
+                    <div v-if="message.user.type === 'admin'" class="message flex items-center justify-end mb-4" >
+                      <div class="flex flex-col">
+                        <div class="text-xs text-gray-500"> {{ formatTime(message.createdAt) }} </div>
+                        
+                        <div class="flex items-center justify-end">
+                          <div class="mr-2 bg-blue-500 text-white rounded-lg p-2" >
+                            <span class="text-sm">{{ message.text }}</span>
+                          </div>
 
-                    <!-- Left -->
-                    <div class="w-1/3 border-r-2">
-
-                        <!-- Search -->
-                        <div class="py-2 px-2 bg-grey-lightest">
-                            <input type="text" class="w-full px-2 py-2 text-sm" placeholder="Search or start new chat"/>
-                        </div>
-
-                            <!-- ขอความที่ทักเข้ามาตอนแรก --> 
-                           <div v-for="message in messages" :key="message.id" class="ml-4 border-b border-grey-lighter py-4">
-                            <div>
-                                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6">
-                                   <path fill-rule="evenodd" d="M7.5 6a4.5 4.5 0 1 1 9 0 4.5 4.5 0 0 1-9 0ZM3.751 20.105a8.25 8.25 0 0 1 16.498 0 .75.75 0 0 1-.437.695A18.683 18.683 0 0 1 12 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 0 1-.437-.695Z" clip-rule="evenodd" />
-                                   </svg>
-                            </div>
-
-                            <div>{{ message.user.fname }} {{ formatTime(message.createdAt) }}</div>         
-                            <div>{{ message.iduser }}</div>       
-                             <div>{{ message.message }}</div>
-                          </div>  
-                      </div>                                   
-<!-- ------------------------------------------------------------------------------------------------------------------------------------ -->         
-                 
-
-<!-- ------------------------------------------------------------------------------------------------------------------------------------------------------------------ -->
-                    <!-- Right -->
-                    <div class="w-2/3">
-
-                        <!-- Header -->
-                        <div class="py-2 px-3 bg-grey-lighter flex flex-row justify-between items-center">
-                           <div class="flex items-center">
-                                <div>
-                                    <img class="w-10 h-10 rounded-full" src="https://darrenjameseeley.files.wordpress.com/2014/09/expendables3.jpeg"/>
-                                </div>
-                                <div class="ml-4">
-
-                                    <p class="text-grey-darkest"> New Movie! Expendables 4 </p>
-                                   
-                                </div>
-                            </div>
-                   <!-- ----------------------------------------------- -->
-                            <div class="flex">    
-                             <!-- รายละเอียด --> 
-                            </div>
-
+                          <div class="bg-gray-100 rounded-lg p-2">
+                            <span class="text-sm font-semibold">{{ message.user.name}}</span>
+                          </div>
 
                         </div>
-
-
-
-                        <!-- Messages -->
-                        <div class="flex-1 overflow-y-auto max-h-96">
-                            <div class="py-2 px-3">                                              
-  <div class="chat-container p-4  rounded-md border-gray-300 ">
-  <template v-for="(message, index) in mergedMessages" :key="index">
-    <div v-if="message.user.type === 'admin'" class="message flex items-center justify-end mb-4">
-      <div class="flex flex-col">
-        <div class="text-xs text-gray-500">{{ formatTime(message.createdAt) }}</div>
-        <div class="flex items-center justify-end">
-          <div class="mr-2 bg-blue-500 text-white rounded-lg p-2">
-            <span class="text-sm">{{ message.text }}</span>
-          </div>
-          <div class="bg-gray-100 rounded-lg p-2">
-            <span class="text-sm font-semibold">{{ message.user.name }}</span>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div v-else class="message flex items-center justify-start mb-4">
-      <div class="flex flex-col">
-        <div class="text-xs text-gray-500">{{ formatTime(message.createdAt) }}</div>
-        <div class="flex items-center">
-          <div class="bg-gray-100 rounded-lg p-2">
-            <span class="text-sm font-semibold">{{ message.user.name }}</span>
-          </div>
-          <div class="ml-2 bg-blue-500 text-white rounded-lg p-2">
-            <span class="text-sm">{{ message.text }}</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </template>
-</div>
-
-                            </div>
-                        </div>
-
-
-                        <!-- Input  ตอบกลับ-->
-                        <div class="bg-grey-lighter px-4 py-4 flex items-center">
-                           
-                            <div class="flex-1 mx-4">
-                                <input class="w-full border rounded px-2 py-2" type="text"/>
-                            </div>
-                        </div>
+                      </div>
                     </div>
-<!-- --------------------------------------------------------------------------------------------------------- -->
-               </div>
-       
- 
 
+                    <div v-else class="message flex items-center justify-start mb-4" >
+                      <div class="flex flex-col">
+                        <div class="text-xs text-gray-500">  {{ formatTime(message.createdAt) }} </div>
+                        
+                        <div class="flex items-center">
+                          <div class="bg-gray-100 rounded-lg p-2">
+                            <span class="text-sm font-semibold">{{ message.user.name}}</span>
+                          </div>
 
+                          <div  class="ml-2 bg-blue-500 text-white rounded-lg p-2" >
+                            <span class="text-sm">{{ message.text }}</span>
+                          </div>
 
+                        </div>
+                      </div>
+                    </div>
+                  </template>
+                  
+                </div>
+              </div>
+            </div>
 
+            <!-- Input  ตอบกลับ-->
+             
+          <div style="display: flex; align-items: center" class="mt-1 ml-2">
+            <input
+              type="text"
+              v-model="messagereply"
+              placeholder="พิมพ์ข้อความที่นี่..."
+              class="block w-full p-2 text-gray-900 border-0 focus:ring-white focus:border-white"
+            />
 
+            <button @click="replyUser">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                class="w-6 h-6 text-gray-600"
+              >
+                <path d="M3.478 2.404a.75.75 0 0 0-.926.941l2.432 7.905H13.5a.75.75 0 0 1 0 1.5H4.984l-2.432 7.905a.75.75 0 0 0 .926.94 60.519 60.519 0 0 0 18.445-8.986.75.75 0 0 0 0-1.218A60.517 60.517 0 0 0 3.478 2.404Z" />
+              </svg>
+            </button>
+          </div>
+ <!-- --------------------------------------------------------------------------------------------------------- -->
 
-
-
-
-
-
-
-
-
-
-
-
+          </div>
         </div>
       </div>
       <!-- --------------------------------------------- -->
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-      <div class="mb-8 ml-2 mr-4">
-        <input
-          type="text"
-          v-model="messagereply"
-          placeholder="พิมพ์ข้อความตอบกลับ"
-        />
-        <button @click="replyUser">ส่ง</button>
-      </div>
-
-      <!-- -------------------------------------------- -->
       <div class="mb-8 ml-2 mr-4">
         <p class="text">**ขออภัย กำลังอยู่ในช่วงพัฒนา**</p>
       </div>
     </div>
-
-
-
-
   </LayoutNurse>
 </template>
 
