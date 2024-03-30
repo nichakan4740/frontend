@@ -196,36 +196,103 @@ onMounted(() => {
 <template>
   <LayoutNurse class="bg-gradient-to-b from-blue-100">
     <!-- content -->
-    <div class="container mx-auto">
-      <div
-        class="box-content-small p-3 ml-5 mr-5 mt-10 bg-gradient-to-b from-blue-900 to-blue-800 shadow-lg shadow-slate-500/50 rounded-lg"
-      >
+    <div class="container mx-auto ">
+      <div class="box-content-small p-3 ml-5 mr-5 mt-10 bg-gradient-to-b from-blue-900 to-blue-800 shadow-lg shadow-slate-500/50 rounded-lg" >
         <h2 class="font-semibold text-xl text-center text-slate-200">
-          คุยกับเรา
+          คุยกับผู้ป่วย
         </h2>
       </div>
+
       <!-- กล่องแชท -->
-      <div
-        class="box-content bg-white shadow-lg shadow-gray-300/50 mt-10 ml-5 mr-5 pt-1 pb-6 pl-20 pr-20 mb-5 rounded-lg"
-      >
-        <iframe
-          width="100%"
-          style="height: 100%; min-height: 500px"
-          frameborder="0"
-        ></iframe>
-        <div v-if="isLoading">กำลังโหลดข้อมูล...</div>
-        <div v-else>
-          <div v-for="message in messages" :key="message.id">
-            <p>{{ message.user.fname }} {{ formatTime(message.createdAt) }}</p>
-            {{ message.message }}
-            {{ message.iduser }}
-          </div>
+      <div class="box-content bg-white shadow-lg shadow-gray-300/50 mt-10 ml-5 mr-5 pt-1 pb-6 pl-20 pr-20 mb-5 rounded-lg">
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   
+        <div >
+         
 
         
 
 <!-- ----- กล่องข้อความ ------------------------------------------------------------- -->
 
-  <div class="chat-container p-4 border rounded-md border-gray-300 max-h-96 overflow-y-auto">
+
+          <!-- เพิ่มส่วนนี้เพื่อแสดงผลข้อความที่ส่งไป -->
+          <div v-if="replyData">
+            <p>ตอบกลับ: {{ replyData.message }}</p>
+          </div>
+          <!-- -------------------------------------------- -->
+
+    <!-- UI chat  -->
+    <!-- component -->
+                <div class="flex">
+
+                    <!-- Left -->
+                    <div class="w-1/3 border-r-2">
+
+                        <!-- Search -->
+                        <div class="py-2 px-2 bg-grey-lightest">
+                            <input type="text" class="w-full px-2 py-2 text-sm" placeholder="Search or start new chat"/>
+                        </div>
+
+                            <!-- ขอความที่ทักเข้ามาตอนแรก --> 
+                           <div v-for="message in messages" :key="message.id" class="ml-4 border-b border-grey-lighter py-4">
+                            <div>
+                                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6">
+                                   <path fill-rule="evenodd" d="M7.5 6a4.5 4.5 0 1 1 9 0 4.5 4.5 0 0 1-9 0ZM3.751 20.105a8.25 8.25 0 0 1 16.498 0 .75.75 0 0 1-.437.695A18.683 18.683 0 0 1 12 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 0 1-.437-.695Z" clip-rule="evenodd" />
+                                   </svg>
+                            </div>
+
+                            <div>{{ message.user.fname }} {{ formatTime(message.createdAt) }}</div>         
+                            <div>{{ message.iduser }}</div>       
+                             <div>{{ message.message }}</div>
+                          </div>  
+                      </div>                                   
+<!-- ------------------------------------------------------------------------------------------------------------------------------------ -->         
+                 
+
+<!-- ------------------------------------------------------------------------------------------------------------------------------------------------------------------ -->
+                    <!-- Right -->
+                    <div class="w-2/3">
+
+                        <!-- Header -->
+                        <div class="py-2 px-3 bg-grey-lighter flex flex-row justify-between items-center">
+                           <div class="flex items-center">
+                                <div>
+                                    <img class="w-10 h-10 rounded-full" src="https://darrenjameseeley.files.wordpress.com/2014/09/expendables3.jpeg"/>
+                                </div>
+                                <div class="ml-4">
+
+                                    <p class="text-grey-darkest"> New Movie! Expendables 4 </p>
+                                   
+                                </div>
+                            </div>
+                   <!-- ----------------------------------------------- -->
+                            <div class="flex">    
+                             <!-- รายละเอียด --> 
+                            </div>
+
+
+                        </div>
+
+
+
+                        <!-- Messages -->
+                        <div class="flex-1 overflow-y-auto max-h-96">
+                            <div class="py-2 px-3">                                              
+  <div class="chat-container p-4  rounded-md border-gray-300 ">
   <template v-for="(message, index) in mergedMessages" :key="index">
     <div v-if="message.user.type === 'admin'" class="message flex items-center justify-end mb-4">
       <div class="flex flex-col">
@@ -256,16 +323,58 @@ onMounted(() => {
   </template>
 </div>
 
+                            </div>
+                        </div>
 
 
-          <!-- เพิ่มส่วนนี้เพื่อแสดงผลข้อความที่ส่งไป -->
-          <div v-if="replyData">
-            <p>ตอบกลับ: {{ replyData.message }}</p>
-          </div>
-          <!-- -------------------------------------------- -->
+                        <!-- Input  ตอบกลับ-->
+                        <div class="bg-grey-lighter px-4 py-4 flex items-center">
+                           
+                            <div class="flex-1 mx-4">
+                                <input class="w-full border rounded px-2 py-2" type="text"/>
+                            </div>
+                        </div>
+                    </div>
+<!-- --------------------------------------------------------------------------------------------------------- -->
+               </div>
+       
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         </div>
       </div>
       <!-- --------------------------------------------- -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
       <div class="mb-8 ml-2 mr-4">
         <input
           type="text"
@@ -280,6 +389,10 @@ onMounted(() => {
         <p class="text">**ขออภัย กำลังอยู่ในช่วงพัฒนา**</p>
       </div>
     </div>
+
+
+
+
   </LayoutNurse>
 </template>
 
