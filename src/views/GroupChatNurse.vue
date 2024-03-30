@@ -51,9 +51,8 @@ const formatTime = (time) => {
 /* -------------------------------------------------------------------------------------------------------------- */
 
 /* การตอบกลับข้อความ------------------------------------------------------------------ */
-const LoadingFromUser = ref(true);
+
 const messageFromUser = ref([]);
-/* const ShowSendMessageAdmin = ref([]); */
 const mergedMessages = ref([]);
 
 const pusher = new Pusher("c38b6cfa9a4f7e26bf76", {
@@ -76,6 +75,7 @@ channelUser.bind("message", (data) => {
       idadmin: data.admin_ids[0],
     };
     mergedMessages.value.push(message);
+    localStorage.setItem("chatMessagesfromuser", JSON.stringify(mergedMessages.value));
     localStorage.setItem("idadmin", data.admin_ids[0]);
   }
 });
@@ -95,17 +95,25 @@ channelSendofAdmin.bind("message", (data) => {
       idadmin: data.admin_ids[0],
     };
     mergedMessages.value.push(message);
+    localStorage.setItem("chatMessagesfromuser", JSON.stringify(mergedMessages.value));
     localStorage.setItem("idadmin", data.admin_ids[0]);
   }
 });
 
+
 onMounted(() => {
-  LoadingFromUser.value = false;
-  const storedMessagesUser = localStorage.getItem("chatMessagesfromUser");
+  const storedMessagesUser = localStorage.getItem("chatMessagesfromuser"); 
   if (storedMessagesUser) {
-    messageFromUser.value = JSON.parse(storedMessagesUser);
+    mergedMessages.value = JSON.parse(storedMessagesUser); 
   }
 });
+
+
+
+
+
+
+
 
 
 /*------------- ส่งข้อความตอบกลับไปหา user ---------------------------------------------- */
