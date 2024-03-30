@@ -206,7 +206,7 @@ onMounted(() => {
       >
         <div class="flex">
           <!-- Left -->
-          <div class="w-1/3 border-r-2">
+          <div class="w-1/3 border-r">
             <!-- Search -->
             <div class="bg-grey-lightest mr-6 mb-4">
               <input
