@@ -75,20 +75,21 @@ const conversationsFiltered = computed(() => {
   );
 });
 
+
 /* --------------------------------------------------------------------------------------------------------------------  */
 
-const Loading = ref(true);
+/* การตอบกลับข้อความ------------------------------------------------------------------ */
+
 const messageFromAdmin = ref([]);
 const mergedMessagesAdminUser = ref([]);
-
 const pusherAdmin = new Pusher("c38b6cfa9a4f7e26bf76", {
   cluster: "ap1",
   encrypted: true,
 });
 
-const channelAdmin = pusherAdmin.subscribe("replyAdmin");
+ const channelAdmin = pusherAdmin.subscribe("replyAdmin");
 channelAdmin.bind("message", (data) => {
-  console.log("ข้อมูลที่ได้รับมาadmin:", data);
+
   if ("text" in data && "admin_ids" in data) {
     const message = {
       user: {
@@ -101,20 +102,19 @@ channelAdmin.bind("message", (data) => {
       idadmin: data.admin_ids[0],
     };
     mergedMessagesAdminUser.value.push(message);
-    // เก็บเฉพาะค่า idadmin ใน localStorage
+    localStorage.setItem("chatMessagesfromadmin", JSON.stringify(mergedMessagesAdminUser.value));
     localStorage.setItem("idadmin", data.admin_ids[0]);
   }
-});
-
+}); 
 const channelSendofUser = pusher.subscribe("replyUser");
 channelSendofUser.bind("message", (data) => {
-   if ("text" in data && "admin_ids" in data) {
+
+  if ("text" in data && "admin_ids" in data) {
     const message = {
       user: {
         type: 'admin',
         name: "พยาบาล",
         nameUser: data.fname,
-
       },
       createdAt: new Date(),
       text: data.text,
@@ -122,18 +122,27 @@ channelSendofUser.bind("message", (data) => {
       idadmin: data.admin_ids[0],
     };
     mergedMessagesAdminUser.value.push(message);
+    localStorage.setItem("chatMessagesfromadmin", JSON.stringify(mergedMessagesAdminUser.value));
     localStorage.setItem("idadmin", data.admin_ids[0]);
+  
   }
 });
 
+const filterMessagesByUserId = (messages, userId) => {
+  return messages.filter(message => message.iduser === userId);
+};
+
+// ใช้ filterMessagesByUserId เพื่อกรองข้อมูลก่อนนำไปแสดงผลในตัวแปร mergedMessagesAdminUser.value
 onMounted(() => {
-  Loading.value = false;
   const storedMessagesAdmin = localStorage.getItem("chatMessagesfromadmin");
-  if (storedMessagesAdmin) {
-    messageFromAdmin.value = JSON.parse(storedMessagesAdmin);
+  const userId = parseInt(localStorage.getItem("iduser")); // แปลงเป็นตัวเลข
+
+  if (storedMessagesAdmin && !isNaN(userId)) {
+    const parsedMessages = JSON.parse(storedMessagesAdmin);
+    mergedMessagesAdminUser.value = filterMessagesByUserId(parsedMessages, userId);
   }
 });
-/* การตอบกลับข้อความ------------------------------------------------------------------ */
+
 
 /* ------------------------------------------------------------------------------------------------------------- */
 /* ตอบกลับแบบเจาะจง id admin   */
@@ -202,20 +211,7 @@ const sendReplyAdmin = (userId, replyadmin) => {
 
 onMounted(() => {
   listenForNewMessagereplyadmin();
-  const savedConversationsadmin = localStorage.getItem(
-    "conversationreplyadmin"
-  );
-  if (savedConversationsadmin) {
-    conversationreplyadmin.value = JSON.parse(savedConversationsadmin);
-  }
-
-  // ตรวจสอบว่ามี replyData ใน local storage หรือไม่ และกำหนดค่าให้กับ replyData ในกรณีที่มี
-  const savedReplyDataadmin = localStorage.getItem("replyDataAdmin");
-  if (savedReplyDataadmin) {
-    replyDataAdmin.value = JSON.parse(savedReplyDataadmin);
-  }
 });
-
 
 
 </script>
@@ -284,7 +280,7 @@ onMounted(() => {
         <!-- แสดงที่ admin user ตอบกลับไปมา -->
 <div class="chat-container p-4 border rounded-md border-gray-300 max-h-96 overflow-y-auto">
   <template v-for="(message, index) in mergedMessagesAdminUser" :key="index">
-    <div v-if="message.user.type === 'admin'" class="message flex items-center justify-start mb-4">
+    <div v-if="message.user.type === 'admin'" class="message flex items-start mb-4">
       <div class="flex flex-col">
         <div class="text-xs text-gray-500">{{ formatTime(message.createdAt) }}</div>
         <div class="flex items-center">
@@ -297,12 +293,12 @@ onMounted(() => {
         </div>
       </div>
     </div>
-    <div v-else class="message flex items-center justify-end mb-4">
+    <div v-else class="message flex items-end justify-end mb-4">
       <div class="flex flex-col">
         <div class="text-xs text-gray-500">{{ formatTime(message.createdAt) }}</div>
         <div class="flex items-center justify-end">
           <div class="mr-2 bg-blue-500 text-white rounded-lg p-2">
-            <span class="text-sm">{{ message.text}}</span>
+            <span class="text-sm">{{ message.text }}</span>
           </div>
           <div class="bg-gray-100 rounded-lg p-2">
             <span class="text-sm font-semibold">{{ message.user.name }}</span>
@@ -312,6 +308,7 @@ onMounted(() => {
     </div>
   </template>
 </div>
+
 
 <!--+++++++++++++++++++++++ -->
 
