@@ -77,35 +77,54 @@ const resetSearch = () => {
             <h2 class="font-semibold text-xl text-center text-slate-200 ">สถิติรายบุคคล</h2>
        </div>
 
-    <!-- boxcontent -->
-    <div class="grid grid-cols-2 gap-2  mt-5 ">
-     <div class="box-content"></div>
-     <div class="box-content p-8 bg-white shadow-lg shadow-gray-300/50 mt-8 ml-5 mr-5  rounded-lg  ">
-      <!-- Search input -->
-      <input type="text" v-model="searchInput" placeholder="ค้นหารายชื่อผู้ป่วย" class="bg-gray-200 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-400">
-      <button @click="resetSearch" class="bg-gray-300 rounded-lg px-3 py-1 ml-2 focus:outline-none focus:ring-2 focus:ring-blue-400">คืนค่า</button>
-  
-     </div>
-     </div>
+     <!-- boxcontent -->
+     <div class="grid grid-cols-2 gap-2 mt-6">
+        <div class="box-content "></div>
+
+        <!-- Search input -->
+
+        <form class="max-w-full mx-auto mr-3 md:mr-5 ">
+          <label for="default-search"
+            class="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white ">Search</label>
+          <div class="relative">
+            <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+              <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true"
+                xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
+              </svg>
+            </div>
+            <input type="search" id="default-search" v-model="searchInput" placeholder="ค้นหารายชื่อผู้ป่วย"
+              class="block w-full md:w-96 p-4 ps-10 text-base text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
+            <button type="submit" @click="resetSearch"
+              class="text-white absolute end-2.5 bottom-2.5 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-semibold rounded-lg text-sm px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+              x </button>
+          </div>
+        </form>
+
+      </div>
 <!-- boxcontent แสดงรายละเอียด -->
       <div
         v-for="(userData, index) in filteredResults"
         :key="index"
-        class="box-content p-8 bg-white shadow-lg shadow-gray-300/50 mt-8 ml-5 mr-5 mb-10 rounded-lg"
-      >
+        >
+        <div v-if="userData.length > 0"
+        class="box-content p-8 bg-white shadow-lg shadow-gray-300/50 mt-4 ml-5 mr-5 mb-10 rounded-lg"
+          >
         <h2 class="text-left text-2xl font-bold mb-5">ข้อมูลรายบุคคลทั้งหมด</h2>
 
         <div class="overflow-x-auto">
           <div class="inline-block min-w-full py-2 sm:px-6 lg:px-8">
             <div class="overflow-hidden">
               <table class="w-full text-sm text-left rtl:text-right text-gray-500 ">
-                <thead class="text-xs text-gray-700 uppercase bg-gray-50 ">
+                <thead class=" text-gray-400 uppercase bg-gray-50 ">
                   <tr>
-                    <th scope="col" class="px-6 py-4">รายชื่อ</th>
-                    <th scope="col" class="px-6 py-4">สถานะ</th>
-                    <th scope="col" class="px-6 py-4">ตรวจล่าสุด</th>
-                    <th scope="col" class="px-6 py-4">(mg/dl)</th>
-                    <th scope="col" class="px-6 py-4"></th>
+                    <th scope="col" class="px-6 py-4 text-sm">รายชื่อ</th>
+                    <th scope="col" class="px-6 py-4 text-center text-sm">สถานะ</th>
+                    <th scope="col" class="px-6 py-4 text-center text-sm"> ตรวจล่าสุด </th>
+                    <th scope="col" class="px-6 py-4 text-center text-sm">(mg/dl)</th>
+                    <th scope="col" class="px-6 py-4 text-center text-sm">พูดคุย</th>
+                    <th scope="col" class="px-6 py-4 text-center text-sm"></th>
                   </tr>
                 </thead>
                 <tbody>
@@ -114,19 +133,27 @@ const resetSearch = () => {
                     v-for="sugarRecord in userData"
                     :key="sugarRecord.id"
                   >
-                    <td class="px-6 py-4">{{ sugarRecord.user.fname }} {{ sugarRecord.user.lname }}</td>
-                    <td class="px-6 py-4"></td>
-                    <td class="px-6 py-4">
+                    <td class="px-6 py-4 text-black font-medium">
+                      {{ sugarRecord.user.fname }} {{ sugarRecord.user.lname }}</td>
+                    <td class="px-6 py-4 flex items-center justify-center">
+                      <img src="/correct.png" class="w-6 h-6 " />
+                    </td>
+                    <td class="px-6 py-4 text-center text-blue-800">
                       {{ moment(sugarRecord.updated_at).format("DD MMM YYYY") }}
-                      <br />
                       {{ moment(sugarRecord.updated_at).format("HH:mm") }}
                     </td>
-                    <td class="px-6 py-4">{{ sugarRecord.sugarValue }}</td>
+                    <td class="px-6 py-4 text-center font-semibold" 
+                    :style="{ 'max-width': sugarRecord.sugarValue + '%' }" :class="{
+              'text-red-600': sugarRecord.sugarValue > 125,
+              'text-green-500': sugarRecord.sugarValue >= 70 && sugarRecord.sugarValue <= 125,
+              'text-yellow-400': sugarRecord.sugarValue < 70
+            }">{{ sugarRecord.sugarValue }}</td>
                   </tr>
                 </tbody>
               </table>
             </div>
           </div>
+        </div>
         </div>
       </div>
     </div>
