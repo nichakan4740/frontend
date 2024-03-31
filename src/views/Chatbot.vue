@@ -77,6 +77,7 @@ const conversationsFiltered = computed(() => {
 
 /* --------------------------------------------------------------------------------------------------------------------  */
 
+
 /* การตอบกลับข้อความ------------------------------------------------------------------ */
 
 const messageFromAdmin = ref([]);
@@ -100,10 +101,10 @@ channelAdmin.bind("message", (data) => {
       idadmin: data.admin_ids[0],
     };
     mergedMessagesAdminUser.value.push(message);
-    localStorage.setItem(
+  /*   localStorage.setItem(
       "chatMessagesfromadmin",
       JSON.stringify(mergedMessagesAdminUser.value)
-    );
+    ); */
     localStorage.setItem("idadmin", data.admin_ids[0]);
   }
 });
@@ -122,15 +123,15 @@ channelSendofUser.bind("message", (data) => {
       idadmin: data.admin_ids[0],
     };
     mergedMessagesAdminUser.value.push(message);
-    localStorage.setItem(
+   /*  localStorage.setItem(
       "chatMessagesfromadmin",
       JSON.stringify(mergedMessagesAdminUser.value)
-    );
+    ); */
     localStorage.setItem("idadmin", data.admin_ids[0]);
   }
 });
 
-const filterMessagesByUserId = (messages, userId) => {
+/* const filterMessagesByUserId = (messages, userId) => {
   return messages.filter((message) => message.iduser === userId);
 };
 
@@ -146,7 +147,17 @@ onMounted(() => {
       userId
     );
   }
+}); */
+onMounted(() => {
+ /*  const storedMessagesAdmin = localStorage.getItem("chatMessagesfromuser");
+  if (storedMessagesAdmin) {
+     mergedMessagesAdminUser.value = JSON.parse(storedMessagesAdmin);
+  } */
 });
+
+
+
+
 
 /* ------------------------------------------------------------------------------------------------------------- */
 /* ตอบกลับแบบเจาะจง id admin   */
@@ -201,11 +212,11 @@ const sendReplyAdmin = (userId, replyadmin) => {
           JSON.stringify(conversationreplyadmin.value)
         );
 
-        // เพิ่มบันทึกค่า replyDataAdmin ลงใน localStorage เมื่อได้รับข้อมูลตอบกลับใหม่
+      /*   // เพิ่มบันทึกค่า replyDataAdmin ลงใน localStorage เมื่อได้รับข้อมูลตอบกลับใหม่
         localStorage.setItem(
           "replyDataAdmin",
           JSON.stringify(replyDataAdmin.value)
-        );
+        ); */
       }
     })
     .catch((error) => {
@@ -217,8 +228,32 @@ onMounted(() => {
   listenForNewMessagereplyadmin();
 });
 
-/* เลือก Teb */
+/* เลือก Teb -------------------------------------------------------- */
 const activeTab = ref(1);
+
+/* ลบข้อมูล ------------------------------------------------------------------------------------------*/
+const confirmClearLocalStorage = () => {
+  Swal.fire({
+    title: 'คุณต้องการปิดแช็ต',
+    text: "ถ้าคุณปิดแช็ตบทสนทนาของคุณกับพยาบาลจะหายไป!",
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#3085d6',
+    cancelButtonColor: '#d33',
+    confirmButtonText: 'ใช่',
+    cancelButtonText: 'ยกเลิก' 
+  }).then((result) => {
+    if (result.isConfirmed) {
+      clearLocalStorage();
+    }
+  });
+};
+
+const clearLocalStorage = () => {
+  localStorage.removeItem("conversations");
+  // รีเฟรชหน้าเพื่อให้แสดงการเปลี่ยนแปลงในข้อมูลที่ถูกลบออก
+  location.reload();
+};
 </script>
 
 <template>
@@ -279,109 +314,86 @@ const activeTab = ref(1);
 
     <!-- ----------------------------------------------------------------------------------------------------------------------------------------------------------- -->
     <!-- Tab conten ที่ 2 -->
-    <div v-if="activeTab === 2" class="flex flex-row">
-    <div class="container mx-auto flex flex-row  ">
-      
-      <!-- Left column -->
-      <div class="flex-1 ">
-        <div class="box-content bg-white shadow-lg shadow-gray-300/50 mt-10 ml-5 mr-5 pt-1 pb-6 pl-20 pr-20 mb-5 rounded-lg pt-6 pb-6 ">
-          <!-- เปิดข้อความ ------------------------------------------------- -->
-          <div style="display: flex; align-items: center">
-            <input
-              type="text"
-              id="small-input"
-              class="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500"
-              v-model="message"
-            />
-            <button @click="store">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="currentColor"
-                class="w-6 h-6"
-              >
-                <path
-                  d="M3.478 2.404a.75.75 0 0 0-.926.941l2.432 7.905H13.5a.75.75 0 0 1 0 1.5H4.984l-2.432 7.905a.75.75 0 0 0 .926.94 60.519 60.519 0 0 0 18.445-8.986.75.75 0 0 0 0-1.218A60.517 60.517 0 0 0 3.478 2.404Z"
-                />
-              </svg>
-            </button>
-          </div>
-          <!-- ------------------------------------ -->
-          <div
-            class="message flex items-start mb-4"
-            v-for="conversation in conversationsFiltered"
-            :key="conversation.id"
-          >
-            <div class="flex flex-col">
-              <div class="text-xs text-gray-500">
-                {{ formatTime(conversation.createdAt) }}
-              </div>
-              <div class="flex items-center">
-                <div class="bg-gray-100 rounded-lg p-2">
-                  <span class="text-sm font-semibold">{{
-                    conversation.iduser
-                  }}</span>
-                </div>
-                <div class="ml-2 bg-blue-500 text-white rounded-lg p-2">
-                  <span class="text-sm">{{ conversation.messages }}</span>
-                </div>
-              </div>
-            </div>
-          </div>
-          <!-- --------------------------------------------------------------------------------------------- -->
-        </div>
-      </div>
+    <div v-if="activeTab === 2">
+   
 
-      <!-- Right column -->
-      <div class="grow">
-        <div class="box-content bg-white shadow-lg shadow-gray-300/50 mt-10 ml-5 mr-5 pt-1 pb-6 pl-20 pr-20 mb-5 rounded-lg pt-6 pb-6">
-          <!-- Your existing content in the right column -->
+    <div class="box-content bg-white shadow-lg shadow-gray-300/50 mt-10 ml-5 mr-5 pt-5 pb-5 pl-10 pr-10 rounded-lg">
+        
+         <div class="flex">
+      <!-- Left--------------------------------------------------------------------------------------------------------------- -->
+               <div class="w-1/3 border-r">
+                  <p class="mb-3 font-semibold ">เปิดใหม่แซ็ตเพื่อพูดคุยกับพยาบาล</p>
+                     <!-- เปิดข้อความ ------------------------------------------------- -->
+                    <div style="display: flex; align-items: center" class="mr-10">
+                         <input type="text" id="small-input" class="block w-1/2 p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500" v-model="message"/>
+                           <button @click="store" class=" bg-blue-500 text-white rounded-lg p-2 ml-2 ">
+                               ส่งข้อความ
+                           </button>
+                    </div>
+                </div>        
+    
+      <!-- Right---------------------------------------------------------------------------------------------------------- -->
+          <div class="w-2/3">
 
-          <div class="flex items-center mb-2">
-            <img
-              class="rounded-full w-10 h-10"
-              src="https://media.istockphoto.com/id/1253022688/th/%E0%B9%80%E0%B8%A7%E0%B8%84%E0%B9%80%E0%B8%95%E0%B8%AD%E0%B8%A3%E0%B9%8C/%E0%B9%84%E0%B8%AD%E0%B8%84%E0%B8%AD%E0%B8%99%E0%B9%81%E0%B8%9E%E0%B8%97%E0%B8%A2%E0%B9%8C%E0%B9%81%E0%B8%A5%E0%B8%B0%E0%B8%9E%E0%B8%A2%E0%B8%B2%E0%B8%9A%E0%B8%B2%E0%B8%A5%E0%B8%81%E0%B8%B2%E0%B8%A3%E0%B9%8C%E0%B8%95%E0%B8%B9%E0%B8%99.jpg?s=612x612&w=0&k=20&c=n1nvQUuq3wjco_oY59OgzrpthJfEkXwfxeJzrPsnCOs="
-            />
-
+          <div class="flex  mb-2 ml-2">
+            <img class="rounded-full w-10 h-10" src="https://media.istockphoto.com/id/1253022688/th/%E0%B9%80%E0%B8%A7%E0%B8%84%E0%B9%80%E0%B8%95%E0%B8%AD%E0%B8%A3%E0%B9%8C/%E0%B9%84%E0%B8%AD%E0%B8%84%E0%B8%AD%E0%B8%99%E0%B9%81%E0%B8%9E%E0%B8%97%E0%B8%A2%E0%B9%8C%E0%B9%81%E0%B8%A5%E0%B8%B0%E0%B8%9E%E0%B8%A2%E0%B8%B2%E0%B8%9A%E0%B8%B2%E0%B8%A5%E0%B8%81%E0%B8%B2%E0%B8%A3%E0%B9%8C%E0%B8%95%E0%B8%B9%E0%B8%99.jpg?s=612x612&w=0&k=20&c=n1nvQUuq3wjco_oY59OgzrpthJfEkXwfxeJzrPsnCOs="/>
             <div class="pl-2">
               <div class="font-semibold">
                 <a class="hover:underline" href="#">พยาบาล</a>
               </div>
-
               <div class="text-xs text-gray-600">Online</div>
             </div>
+
+                 
+                  <button @click="confirmClearLocalStorage" class=" mx-10 px-2 py-2 bg-blue-500 text-white rounded-md">
+                   ปิดแช็ต
+                  </button>
           </div>
+          
+          
+
+
+
+
+
+
           <!-- -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- -->
           <!-- แสดงที่ admin user ตอบกลับไปมา -->
-          <div
-            class="chat-container p-4 border-t border-b border-gray-200 border-gray-300 max-h-96 overflow-y-auto"
-          >
-            <template
-              v-for="(message, index) in mergedMessagesAdminUser"
-              :key="index"
-            >
-              <div
-                v-if="message.user.type === 'admin'"
-                class="message flex items-start mb-4"
-              >
+          <div class="chat-container p-4 border-t border-b border-gray-200 border-gray-300 max-h-96 overflow-y-auto" >
+            <div class="message flex items-end justify-end mb-4" v-for="conversation in conversationsFiltered" :key="conversation.id" >
+            
+            <div class="flex flex-col">
+              <div class="text-xs text-gray-500">  {{ formatTime(conversation.createdAt) }}</div>
+              
+                <div class="ml bg-blue-500 text-white rounded-lg p-2">
+                  <span class="text-sm">{{ conversation.messages }}</span>
+              </div>
+
+            </div>
+          </div>
+<!-- --------------------------------------------------------------------------------------------------------------------------------------------- -->
+
+            <template v-for="(message, index) in mergedMessagesAdminUser" :key="index" >
+              <div v-if="message.user.type === 'admin'" class="message flex items-start mb-4">
                 <div class="flex flex-col">
-                  <div class="text-xs text-gray-500">
-                    {{ formatTime(message.createdAt) }}
-                  </div>
+
+                  <div class="text-xs text-gray-500"> {{ formatTime(message.createdAt) }}</div>
 
                   <div class="flex items-center">
+
                     <div class="bg-gray-100 rounded-lg p-2">
-                      <span class="text-sm font-semibold">{{
-                        message.user.name
-                      }}</span>
+                      <span class="text-sm font-semibold">{{ message.user.name }}</span>
                     </div>
 
                     <div class="ml-2 bg-blue-500 text-white rounded-lg p-2">
                       <span class="text-sm">{{ message.text }}</span>
                     </div>
+
                   </div>
+
                 </div>
               </div>
+
               <div v-else class="message flex items-end justify-end mb-4">
                 <div class="flex flex-col">
                   <div class="text-xs text-gray-500">
@@ -423,13 +435,17 @@ const activeTab = ref(1);
               </svg>
             </button>
           </div>
-          <!-- ----------------------------------------------------- -->
 
-        </div>
-        </div>
+          
+          </div>
+
+    </div>
+
       </div>
     </div>
 
+
+<!-- --------------------------------------------------------------------------------------------------------- -->
     <div class="mb-8 ml-2 mr-4">
       <p class="text">**ขออภัย กำลังอยู่ในช่วงพัฒนา**</p>
     </div>
