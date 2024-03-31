@@ -32,13 +32,9 @@ import WhatIs from '../views/WhatIs.vue';
 
 
 /* chat */
-import GroupsChatUser from '../views/GroupsChatUser.vue';
-import CreateGroupChat from '../views/CreateGroupChat.vue';
+
+
 import GroupChatNurse from '../views/GroupChatNurse.vue'
-
-
-
-
 
 
 const history = createWebHistory(`${import.meta.env.VITE_BASE_URL}`)
@@ -153,12 +149,6 @@ const routes = [
 
 
   /* chat */
-  {
-    path: '/groupschat',
-    name: 'groupschat',
-    component: GroupsChatUser,
-  },
-
 
 
 
