@@ -15,9 +15,9 @@ const fullname = localStorage.getItem("name") + " " + localStorage.getItem("lnam
 const fname = localStorage.getItem("name");
 const lname = localStorage.getItem("lname");
 const idcard = localStorage.getItem("idcard");
-const dob = localStorage.getItem("dob");
-const phone = localStorage.getItem("phone");
-const address = localStorage.getItem("address");
+const dob = localStorage.getItem("dob")|| '-'; 
+const phone = localStorage.getItem("phone")|| '-';
+const address = localStorage.getItem("address")|| '-';
 
 // เรียกข้อมูล
 const originalData = ref([]); 
@@ -85,7 +85,8 @@ const updateinfouser = async () => {
          title: 'Error',
          text: 'Failed to update information. Please try again later.',
       });
-   }
+   }closeModal();
+   window.location.reload(); // Reload the browser after successfully updating the information
 };
 
 
@@ -135,12 +136,12 @@ const closeModal = () => {
 };
 
 const editinfo = () => {
-   myinfo.value.fname = fname.value;
-   myinfo.value.lname = lname.value;
-   myinfo.value.idcard = idcard.value;
-   myinfo.value.dob = myinfo.dob; // อาจต้องรับค่าจากวันที่ที่ต้องการแก้ไข
-   myinfo.value.phone = myinfo.phone;
-   myinfo.value.address = myinfo.address;
+   myinfo.value.fname = fname;
+   myinfo.value.lname = lname;
+   myinfo.value.idcard = idcard;
+   myinfo.value.dob = dob; 
+   myinfo.value.phone = phone;
+   myinfo.value.address = address;
    openModal();
 };
 
@@ -309,7 +310,7 @@ const editinfo = () => {
                            <div class="box-content  pt-3 pb-3  ">
                               <p>นามสกุล</p>
                               <div class="box-content ">
-                                 <input type="text" v-model="myinfo.lname" 
+                                 <input type="text" v-model="myinfo.lname"
                                     class="block w-full rounded-md border-0 py-2 pl-6 pr-20 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400">
                               </div>
                            </div>
@@ -318,8 +319,7 @@ const editinfo = () => {
                            <div class="box-content  pt-3 pb-3  ">
                               <p>เลขบัตรประจำตัวประชาชน</p>
                               <div class="box-content ">
-                                 <input type="text" v-model="myinfo.idcard"
-                                 maxlength="13" 
+                                 <input type="text" v-model="myinfo.idcard" maxlength="13"
                                     class="block w-full rounded-md border-0 py-2 pl-6 pr-20 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400">
                               </div>
                            </div>
@@ -335,8 +335,7 @@ const editinfo = () => {
 
                            <div class="box-content pt-3 pb-3">
                               <p>เบอร์โทรศัพท์</p>
-                              <input type="text" v-model="myinfo.phone"
-                              maxlength="10" 
+                              <input type="text" v-model="myinfo.phone" maxlength="10"
                                  class="block w-full rounded-md border-0 py-2 pl-6 pr-20 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400"
                                  placeholder="เช่น 0800000000" />
                            </div>
