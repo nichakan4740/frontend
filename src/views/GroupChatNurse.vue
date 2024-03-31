@@ -50,7 +50,12 @@ const formatTime = (time) => {
 };
 /* -------------------------------------------------------------------------------------------------------------- */
 
-/* การตอบกลับข้อความ------------------------------------------------------------------ */
+
+
+
+
+
+/* แสดงการตอบกลับข้อความของ พยาบาลและผู้ป่วย ------------------------------------------------------------------ */
 
 const messageFromUser = ref([]);
 const mergedMessages = ref([]);
@@ -186,6 +191,15 @@ onMounted(() => {
 });
 
 /* -------------------------------------------------------------------------------------------------------------------------- */
+
+
+
+const isOpen = ref(false);
+
+
+
+
+
 </script>
 
 <template>
@@ -216,12 +230,8 @@ onMounted(() => {
               />
             </div>
 
-            <!-- ขอความที่ทักเข้ามาตอนแรก -->
-            <div
-              v-for="message in messages"
-              :key="message.id"
-              class="box-content bg-white shadow-lg shadow-gray-300 mr-6 mb-4 p-4"
-            >
+<!-- ตอบกลับข้อความ -->
+            <div v-for="message in messages" :key="message.id" class="box-content bg-white shadow-lg shadow-gray-300 mr-6 mb-4 p-4"  @click="isOpen = true">
               <div>
                 <img
                   class="rounded-full w-6 h-6"
@@ -235,10 +245,18 @@ onMounted(() => {
               <div>{{ message.iduser }}</div>
               <div>{{ message.message }}</div>
             </div>
+         
+
           </div>
           <!-- ------------------------------------------------------------------------------------------------------------------------------------------------------------------ -->
           <!-- Right -->
           <div class="w-2/3">
+          
+ <!-- pop up แสดงข้อความตอบกลับกัน -->
+  <div v-if="isOpen">
+    <div class="bg-white p-8 rounded-lg shadow-lg">
+      <slot>
+         
             <!-- Header -->
             <div
               class="py-2 px-3 bg-grey-lighter flex flex-row justify-between items-center"
@@ -322,13 +340,21 @@ onMounted(() => {
               </svg>
             </button>
           </div>
+      </slot>
+      <button @click="isOpen = false" class="mt-4 px-4 py-2 bg-blue-500 text-white rounded-md">Close</button>
+    </div>
+  </div>
+
+
+
+
  <!-- --------------------------------------------------------------------------------------------------------- -->
 
           </div>
         </div>
       </div>
       <!-- --------------------------------------------- -->
-      <div class="mb-8 ml-2 mr-4">
+      <div class="mb-8 ml-2 mr-4 mt-10">
         <p class="text">**ขออภัย กำลังอยู่ในช่วงพัฒนา**</p>
       </div>
     </div>
