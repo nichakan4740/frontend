@@ -32,6 +32,7 @@ channel.bind("message", (data) => {
 
     // บันทึกข้อมูลลงใน local storage
     localStorage.setItem("chatMessages", JSON.stringify(messages.value));
+
   } else {
     console.error('ข้อมูลที่ได้รับมาไม่มี key "text":', data);
   }
@@ -108,6 +109,7 @@ channelSendofAdmin.bind("message", (data) => {
     );
     localStorage.setItem("idadmin", data.admin_ids[0]);
   }
+
 });
 
 onMounted(() => {
@@ -192,12 +194,17 @@ onMounted(() => {
 
 /* -------------------------------------------------------------------------------------------------------------------------- */
 
-
-
+/* ทำ pop up */
 const isOpen = ref(false);
 
+/* เลือกข้อมูล */
+const selectedMessage = ref({});
 
-
+const selectMessage = (message) => {
+  // เมื่อคลิกบนข้อความ จะเก็บข้อมูลข้อความที่เลือกไว้
+  selectedMessage.value = message;
+  isOpen.value = true; // เปิดตัว div ที่มีข้อมูลข้อความที่ถูกเลือก
+};
 
 
 </script>
@@ -231,7 +238,7 @@ const isOpen = ref(false);
             </div>
 
 <!-- ตอบกลับข้อความ -->
-            <div v-for="message in messages" :key="message.id" class="box-content bg-white shadow-lg shadow-gray-300 mr-6 mb-4 p-4"  @click="isOpen = true">
+          <!--   <div v-for="message in messages" :key="message.id" class="box-content bg-white shadow-lg shadow-gray-300 mr-6 mb-4 p-4"  @click="isOpen = true">
               <div>
                 <img
                   class="rounded-full w-6 h-6"
@@ -244,41 +251,81 @@ const isOpen = ref(false);
               </div>
               <div>{{ message.iduser }}</div>
               <div>{{ message.message }}</div>
-            </div>
-         
-
+            </div> -->
           </div>
+
+
+<div>
+    <div v-for="message in messages" :key="message.id" class="box-content bg-white shadow-lg shadow-gray-300 mr-6 mb-4 p-4" @click="selectMessage(message)">
+      <div>
+        <img class="rounded-full w-6 h-6" src="https://cdn-icons-png.flaticon.com/512/9131/9131529.png" />
+      </div>
+
+      <div>
+        {{ message.user.fname }} {{ formatTime(message.createdAt) }}
+      </div>
+      <div>{{ message.iduser }}</div>
+      <div>{{ message.message }}</div>
+    </div>
+
+    <div v-if="isOpen">
+ 
+    </div>
+  </div>
+
+
+
           <!-- ------------------------------------------------------------------------------------------------------------------------------------------------------------------ -->
           <!-- Right -->
           <div class="w-2/3">
           
  <!-- pop up แสดงข้อความตอบกลับกัน -->
   <div v-if="isOpen">
-    <div class="bg-white p-8 rounded-lg shadow-lg">
       <slot>
          
             <!-- Header -->
-            <div
-              class="py-2 px-3 bg-grey-lighter flex flex-row justify-between items-center"
-            >
-              <div class="flex items-center">
-                <div>
-                  <img
-                    class="w-10 h-10 rounded-full"
-                    src="https://darrenjameseeley.files.wordpress.com/2014/09/expendables3.jpeg"
-                  />
-                </div>
-                <div class="ml-4">
-                  <p class="text-grey-darkest">New Movie! Expendables 4</p>
-                </div>
-              </div>
-              <!-- ----------------------------------------------- -->
+            <div class="py-2 px-3 bg-grey-lighter flex flex-row justify-between items-center">
+               <div class="flex items-center">
+                  <div>
+                    <img class="rounded-full w-6 h-6" src="https://cdn-icons-png.flaticon.com/512/9131/9131529.png" />
+                  </div>
+
+                   <div class="ml-2 text-sm font-semibold ">{{ selectedMessage.user.fname }}</div>
+               </div>
+                  <button @click="isOpen = false" class="me-8 px-2 py-2 bg-blue-500 text-white rounded-md">ปิดแช็ต</button>
             </div>
 
+            
+
+
+        
+              <!-- -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- -->
             <!-- Messages -->
             <div class="flex-1 overflow-y-auto max-h-96 border-y">
               <div class="py-2 px-3">
                 <div class="chat-container p-4 rounded-md border-gray-300">
+
+                     <div class="text-xs text-gray-500">{{ formatTime(selectedMessage.createdAt ) }}</div>
+  
+                       <div class="flex items-center">
+                         
+                         <div class="bg-gray-100 rounded-lg p-2">
+                            <span class="text-sm font-semibold"> {{selectedMessage.user.fname}} </span>
+                          </div>
+
+                          <div  class="ml-2 bg-blue-500 text-white rounded-lg p-2" >
+                            <span class="text-sm">{{ selectedMessage.message }}</span>
+                          </div>
+
+                        </div>
+                   
+                      <!-- เริ่มต้น -->
+       
+
+
+
+
+
                   <template  v-for="(message, index) in mergedMessages" :key="index" >
                     <div v-if="message.user.type === 'admin'" class="message flex items-center justify-end mb-4" >
                       <div class="flex flex-col">
@@ -297,12 +344,14 @@ const isOpen = ref(false);
                       </div>
                     </div>
 
+
                     <div v-else class="message flex items-center justify-start mb-4" >
                       <div class="flex flex-col">
                         <div class="text-xs text-gray-500">  {{ formatTime(message.createdAt) }} </div>
                         
                         <div class="flex items-center">
-                          <div class="bg-gray-100 rounded-lg p-2">
+                         
+                         <div class="bg-gray-100 rounded-lg p-2">
                             <span class="text-sm font-semibold">{{ message.user.name}}</span>
                           </div>
 
@@ -311,6 +360,8 @@ const isOpen = ref(false);
                           </div>
 
                         </div>
+
+                        
                       </div>
                     </div>
                   </template>
@@ -341,12 +392,8 @@ const isOpen = ref(false);
             </button>
           </div>
       </slot>
-      <button @click="isOpen = false" class="mt-4 px-4 py-2 bg-blue-500 text-white rounded-md">Close</button>
+    
     </div>
-  </div>
-
-
-
 
  <!-- --------------------------------------------------------------------------------------------------------- -->
 
