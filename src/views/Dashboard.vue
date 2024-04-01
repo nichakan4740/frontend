@@ -14,7 +14,32 @@ const originalData = ref([]); // Store original data
 const startDate = ref('');
 const endDate = ref('');
 
+const maxSugarValue = ref(null);
+const minSugarValue = ref(null);
 
+
+const maxSugarValueByDate = computed(() => {
+  const filteredData = filterBySelectedDate(originalData.value, startDate.value, endDate.value);
+  if (filteredData.length > 0) {
+    return Math.max(...filteredData.map(record => record.sugarValue));
+  } else {
+    return 0; // ถ้าไม่มีข้อมูลให้คืนค่าเป็น 0
+  }
+});
+
+const minSugarValueByDate = computed(() => {
+  const filteredData = filterBySelectedDate(originalData.value, startDate.value, endDate.value);
+  if (filteredData.length > 0) {
+    return Math.min(...filteredData.map(record => record.sugarValue));
+  } else {
+    return 0; // ถ้าไม่มีข้อมูลให้คืนค่าเป็น 0
+  }
+});
+
+watch([startDate, endDate], ([newStartDate, newEndDate], [oldStartDate, oldEndDate]) => {
+  maxSugarValueByDate.value = Math.max(...filterBySelectedDate(originalData.value, newStartDate, newEndDate).map(record => record.sugarValue));
+  minSugarValueByDate.value = Math.min(...filterBySelectedDate(originalData.value, newStartDate, newEndDate).map(record => record.sugarValue));
+});
 
 /* การใช้งาน API  */
 const mysugar = ref({
@@ -45,20 +70,43 @@ const MysugarLoad = async () => {
     } else {
       throw new Error('Failed to fetch data');
     }
+    // หาค่าน้ำตาลที่มากที่สุดและน้อยที่สุด
+    findMaxMinSugarValue();
   } catch (error) {
     console.error('Error fetching data:', error);
   }
 };
 onMounted(MysugarLoad);
 
+// - หาค่าน้ำตาลมากสุด และ น้อยสุด -------------------------------------------------------------------------
+const findMaxMinSugarValue = () => {
+  if (result.value.length > 0) {
+    // หาค่าน้ำตาลที่มากที่สุด
+    maxSugarValue.value = Math.max(...result.value.map(record => record.sugarValue));
+    // หาค่าน้ำตาลที่น้อยที่สุด
+    minSugarValue.value = Math.min(...result.value.map(record => record.sugarValue));
+  } else {
+    // ถ้าไม่มีข้อมูลให้กำหนดค่าเป็น 0
+    maxSugarValue.value = 0;
+    minSugarValue.value = 0;
+  }
+};
+// watch(result, findMaxMinSugarValue);
+
 
 /* ------ filter------------------------------------------------------------------------------------------ */
 const filterBySelectedDate = (data, startDate, endDate) => {
   if (startDate && endDate) {
-    return data.filter(record => {
+    const filteredData = data.filter(record => {
       const recordDate = moment(record.updated_at).format('YYYY-MM-DD');
       return moment(recordDate).isBetween(startDate, endDate, 'days', '[]');
     });
+
+    // หาค่าน้ำตาลที่มากที่สุด
+    maxSugarValue.value = Math.max(...filteredData.map(record => record.sugarValue));
+    // หาค่าน้ำตาลที่น้อยที่สุด
+    minSugarValue.value = Math.min(...filteredData.map(record => record.sugarValue));
+
     // คำนวณค่าเฉลี่ยและคืนค่า
     averageLowSugar.value = calculateAverageSugar('low', filteredData);
     averageNormalSugar.value = calculateAverageSugar('normal', filteredData);
@@ -67,6 +115,8 @@ const filterBySelectedDate = (data, startDate, endDate) => {
     return filteredData;
 
   } else {
+    maxSugarValue.value = null;
+    minSugarValue.value = null;
     return data;
   }
 };
@@ -285,6 +335,8 @@ const previousPage = () => {
   }
 };
 
+
+
 </script>
 
 <template>
@@ -299,36 +351,36 @@ const previousPage = () => {
 
       <div class="grid grid-cols-2 gap-2 mt-5">
         <div class="flex flex-col box-content p-8 pb-4 bg-white shadow-lg shadow-gray-300/50 mt-8 ml-5 mr-2 rounded-lg">
-          
+
           <div class="flex justify-start">
             <div>
               <p>เลือกช่วงเวลาที่ต้องการ</p>
-                
-                <!-- ---------------------------------------------------------- -->
-                <!-- Input for selecting date -->
-                <div class="mt-5 mx-5">
-                  <label for="startDate" class="text-lg text-gray-800">เลือกวันที่เริ่มต้น: </label>
-                  <input type="date" id="startDate" v-model="startDate" class="mt-2 px-4 py-2 border rounded-md">
-                </div>
-                <div class="mt-5 mx-5">
-                  <label for="endDate" class="text-lg text-gray-800">เลือกวันที่สิ้นสุด: </label>
-                  <input type="date" id="endDate" v-model="endDate" class="mt-2 px-4 py-2 border rounded-md">
-                </div>
-                
-                
-                <!-- <div class="mt-5 mx-5">
+
+              <!-- ---------------------------------------------------------- -->
+              <!-- Input for selecting date -->
+              <div class="mt-5 mx-5">
+                <label for="startDate" class="text-lg text-gray-800">เลือกวันที่เริ่มต้น: </label>
+                <input type="date" id="startDate" v-model="startDate" class="mt-2 px-4 py-2 border rounded-md">
+              </div>
+              <div class="mt-5 mx-5">
+                <label for="endDate" class="text-lg text-gray-800">เลือกวันที่สิ้นสุด: </label>
+                <input type="date" id="endDate" v-model="endDate" class="mt-2 px-4 py-2 border rounded-md">
+              </div>
+
+
+              <!-- <div class="mt-5 mx-5">
                   <label for="endDate" class="text-lg text-gray-800">เลือกวันที่ต้องการแบบรายวัน: </label>
                   <input type="date" id="selectedDate" v-model="selectedDate" @change="filterDataByDate"
                   class="mt-2 px-4 py-2 border rounded-md">
                 </div> -->
-                
-                <!-- ---------------------------------------------------------- -->
-              </div>
+
+              <!-- ---------------------------------------------------------- -->
             </div>
-            <div>
-            </div>
-            <div class="flex justify-end">
-              <button class="bg-blue-500 hover:bg-blue-700 text-white font-hairline py-2 px-4 max-w-20 rounded"
+          </div>
+          <div>
+          </div>
+          <div class="flex justify-end">
+            <button class="bg-blue-500 hover:bg-blue-700 text-white font-hairline py-2 px-4 max-w-20 rounded"
               @click="handleDateSelection">
               ยกเลิก
             </button>
@@ -355,7 +407,7 @@ const previousPage = () => {
                     <!-- <div
                       class="box-border h-20 w-20 p-4  bg-amber-200  text-lg pt-7 text-white text-center rounded-full">
                       {{ averageLowSugar }} </div> -->
-                      <p class="text-center text-yellow-400 text-xl font-extrabold">น้ำตาลต่ำ</p>
+                    <p class="text-center text-yellow-400 text-xl font-extrabold">น้ำตาลต่ำ</p>
                     <br>
                     <p class="text-center text-yellow-400 text-6xl font-extrabold">{{ countLowSugar }}</p>
                     <p class="text-center ">ครั้ง</p>
@@ -364,7 +416,7 @@ const previousPage = () => {
                     <!-- <div
                       class="box-border h-20 w-20 p-4 bg-green-500 pt-7  text-lg text-white text-center  rounded-full">
                       {{ averageNormalSugar }} </div> -->
-                      <p class="text-center text-green-500 text-xl font-extrabold">น้ำตาลปกติ</p>
+                    <p class="text-center text-green-500 text-xl font-extrabold">น้ำตาลปกติ</p>
 
                     <br>
                     <p class="text-center text-green-500 text-6xl font-extrabold"> {{ countNormalSugar }}</p>
@@ -373,7 +425,7 @@ const previousPage = () => {
                   <td class="px-6 py-4 content-center">
                     <!-- <div class="box-border h-20 w-20 p-4 bg-red-500 pt-7 text-lg  text-white text-center rounded-full">
                       {{ averageHighSugar }} </div> -->
-                      <p class="text-center text-red-500 text-xl font-extrabold">น้ำตาลสูง</p>
+                    <p class="text-center text-red-500 text-xl font-extrabold">น้ำตาลสูง</p>
                     <br>
                     <p class="text-center text-red-500 text-6xl font-extrabold">{{ countHighSugar }}</p>
                     <p class="text-center ">ครั้ง </p>
@@ -392,7 +444,17 @@ const previousPage = () => {
 
 
         <div class="box-content p-8 bg-white shadow-lg shadow-gray-300/50 mt-8 ml-5 mr-5 mb-10 rounded-lg">
-          <h2 class="text-center text-2xl font-bold mb-5">รายละเอียดค่าน้ำตาลช่วง</h2>
+          <h2 class="text-center text-2xl font-bold mb-5">รายละเอียดค่าน้ำตาล</h2>
+          <div v-if="maxSugarValue !== null || minSugarValue !== null">
+            <p v-if="maxSugarValue !== null || minSugarValue !== null" class="text-center text-medium">
+              <span v-if="minSugarValue !== null" class="text-gray-500">ค่าน้ำตาลที่ต่ำที่สุด: {{ minSugarValueByDate }}
+                mg/dL</span>
+              <span v-if="maxSugarValue !== null && minSugarValue !== null" class="mx-2">|</span>
+              <span v-if="maxSugarValue !== null" class="text-gray-500">ค่าน้ำตาลที่สูงที่สุด: {{ maxSugarValueByDate }}
+                mg/dL</span>
+            </p>
+          </div>
+
           <!-- ---------------------------------------------------------------------------------------------------------------------- -->
 
           <div class="flex flex-col">
@@ -415,17 +477,17 @@ const previousPage = () => {
                       <tr class="border-b dark:border-neutral-500" v-for="(sugarRecord, index) in paginatedResults"
                         :key="sugarRecord.id">
                         <td class="whitespace-nowrap px-6 py-4"> {{ moment(sugarRecord.updated_at).format("DD MMM YYYY"
-              ) }}
+                ) }}
                           <!--แสดงข้อความตามเงื่อนไขของค่าน้ำตาล / แสดงข้อความตามเงื่อนไขของค่าน้ำตาล -->
                           <br>
                           <span :class="{
-                'text-yellow-500': sugarRecord.sugarValue < 70,
-                'text-green-500': sugarRecord.sugarValue >= 70 && sugarRecord.sugarValue <= 125,
-                'text-red-500': sugarRecord.sugarValue > 125
-              }">
+                  'text-yellow-500': sugarRecord.sugarValue < 70,
+                  'text-green-500': sugarRecord.sugarValue >= 70 && sugarRecord.sugarValue <= 125,
+                  'text-red-500': sugarRecord.sugarValue > 125
+                }">
                             <span v-if="sugarRecord.sugarValue < 70"><router-link
                                 to="/knowledge">น้ำตาลต่ำ</router-link></span>
-                                
+
                             <span v-else-if="sugarRecord.sugarValue >= 70 && sugarRecord.sugarValue <= 125"><router-link
                                 to="/knowledge">น้ำตาลปกติ</router-link></span>
                             <span v-else><router-link to="/knowledge">น้ำตาลสูง</router-link></span>
@@ -437,10 +499,10 @@ const previousPage = () => {
                           <div class="w-full rounded-full h-2.5 mb-4 dark:bg-gray-300 ">
                             <div class="bg-gray-600 h-2.5 rounded-full "
                               :style="{ 'max-width': sugarRecord.sugarValue + '%' }" :class="{
-                'bg-red-500': sugarRecord.sugarValue > 125,
-                'bg-green-500': sugarRecord.sugarValue >= 70 && sugarRecord.sugarValue <= 125,
-                'bg-yellow-500': sugarRecord.sugarValue < 70
-              }"></div>
+                  'bg-red-500': sugarRecord.sugarValue > 125,
+                  'bg-green-500': sugarRecord.sugarValue >= 70 && sugarRecord.sugarValue <= 125,
+                  'bg-yellow-500': sugarRecord.sugarValue < 70
+                }"></div>
                           </div>
 
 

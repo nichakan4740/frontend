@@ -211,7 +211,7 @@ const updateDrug = async () => {
 
         <!-- ข้อมูล ---------------------------------------------------------------------------------->
         <div class="box-content  pt-3 pb-3 mx-2 md:mx-4 lg:mx-8 xl:mx-24 2xl:mx-28">
-          <p>ข้อมูลการใช้ยา</p>
+          <p>ยาที่ใช้ประจำ</p>
           <div class="box-content ">
 
             <div
@@ -262,14 +262,14 @@ const updateDrug = async () => {
         <div class="card-body">
           <form @submit.prevent="updateDrug">
             <div class="box-content pt-3 pb-3">
+              <p>ยาที่ใช้ประจำ <span style="font-size: 13px; color: rgb(177, 109, 241)">( ถ้าไม่มีพิมพ์ว่า ' ไม่มี ' หรือ ' - ' )</span></p>
+              <input type="text" v-model="mydrug.my_drug" class="block w-full rounded-md border-0 py-10 pl-7 pr-20 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400" placeholder="กรุณากรอกยาที่ใช้ประจำ">
+            </div>
+            <div class="box-content pt-3 pb-3">
               <p>ยาที่แพ้ <span style="font-size: 13px; color: rgb(177, 109, 241)">( ถ้าไม่มีพิมพ์ว่า ' ไม่มี ' หรือ ' - ' )</span></p>
               <div class="box-content">
                 <input type="text" v-model="mydrug.allergic_drug" class="block w-full rounded-md border-0 py-10 pl-7 pr-20 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400" placeholder="กรุณากรอกชื่อยาที่แพ้">
               </div>
-            </div>
-            <div class="box-content pt-3 pb-3">
-              <p>ยาที่ใช้ประจำ <span style="font-size: 13px; color: rgb(177, 109, 241)">( ถ้าไม่มีพิมพ์ว่า ' ไม่มี ' หรือ ' - ' )</span></p>
-              <input type="text" v-model="mydrug.my_drug" class="block w-full rounded-md border-0 py-10 pl-7 pr-20 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400" placeholder="กรุณากรอกยาที่ใช้ประจำ">
             </div>
             <div class="flex justify-center mt-3">
               <button type="submit" class=" text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-6 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">
