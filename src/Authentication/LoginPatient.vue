@@ -13,7 +13,7 @@ const loading = ref(false);
 const loginpatient = async () => {
   loading.value = true;
   try {
-    const res = await fetch(`${import.meta.env.VITE_BASE_URL}api/patient/login`, {
+    const res = await fetch(`http://cp23ssa2.sit.kmutt.ac.th:8000/api/patient/login`, {
       method: "POST",
       headers: {
         "Content-type": "application/json",

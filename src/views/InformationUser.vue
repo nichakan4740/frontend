@@ -38,7 +38,7 @@ const updateinfouser = async () => {
    try {
    
       const userId = localStorage.getItem('iduser');
-      const response = await fetch(`${import.meta.env.VITE_BASE_URL}api/updateinfo`, {
+      const response = await fetch(`http://cp23ssa2.sit.kmutt.ac.th:8000/api/updateinfo`, {
          method: 'PUT',
          headers: {
             'Content-Type': 'application/json',

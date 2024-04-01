@@ -212,7 +212,7 @@ const listenForNewMessagereply = () => {
 };
 
 const sendReply = (adminId, messagereply) => {
-  fetch(`${import.meta.env.VITE_BASE_URL}api/reply/user`, {
+  fetch(`http://cp23ssa2.sit.kmutt.ac.th:8000/api/reply/user`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

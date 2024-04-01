@@ -37,7 +37,7 @@ const mysugar = ref({
 const MysugarLoad = async () => {
   try {
     const user_id = localStorage.getItem('iduser');
-    const response = await fetch(`${import.meta.env.VITE_BASE_URL}api/mysugar`);
+    const response = await fetch(`http://cp23ssa2.sit.kmutt.ac.th:8000/api/mysugar`);
     const sugarData = await response.json();
 
     // เพิ่ม user_id เข้าไปในข้อมูลที่โหลดมา
@@ -85,7 +85,7 @@ const saveData = async () => {
       user_id: user_id // เพิ่ม user_id เข้าไปในข้อมูลที่จะส่ง
     };
 
-    const response = await fetch(`${import.meta.env.VITE_BASE_URL}api/mysugar`, {
+    const response = await fetch(`http://cp23ssa2.sit.kmutt.ac.th:8000/api/mysugar`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -133,7 +133,7 @@ const updateData = async () => {
   try {
     // ดึง user_id จาก Local Storage
     const user_id = localStorage.getItem('iduser');
-    const editrecords = `${import.meta.env.VITE_BASE_URL}api/mysugar/${mysugar.value.id}`;
+    const editrecords = `http://cp23ssa2.sit.kmutt.ac.th:8000/api/mysugar/${mysugar.value.id}`;
     const dataToSend = {
       ...mysugar.value,
       user_id: user_id // เพิ่ม user_id เข้าไปในข้อมูลที่จะส่ง
@@ -164,7 +164,7 @@ const updateData = async () => {
 
 const remove = async (record) => {
   try {
-    const url = `${import.meta.env.VITE_BASE_URL}api/mysugar/${record.id}`;
+    const url = `http://cp23ssa2.sit.kmutt.ac.th:8000/api/mysugar/${record.id}`;
     const response = await fetch(url, { method: 'DELETE' });
     if (response.ok) {
       alert('Deleted');
@@ -213,7 +213,7 @@ onMounted(async () => {
   try {
     
     const userId = localStorage.getItem('iduser');
-    const response = await fetch(`${import.meta.env.VITE_BASE_URL}api/check-data/${userId}`);
+    const response = await fetch(`http://cp23ssa2.sit.kmutt.ac.th:8000/api/check-data/${userId}`);
     const dataDrug = await response.json();
     console.log('data drug',dataDrug.hasData);
     if (dataDrug.hasData === false) {
@@ -226,7 +226,7 @@ onMounted(async () => {
 
 const saveDrug = async (event) => { // รับ event เข้ามา
   const res = await fetch(
-    `${import.meta.env.VITE_BASE_URL}api/savedrug`,
+    `http://cp23ssa2.sit.kmutt.ac.th:8000/api/savedrug`,
     {
       method: "POST",
       headers: {
@@ -274,7 +274,7 @@ const MyDrugLoad = async () => {
   try {
     const userId = localStorage.getItem('iduser');
     console.log(userId);
-    const response = await fetch(`${import.meta.env.VITE_BASE_URL}api/drug/${userId}`);
+    const response = await fetch(`http://cp23ssa2.sit.kmutt.ac.th:8000/api/drug/${userId}`);
     if (response.ok) {
       const mydrug = await response.json();
       const originalData = ref();

@@ -4,7 +4,7 @@ import { useRouter } from "vue-router";
 import moment from "moment";
 import Swal from "sweetalert2";
 import Pusher from "pusher-js";
-import { ref, onMounted, computed } from "vue";
+import { ref, onMounted, computed , watch} from "vue";
 
 /* ส่งหา admin id ทุกคน */
 const conversations = ref([]);
@@ -34,7 +34,7 @@ const listenForNewMessage = () => {
 };
 
 const sendMessage = (userId, message) => {
-  fetch(`${import.meta.env.VITE_BASE_URL}api/conversations`, {
+  fetch(`http://cp23ssa2.sit.kmutt.ac.th:8000/api/conversations`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -101,10 +101,10 @@ channelAdmin.bind("message", (data) => {
       idadmin: data.admin_ids[0],
     };
     mergedMessagesAdminUser.value.push(message);
-  /*   localStorage.setItem(
+    localStorage.setItem(
       "chatMessagesfromadmin",
       JSON.stringify(mergedMessagesAdminUser.value)
-    ); */
+    );
     localStorage.setItem("idadmin", data.admin_ids[0]);
   }
 });
@@ -123,15 +123,15 @@ channelSendofUser.bind("message", (data) => {
       idadmin: data.admin_ids[0],
     };
     mergedMessagesAdminUser.value.push(message);
-   /*  localStorage.setItem(
+    localStorage.setItem(
       "chatMessagesfromadmin",
       JSON.stringify(mergedMessagesAdminUser.value)
-    ); */
+    );
     localStorage.setItem("idadmin", data.admin_ids[0]);
   }
 });
 
-/* const filterMessagesByUserId = (messages, userId) => {
+const filterMessagesByUserId = (messages, userId) => {
   return messages.filter((message) => message.iduser === userId);
 };
 
@@ -147,15 +147,13 @@ onMounted(() => {
       userId
     );
   }
-}); */
+});
 onMounted(() => {
- /*  const storedMessagesAdmin = localStorage.getItem("chatMessagesfromuser");
+  const storedMessagesAdmin = localStorage.getItem("chatMessagesfromuser");
   if (storedMessagesAdmin) {
      mergedMessagesAdminUser.value = JSON.parse(storedMessagesAdmin);
-  } */
+  }
 });
-
-
 
 
 
@@ -189,7 +187,7 @@ const sendReplyAdmin = (userId, replyadmin) => {
   // ดึงค่า idadmin จาก localStorage
   const idadmin = localStorage.getItem("idadmin");
 
-  fetch(`${import.meta.env.VITE_BASE_URL}api/reply/admin`, {
+  fetch(`http://cp23ssa2.sit.kmutt.ac.th:8000/api/reply/admin`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -284,9 +282,6 @@ const clearLocalStorage = () => {
       </div>
       
 
-
-
-
       <!-- ----------------------------------------------------------------------------------------------------------------------------------- -->
 
       <!-- Tab content ที่ 1 -->
@@ -349,15 +344,9 @@ const clearLocalStorage = () => {
                    ปิดแช็ต
                   </button>
           </div>
-          
-          
+               
 
-
-
-
-
-
-          <!-- -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- -->
+        <!-- -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- -->
           <!-- แสดงที่ admin user ตอบกลับไปมา -->
           <div class="chat-container p-4 border-t border-b border-gray-200 border-gray-300 max-h-96 overflow-y-auto" >
             <div class="message flex items-end justify-end mb-4" v-for="conversation in conversationsFiltered" :key="conversation.id" >
