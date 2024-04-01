@@ -54,7 +54,7 @@ const formatTime = (time) => {
 /* ทำ pop up */
 const isOpen = ref(false);
 
-const closeChat = () => {
+const deleteChat = () => {
   Swal.fire({
     title: 'คุณต้องการปิดแช็ต',
     text: "ถ้าคุณปิดแช็ตบทสนทนาของคุณกับพยาบาลจะหายไป!",
@@ -75,6 +75,23 @@ const closeChat = () => {
     }
   });
 };
+
+const closeChat = () => {
+  Swal.fire({
+    title: 'คุณต้องการปิดแช็ต',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#3085d6',
+    cancelButtonColor: '#d33',
+    confirmButtonText: 'ใช่',
+    cancelButtonText: 'ยกเลิก' 
+  }).then((result) => {
+    if (result.isConfirmed) { 
+      reloadPage();
+    }
+  });
+};
+
 const reloadPage = () => {
   // โหลดหน้าเว็บใหม่
   window.location.reload();
@@ -309,17 +326,18 @@ onMounted(() => {
       <slot>
          
             <!-- Header -->
-            <div class="py-2 px-3 bg-grey-lighter flex flex-row justify-between items-center">
-               <div class="flex items-center">
-                  <div>
-                    <img class="rounded-full w-6 h-6" src="https://cdn-icons-png.flaticon.com/512/9131/9131529.png" />
-                  </div>
-
-                   <div class="ml-2 text-sm font-semibold ">{{ selectedMessage.user.fname }} </div>
+            <div class="py-2 px-3 bg-grey-lighter flex flex-row items-center justify-between">
+              <div class="flex items-center">
+                <div>
+                   <img class="rounded-full w-6 h-6" src="https://cdn-icons-png.flaticon.com/512/9131/9131529.png" />
+                </div>
+               <div class="ml-2 text-sm font-semibold">{{ selectedMessage.user.fname }}</div>
                </div>
-                 <button @click="closeChat" class="me-8 px-2 py-2 bg-blue-500 text-white rounded-md">ปิดแช็ต</button>
-                
-            </div>
+                   <div>
+                      <button @click="deleteChat" class="px-2 py-2 bg-blue-500 text-white rounded-md">ลบแช็ต</button>
+                      <button @click="closeChat" class="px-2 py-2 bg-blue-500 text-white rounded-md ml-2">ปิดแช็ต</button>
+                    </div>
+               </div>
 
           
               <!-- -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- -->

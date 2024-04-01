@@ -104,13 +104,9 @@ const resetSearch = () => {
 
       </div>
 <!-- boxcontent แสดงรายละเอียด -->
-      <div
-        v-for="(userData, index) in filteredResults"
-        :key="index"
-        >
-        <div v-if="userData.length > 0"
-        class="box-content p-8 bg-white shadow-lg shadow-gray-300/50 mt-4 ml-5 mr-5 mb-10 rounded-lg"
-          >
+      <div v-for="(userData, index) in filteredResults" :key="index" >
+        <div v-if="userData.length > 0" class="box-content p-8 bg-white shadow-lg shadow-gray-300/50 mt-4 ml-5 mr-5 mb-10 rounded-lg" >
+        
         <h2 class="text-left text-2xl font-bold mb-5">ข้อมูลรายบุคคลทั้งหมด</h2>
 
         <div class="overflow-x-auto">
@@ -128,11 +124,10 @@ const resetSearch = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  <tr
-                    class="bg-white border-b"
-                    v-for="sugarRecord in userData"
-                    :key="sugarRecord.id"
-                  >
+        
+                 <!-- ------------------------------------------------------------------ -->
+
+                  <tr class="bg-white border-b"  v-for="sugarRecord in userData"  :key="sugarRecord.id" >
                     <td class="px-6 py-4 text-black font-medium">
                       {{ sugarRecord.user.fname }} {{ sugarRecord.user.lname }}</td>
                     <td class="px-6 py-4 flex items-center justify-center">
@@ -156,6 +151,12 @@ const resetSearch = () => {
         </div>
         </div>
       </div>
+
+ <!-- ถ้าไม่พบข้อมูล  -->
+<div v-if="filteredResults.length === 0" class="box-content p-8 bg-white shadow-lg shadow-gray-300/50 mt-4 ml-5 mr-5 mb-10 rounded-lg" >
+  <h2 class="text-left text-2xl font-bold mb-5 t text-center">ไม่มีประวัติการบันทึกผลการวัดค่าน้ำตาลของผู้ป่วย</h2>
+</div>
+<!-- ---------------------------------------- -->
     </div>
   </LayoutNurse>
 </template>
