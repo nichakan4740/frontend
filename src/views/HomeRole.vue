@@ -38,7 +38,7 @@ import Footer from '../layouts/Footer.vue';
           "
         />
       </div>
-      <div class="mx-auto max-w-2xl py-32 sm:py-48 lg:py-56">
+      <div class="mx-auto max-w-2xl py-32 sm:py-32 lg:py-36">
         <div class="hidden sm:mb-8 sm:flex sm:justify-center">
          
         </div>

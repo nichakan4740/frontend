@@ -45,6 +45,31 @@ pusherScript.onload = () => {
       class="flex items-center justify-between p-6 lg:px-8"
       aria-label="Global"
     >
+    <div class="hidden lg:flex lg:gap-x-12 mr-8">
+        <a
+          v-for="item in navigation"
+          :key="item.name"
+          :href="item.href"
+          class="text-sm font-semibold leading-6 text-gray-900"
+          >{{ item.name }}</a
+        >
+      </div>
+    <router-link :to="{ name: 'what-is' }">
+        <button
+          type="button"
+          class="text-sm font-semibold leading-6 text-gray-900 mr-6"
+        >
+        Tele-Nursing คืออะไร
+        </button>
+      </router-link>
+      <router-link :to="{ name: 'features' }">
+        <button
+          type="button"
+          class="text-sm font-semibold leading-6 text-gray-900 mr-6"
+        >
+        ฟีเจอร์แนะนำ
+        </button>
+      </router-link>
       <div class="flex lg:flex-1"></div>
       <div class="flex lg:hidden">
         <button
@@ -56,36 +81,14 @@ pusherScript.onload = () => {
           <Bars3Icon class="h-6 w-6" aria-hidden="true" />
         </button>
       </div>
-      <div class="hidden lg:flex lg:gap-x-12">
-        <a
-          v-for="item in navigation"
-          :key="item.name"
-          :href="item.href"
-          class="text-sm font-semibold leading-6 text-gray-900"
-          >{{ item.name }}</a
-        >
-      </div>
+      
+     
 
       <!-- คอม  -->
 
 
+      
       <div class="hidden lg:flex lg:flex-1 lg:justify-end">
-        <router-link :to="{ name: 'what-is' }">
-          <button
-            type="button"
-            class="text-sm font-semibold leading-6 text-gray-900 mr-6"
-          >
-          Tele-Nursing คืออะไร
-          </button>
-        </router-link>
-        <router-link :to="{ name: 'features' }">
-          <button
-            type="button"
-            class="text-sm font-semibold leading-6 text-gray-900 mr-6"
-          >
-          ฟีเจอร์แนะนำ
-          </button>
-        </router-link>
         <router-link :to="{ name: 'loginNurse' }">
           <button
             type="button"
