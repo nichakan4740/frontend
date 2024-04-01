@@ -6,8 +6,6 @@ import Header from '../layouts/Header.vue';
 
 const fname = ref("");
 const lname = ref("");
-// const allergic_drug = ref("");
-// const my_drug = ref("");
 const idcard = ref("");
 const password = ref("");
 const passwordcheck = ref("");
@@ -23,10 +21,9 @@ const registerpatient = async () => {
       body: JSON.stringify({
         fname: fname.value,
         lname: lname.value,
-        // allergic_drug : allergic_drug.value,
-        // my_drug :  my_drug .value,
         idcard:  idcard.value,
         password: password.value,
+         password_confirmation: passwordcheck.value
       }),
     }
   );

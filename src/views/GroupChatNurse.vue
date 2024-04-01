@@ -71,14 +71,10 @@ const closeChat = () => {
       const storedMessages = JSON.parse(localStorage.getItem('chatMessages'));
       const updatedMessages = storedMessages.filter(message => message.iduser !== selectedUserId);
       localStorage.setItem('chatMessages', JSON.stringify(updatedMessages));
-
       reloadPage();
     }
   });
 };
-
-
-
 const reloadPage = () => {
   // โหลดหน้าเว็บใหม่
   window.location.reload();
@@ -87,10 +83,18 @@ const reloadPage = () => {
 /* เลือกข้อมูล */
 const selectedMessage = ref(null); // เพิ่มตัวแปร selectedMessage
 
-const selectMessage = (message) => {
+/* const selectMessage = (message) => {
   selectedMessage.value = message;
   isOpen.value = true;
+}; */
+const selectMessage = (message) => {
+  // เพิ่มเงื่อนไขเช็คว่า isOpen.value เป็น false หรือไม่
+  if (!isOpen.value) {
+    selectedMessage.value = message;
+    isOpen.value = true;
+  }
 };
+
 
 
 

@@ -10,6 +10,12 @@ const password = ref("");
 const passwordcheck = ref("");
 
 const registernurse = async () => {
+  // ตรวจสอบว่ารหัสผ่านและการยืนยันรหัสผ่านตรงกันหรือไม่
+  if (password.value !== passwordcheck.value) {
+    Swal.fire("รหัสผ่านและการยืนยันรหัสผ่านไม่ตรงกัน!");
+    return;
+  }
+
   const res = await fetch(`${import.meta.env.VITE_BASE_URL}api/nurse/register`, {
     method: "POST",
     headers: {
@@ -19,8 +25,10 @@ const registernurse = async () => {
       name: name.value,
       professional_id: professional_id.value,
       password: password.value,
+      password_confirmation: passwordcheck.value, // เพิ่มการส่ง password_confirmation
     }),
   });
+
   if (res.status === 200) {
     Swal.fire("คุณสร้างบัญชีสำเร็จ!");
     setTimeout(function () {
@@ -36,6 +44,7 @@ const registernurse = async () => {
     });
   }
 };
+
 
 const checkmatch = () => {
   const pass = password.value;
