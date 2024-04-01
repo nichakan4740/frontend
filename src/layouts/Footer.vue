@@ -17,7 +17,7 @@
             <a href="https://github.com/nichakan4740/frontend" class="hover:underline me-4 md:me-6">Git Frontend</a>
         </li>
         <li>
-            <a href="https://github.com/nichakan4740/backend" class="hover:underline me-4 md:me-6">Backtend</a>
+            <a href="https://github.com/nichakan4740/backend" class="hover:underline me-4 md:me-6">Backend</a>
         </li>
         <li>
             <a href="#" class="hover:underline">Contact</a>
