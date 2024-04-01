@@ -8,7 +8,6 @@ import Swal from "sweetalert2";
 const appRouter = useRouter();
 
 /* date-time */
-const endDate = ref('');
 const selectedDate = ref('');
 
 const fullname = localStorage.getItem("name") + " " + localStorage.getItem("lname");
@@ -121,7 +120,9 @@ watch(selectedDate, (newSelectedDate) => {
   result.value = filterByDaily(originalData.value, newSelectedDate);
 });
 
-
+const getCurrentDate = () => {
+    return moment().format('YYYY-MM-DD');
+};
 
 /* --------------------------------------------------------------------------------------------------- */
 /* model popup */
@@ -329,6 +330,7 @@ const editinfo = () => {
                               <div class="box-content">
                                  <label for="selectedDate" class="text-md text-gray-800">เลือกวันที่: </label>
                                  <input type="date" id="selectedDate" v-model="myinfo.dob" @change="filterDataByDate"
+                                 :max="getCurrentDate()"
                                     class="mt-2 px-4 py-2 border rounded-md">
                               </div>
                            </div>
