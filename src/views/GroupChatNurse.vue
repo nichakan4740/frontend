@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted,computed } from "vue";
 import LayoutNurse from "../layouts/LayoutNurse.vue";
 import moment from "moment";
 import Swal from "sweetalert2";
@@ -32,6 +32,7 @@ channel.bind("message", (data) => {
 
     // บันทึกข้อมูลลงใน local storage
     localStorage.setItem("chatMessages", JSON.stringify(messages.value));
+
   } else {
     console.error('ข้อมูลที่ได้รับมาไม่มี key "text":', data);
   }
@@ -50,7 +51,51 @@ const formatTime = (time) => {
 };
 /* -------------------------------------------------------------------------------------------------------------- */
 
-/* การตอบกลับข้อความ------------------------------------------------------------------ */
+/* ทำ pop up */
+const isOpen = ref(false);
+
+const closeChat = () => {
+  Swal.fire({
+    title: 'คุณต้องการปิดแช็ต',
+    text: "ถ้าคุณปิดแช็ตบทสนทนาของคุณกับพยาบาลจะหายไป!",
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#3085d6',
+    cancelButtonColor: '#d33',
+    confirmButtonText: 'ใช่',
+    cancelButtonText: 'ยกเลิก' 
+  }).then((result) => {
+    if (result.isConfirmed) { 
+      // ลบข้อมูลใน localStorage โดยใช้ iduser ของ selectedMessage
+      const selectedUserId = selectedMessage.value.iduser;
+      const storedMessages = JSON.parse(localStorage.getItem('chatMessages'));
+      const updatedMessages = storedMessages.filter(message => message.iduser !== selectedUserId);
+      localStorage.setItem('chatMessages', JSON.stringify(updatedMessages));
+
+      reloadPage();
+    }
+  });
+};
+
+
+
+const reloadPage = () => {
+  // โหลดหน้าเว็บใหม่
+  window.location.reload();
+};
+
+/* เลือกข้อมูล */
+const selectedMessage = ref(null); // เพิ่มตัวแปร selectedMessage
+
+const selectMessage = (message) => {
+  selectedMessage.value = message;
+  isOpen.value = true;
+};
+
+
+
+
+/* แสดงการตอบกลับข้อความของ พยาบาลและผู้ป่วย ------------------------------------------------------------------ */
 
 const messageFromUser = ref([]);
 const mergedMessages = ref([]);
@@ -74,10 +119,10 @@ channelUser.bind("message", (data) => {
       idadmin: data.admin_ids[0],
     };
     mergedMessages.value.push(message);
-    localStorage.setItem(
+   /*  localStorage.setItem(
       "chatMessagesfromuser",
       JSON.stringify(mergedMessages.value)
-    );
+    ); */
     localStorage.setItem("idadmin", data.admin_ids[0]);
   }
 });
@@ -97,19 +142,26 @@ channelSendofAdmin.bind("message", (data) => {
       idadmin: data.admin_ids[0],
     };
     mergedMessages.value.push(message);
-    localStorage.setItem(
+  /*   localStorage.setItem(
       "chatMessagesfromuser",
       JSON.stringify(mergedMessages.value)
-    );
+    ); */
     localStorage.setItem("idadmin", data.admin_ids[0]);
   }
 });
 
+// สร้าง computed property สำหรับกรองข้อความที่มี id user ตรงกับข้อมูลที่เก็บไว้ใน selectedMessage
+const filteredMessages = computed(() => {
+  if (!selectedMessage.value) return []; // ถ้าไม่มีข้อความที่ถูกเลือก ให้ return ข้อความว่าง
+  return mergedMessages.value.filter(message => message.iduser === selectedMessage.value.iduser);
+});
+
+
 onMounted(() => {
-  const storedMessagesUser = localStorage.getItem("chatMessagesfromuser");
+ /*  const storedMessagesUser = localStorage.getItem("chatMessagesfromuser");
   if (storedMessagesUser) {
     mergedMessages.value = JSON.parse(storedMessagesUser);
-  }
+  } */
 });
 
 /*------------- ส่งข้อความตอบกลับไปหา user ---------------------------------------------- */
@@ -162,8 +214,8 @@ const sendReply = (adminId, messagereply) => {
           JSON.stringify(conversationreply.value)
         );
 
-        // เพิ่มบันทึกค่า replyData ลงใน localStorage เมื่อได้รับข้อมูลตอบกลับใหม่
-        localStorage.setItem("replyData", JSON.stringify(replyData.value));
+   /*      // เพิ่มบันทึกค่า replyData ลงใน localStorage เมื่อได้รับข้อมูลตอบกลับใหม่
+        localStorage.setItem("replyData", JSON.stringify(replyData.value)); */
       }
     })
 
@@ -186,6 +238,12 @@ onMounted(() => {
 });
 
 /* -------------------------------------------------------------------------------------------------------------------------- */
+
+
+
+
+
+
 </script>
 
 <template>
@@ -208,60 +266,80 @@ onMounted(() => {
           <!-- Left -->
           <div class="w-1/3 border-r">
             <!-- Search -->
-            <div class="bg-grey-lightest mr-6 mb-4">
+            <div class="bg-grey-lightest mr-6 mb-4   ">
               <input
                 type="text"
-                class="w-full px-2 py-2 text-sm"
-                placeholder="Search or start new chat"
+                class="w-full px-2 py-2 text-sm   rounded-lg"
+                placeholder="Search "
               />
             </div>
 
-            <!-- ขอความที่ทักเข้ามาตอนแรก -->
-            <div
-              v-for="message in messages"
-              :key="message.id"
-              class="box-content bg-white shadow-lg shadow-gray-300 mr-6 mb-4 p-4"
-            >
-              <div>
-                <img
-                  class="rounded-full w-6 h-6"
-                  src="https://cdn-icons-png.flaticon.com/512/9131/9131529.png"
-                />
-              </div>
 
-              <div>
-                {{ message.user.fname }} {{ formatTime(message.createdAt) }}
-              </div>
-              <div>{{ message.iduser }}</div>
-              <div>{{ message.message }}</div>
-            </div>
-          </div>
+
+<!-- ตอบกลับข้อความ ฝั่งซ้าย -->
+    <div>
+    <div v-for="message in messages" :key="message.id" class="message-box box-content bg-white shadow-lg shadow-gray-300 mr-6 mb-4 p-4  rounded-lg" @click="selectMessage(message)">
+      <div>
+        <img class="rounded-full w-6 h-6" src="https://cdn-icons-png.flaticon.com/512/9131/9131529.png" />
+      </div>
+
+      <div>
+           {{ message.user.fname }} {{ formatTime(message.createdAt) }}
+      </div>
+      <div>{{ message.iduser }}</div>
+      <div>{{ message.message }}</div>
+    </div>
+  </div>
+</div>
+
+
           <!-- ------------------------------------------------------------------------------------------------------------------------------------------------------------------ -->
           <!-- Right -->
           <div class="w-2/3">
+          
+ <!-- pop up แสดงข้อความตอบกลับกัน -->
+  <div v-if="isOpen">
+      <slot>
+         
             <!-- Header -->
-            <div
-              class="py-2 px-3 bg-grey-lighter flex flex-row justify-between items-center"
-            >
-              <div class="flex items-center">
-                <div>
-                  <img
-                    class="w-10 h-10 rounded-full"
-                    src="https://darrenjameseeley.files.wordpress.com/2014/09/expendables3.jpeg"
-                  />
-                </div>
-                <div class="ml-4">
-                  <p class="text-grey-darkest">New Movie! Expendables 4</p>
-                </div>
-              </div>
-              <!-- ----------------------------------------------- -->
+            <div class="py-2 px-3 bg-grey-lighter flex flex-row justify-between items-center">
+               <div class="flex items-center">
+                  <div>
+                    <img class="rounded-full w-6 h-6" src="https://cdn-icons-png.flaticon.com/512/9131/9131529.png" />
+                  </div>
+
+                   <div class="ml-2 text-sm font-semibold ">{{ selectedMessage.user.fname }} {{selectedMessage.iduser}}</div>
+               </div>
+                 <button @click="closeChat" class="me-8 px-2 py-2 bg-blue-500 text-white rounded-md">ปิดแช็ต</button>
+                
             </div>
 
+          
+              <!-- -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- -->
             <!-- Messages -->
             <div class="flex-1 overflow-y-auto max-h-96 border-y">
               <div class="py-2 px-3">
                 <div class="chat-container p-4 rounded-md border-gray-300">
-                  <template  v-for="(message, index) in mergedMessages" :key="index" >
+                      <!-- เริ่มต้นแชท -->
+                     <div class="text-xs text-gray-500">{{ formatTime(selectedMessage.createdAt ) }}</div>
+  
+                       <div class="flex items-center">
+                         
+                         <div class="bg-gray-100 rounded-lg p-2">
+                            <span class="text-sm font-semibold"> {{selectedMessage.user.fname}} </span>
+                          </div>
+
+                          <div  class="ml-2 bg-blue-500 text-white rounded-lg p-2" >
+                            <span class="text-sm">{{ selectedMessage.message }} {{selectedMessage.iduser}}</span>
+                          </div>
+
+                        </div>
+                   
+                    <!-- ------------------------------------------------------------------ -->
+      
+
+                  <template  v-for="(message, index) in  mergedMessages " :key="index" >
+                    
                     <div v-if="message.user.type === 'admin'" class="message flex items-center justify-end mb-4" >
                       <div class="flex flex-col">
                         <div class="text-xs text-gray-500"> {{ formatTime(message.createdAt) }} </div>
@@ -272,29 +350,29 @@ onMounted(() => {
                           </div>
 
                           <div class="bg-gray-100 rounded-lg p-2">
-                            <span class="text-sm font-semibold">{{ message.user.name}}</span>
+                            <span class="text-sm font-semibold">{{ message.user.name}} {{message.idadmin}}</span>
                           </div>
 
                         </div>
                       </div>
                     </div>
-
-                    <div v-else class="message flex items-center justify-start mb-4" >
+                    
+                     <div v-else class="message flex items-center justify-start mb-4" >
                       <div class="flex flex-col">
                         <div class="text-xs text-gray-500">  {{ formatTime(message.createdAt) }} </div>
                         
                         <div class="flex items-center">
-                          <div class="bg-gray-100 rounded-lg p-2">
-                            <span class="text-sm font-semibold">{{ message.user.name}}</span>
+                         
+                         <div class="bg-gray-100 rounded-lg p-2">
+                            <span class="text-sm font-semibold">{{ message.user.name}} {{message.iduser}}</span>
                           </div>
 
                           <div  class="ml-2 bg-blue-500 text-white rounded-lg p-2" >
                             <span class="text-sm">{{ message.text }}</span>
                           </div>
-
-                        </div>
+                        </div>       
                       </div>
-                    </div>
+                    </div>         
                   </template>
                   
                 </div>
@@ -322,13 +400,17 @@ onMounted(() => {
               </svg>
             </button>
           </div>
+      </slot>
+    
+    </div>
+
  <!-- --------------------------------------------------------------------------------------------------------- -->
 
           </div>
         </div>
       </div>
       <!-- --------------------------------------------- -->
-      <div class="mb-8 ml-2 mr-4">
+      <div class="mb-8 ml-2 mr-4 mt-10">
         <p class="text">**ขออภัย กำลังอยู่ในช่วงพัฒนา**</p>
       </div>
     </div>
