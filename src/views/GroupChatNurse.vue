@@ -283,15 +283,18 @@ onMounted(() => {
 <!-- ตอบกลับข้อความ ฝั่งซ้าย -->
     <div>
     <div v-for="message in messages" :key="message.id" class="message-box box-content bg-white shadow-lg shadow-gray-300 mr-6 mb-4 p-4  rounded-lg" @click="selectMessage(message)">
-      <div>
+      <div class="py-2 px-3 bg-grey-lighter flex flex-row items-center">
+         <div>
         <img class="rounded-full w-6 h-6" src="https://cdn-icons-png.flaticon.com/512/9131/9131529.png" />
       </div>
 
-      <div>
-           {{ message.user.fname }} {{ formatTime(message.createdAt) }}
+      <div class="ml-4 text-sm font-semibold"> {{ message.user.fname }} </div>
+
       </div>
-      <div>{{ message.iduser }}</div>
-      <div>{{ message.message }}</div>
+      
+      <div class="text-xs text-gray-500 ml-4">  {{ formatTime(message.createdAt) }}  </div>
+
+      <div  class="ml-4 mt-2 bg-blue-500 text-white rounded-lg p-2 text-sm">{{ message.message }}</div>
     </div>
   </div>
 </div>
@@ -312,7 +315,7 @@ onMounted(() => {
                     <img class="rounded-full w-6 h-6" src="https://cdn-icons-png.flaticon.com/512/9131/9131529.png" />
                   </div>
 
-                   <div class="ml-2 text-sm font-semibold ">{{ selectedMessage.user.fname }} {{selectedMessage.iduser}}</div>
+                   <div class="ml-2 text-sm font-semibold ">{{ selectedMessage.user.fname }} </div>
                </div>
                  <button @click="closeChat" class="me-8 px-2 py-2 bg-blue-500 text-white rounded-md">ปิดแช็ต</button>
                 
@@ -334,7 +337,7 @@ onMounted(() => {
                           </div>
 
                           <div  class="ml-2 bg-blue-500 text-white rounded-lg p-2" >
-                            <span class="text-sm">{{ selectedMessage.message }} {{selectedMessage.iduser}}</span>
+                            <span class="text-sm">{{ selectedMessage.message }}</span>
                           </div>
 
                         </div>
