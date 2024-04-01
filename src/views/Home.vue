@@ -10,7 +10,7 @@ import axios from 'axios';
 /* แสดงเวลาแบบ real time  */
 const currentTime = ref('');
 const updateCurrentTime = () => {
-  currentTime.value = moment().format("DD MMM YYYY, HH:mm");
+  currentTime.value = moment().format("DD MMMM YYYY, HH:mm");
 };
 // ใช้ onMounted เพื่อเรียกใช้ฟังก์ชันเมื่อ Component ถูก Mount
 onMounted(() => {
@@ -346,13 +346,14 @@ onMounted(MyDrugLoad);
 
       <div class="grid grid-cols-2 gap-2  mt-5  ">
 
-        <div class="box-content  p-8 bg-white shadow-lg shadow-gray-300/50 mt-8 ml-5 mr-5  rounded-lg">
+        <div class="box-content text-lg p-8 bg-white shadow-lg shadow-gray-300/50 mt-8 ml-5 mr-5  rounded-lg  text-center ">
           <p>ยาอินซูลินที่แพทย์กำหนด</p>
           <p>------------</p>
         </div>
 
-        <div class="box-content   p-8 bg-white shadow-lg shadow-gray-300/50 mt-8 ml-5 mr-5  rounded-lg  ">
-          <p>เวลาปัจจุบัน: {{ currentTime }}</p>
+        <div class="box-content text-lg p-8 bg-white shadow-lg shadow-gray-300/50 mt-8 ml-5 mr-5  rounded-lg text-center ">
+          <p>เวลาปัจจุบัน : 
+            <br><span class="font-bold text-blue-700 "> {{ currentTime }} </span></p>
         </div>
       </div>
 
@@ -364,7 +365,7 @@ onMounted(MyDrugLoad);
           class="box-content   bg-white shadow-lg shadow-gray-300/50 mt-10 ml-5 mr-5 pt-6 pb-6 pl-20 pr-20  mb-10  rounded-lg ">
           <form @submit.prevent="save">
 
-            <div class="box-content  pt-3 pb-3  ">
+            <div class="box-content text-lg pt-3 pb-3  ">
               <p>น้ำตาลในเลือด (mg/dL) <span class="text-red-500">*</span></p>
               <div class="box-content ">
                 <input type="text" v-model="mysugar.sugarValue"
@@ -374,7 +375,7 @@ onMounted(MyDrugLoad);
             </div>
 
 
-            <div class="box-content pt-3 pb-3">
+            <div class="box-content text-lg pt-3 pb-3">
               <p>อาการผิดปกติ (ถ้ามี)</p>
               <input type="text" v-model="mysugar.symptom"
                 class="block w-full rounded-md border-0 py-5 pl-7 pr-20 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400"
@@ -383,7 +384,7 @@ onMounted(MyDrugLoad);
 
 
 
-            <div class="box-content pt-3 pb-3 ">
+            <div class="box-content text-lg pt-3 pb-3 ">
               <p>ข้อมูลอื่นๆ (ถ้ามี)</p>
               <div class="box-content">
                 <input type="text" v-model="mysugar.note"
