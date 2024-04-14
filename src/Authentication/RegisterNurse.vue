@@ -10,18 +10,14 @@ const password = ref("");
 const passwordcheck = ref("");
 
 const registernurse = async () => {
-<<<<<<< HEAD
-  // ตรวจสอบว่ารหัสผ่านและการยืนยันรหัสผ่านตรงกันหรือไม่
+
   if (password.value !== passwordcheck.value) {
     Swal.fire("รหัสผ่านและการยืนยันรหัสผ่านไม่ตรงกัน!");
     return;
   }
 
   const res = await fetch(`${import.meta.env.VITE_BASE_URL}api/nurse/register`, {
-=======
-  const res = await 
-  fetch(`http://cp23ssa2.sit.kmutt.ac.th:8000/api/nurse/register`, {
->>>>>>> d8db57037fac7032b3cb9e8c0c63008ad1ba5544
+
     method: "POST",
     headers: {
       "content-type": "application/json",
