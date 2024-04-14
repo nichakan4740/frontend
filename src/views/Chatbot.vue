@@ -34,7 +34,7 @@ const listenForNewMessage = () => {
 };
 
 const sendMessage = (userId, message) => {
-  fetch(`http://cp23ssa2.sit.kmutt.ac.th:8000/api/conversations`, {
+  fetch(`${import.meta.env.VITE_BASE_URL}api/conversations`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -187,7 +187,7 @@ const sendReplyAdmin = (userId, replyadmin) => {
   // ดึงค่า idadmin จาก localStorage
   const idadmin = localStorage.getItem("idadmin");
 
-  fetch(`http://cp23ssa2.sit.kmutt.ac.th:8000/api/reply/admin`, {
+  fetch(`${import.meta.env.VITE_BASE_URL}api/reply/admin`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
