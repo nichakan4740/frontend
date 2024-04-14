@@ -6,9 +6,14 @@ import Header from '../layouts/Header.vue';
 
 const fname = ref("");
 const lname = ref("");
+// const allergic_drug = ref("");
+// const my_drug = ref("");
 const idcard = ref("");
 const password = ref("");
 const passwordcheck = ref("");
+const dob = ref("");
+const phone = ref("");
+const address = ref("");
 
 const registerpatient = async () => {
   const res = await fetch(
@@ -21,9 +26,13 @@ const registerpatient = async () => {
       body: JSON.stringify({
         fname: fname.value,
         lname: lname.value,
+        // allergic_drug : allergic_drug.value,
+        // my_drug :  my_drug .value,
         idcard:  idcard.value,
         password: password.value,
-         password_confirmation: passwordcheck.value
+        dob: dob.value,
+        phone: phone.value,
+        address: address.value,
       }),
     }
   );

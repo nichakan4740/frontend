@@ -10,6 +10,3 @@ export default defineConfig({
   // base:'/ssa2/'
 })
 
-
-
-

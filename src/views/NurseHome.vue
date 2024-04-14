@@ -195,7 +195,7 @@ const resetSearch = () => {
                     <th scope="col" class="px-6 py-4 text-center text-sm"></th>
                   </tr>
                 </thead>
-                <tbody v-if="filteredResult.length > 0">
+                <tbody>
                   <tr class="bg-white border-b" v-for="sugarRecord in filteredResult" :key="sugarRecord.id">
                     <td class="px-6 py-4 text-black font-medium">
                       <!-- <router-link :to="'/informationUser/' + sugarRecord.id"> -->
@@ -217,13 +217,6 @@ const resetSearch = () => {
             }"> {{ sugarRecord.sugarValue }}</td>
                   </tr>
                 </tbody>
-                <tbody v-else>
-                 <!-- แสดงข้อความ "ไม่มีข้อมูล" -->
-                   <tr>
-                     <td colspan="6" class="px-6 py-4 text-center text-gray-500">ไม่มีประวัติการบันทึกผลการวัดค่าน้ำตาลของผู้ป่วย</td>
-                   </tr>
-                 </tbody>
-<!-- ------------------------------------------------------------------------------------------------------ -->
               </table>
             </div>
           </div>

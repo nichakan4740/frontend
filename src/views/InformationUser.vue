@@ -14,30 +14,32 @@ const fullname = localStorage.getItem("name") + " " + localStorage.getItem("lnam
 const fname = localStorage.getItem("name");
 const lname = localStorage.getItem("lname");
 const idcard = localStorage.getItem("idcard");
-const dob = localStorage.getItem("dob")|| '-'; 
-const phone = localStorage.getItem("phone")|| '-';
-const address = localStorage.getItem("address")|| '-';
+const dob = localStorage.getItem("dob");
+const phone = localStorage.getItem("phone");
+const address = localStorage.getItem("address");
+
 
 // เรียกข้อมูล
-const originalData = ref([]); 
-
+const originalData = ref([]);
+const result = ref([]);
 
 const myinfo = ref({
-  fname: '',
-  lname: '',
-  idcard: '',
-  dob: '', // กำหนดค่าเริ่มต้นเป็นข้อความว่างหรือค่าที่เหมาะสมกับที่ต้องการ
-  phone: '', 
-  address: '' 
+   fname: '',
+   lname: '',
+   idcard: '',
+   dob: '',
+   phone: '',
+   address: ''
 
 });
 
-const updateinfouser = async () => {
-   console.log(myinfo.value.fname);
 
+
+/* --------------------------------------------------------------------------------------------------- */
+const MyInfo = async () => {
    try {
-   
       const userId = localStorage.getItem('iduser');
+<<<<<<< HEAD
       const response = await fetch(`${import.meta.env.VITE_BASE_URL}api/updateinfo`, {
          method: 'PUT',
          headers: {
@@ -68,25 +70,140 @@ const updateinfouser = async () => {
             title: 'บันทึกข้อมูลสำเร็จ',
             // text: 'Information updated successfully',
          });
+=======
+      if (userId) {
+         const response = await 
+         fetch(`http://cp23ssa2.sit.kmutt.ac.th:8000/api/patient/getProfile/${userId}`);
+         if (response.ok) {
+            const data = await response.json();
+            localStorage.setItem("name", data.fname);
+            localStorage.setItem("lname", data.lname);
+            localStorage.setItem("idcard", data.idcard);
+            localStorage.setItem("dob", data.dob);
+            localStorage.setItem("phone", data.phone);
+            localStorage.setItem("address", data.address);
+            result.value = data;
+            console.log(result.value.dob);
+            console.log(result.value.phone);
+            console.log(result.value.address);
+         } else if (response.status === 404) {
+            // Handle case when no data is found
+            console.log('No data found');
+            result.value = [];
+         } else {
+            throw new Error('Failed to fetch data');
+         }
+>>>>>>> d8db57037fac7032b3cb9e8c0c63008ad1ba5544
       } else {
-         const errorMessage = await response.text();
-         console.error('Failed to update information:', errorMessage);
-         Swal.fire({
-            icon: 'error',
-            title: 'Failed',
-            text: errorMessage,
-         });
+         console.log('No user ID found in LocalStorage');
       }
    } catch (error) {
-      console.error('Error updating information:', error);
-      Swal.fire({
-         icon: 'error',
-         title: 'Error',
-         text: 'Failed to update information. Please try again later.',
-      });
-   }closeModal();
-   window.location.reload(); // Reload the browser after successfully updating the information
+      console.error('Error fetching data:', error);
+   }
 };
+
+onMounted(MyInfo);
+/* --------------------------------------------------------------------------------------------------- */
+
+const updateinfouser = async () => {
+  try {
+   const userId = localStorage.getItem('iduser');
+   const editinfo = `${import.meta.env.VITE_BASE_URL}api/patient/updateProfile/${userId}`;
+
+    // Display confirmation dialog using Swal
+    const confirmationResult = await Swal.fire({
+      title: "คุณแน่ใจหรือไหม",
+      text: "คุณต้องการที่จะแก้ไขข้อมูล",
+      icon: "warning",
+      confirmButtonText: "ใช่ ,แก้ไขมัน",
+      cancelButtonText: "ยกเลิก",
+      showCancelButton: true,
+      showCloseButton: true
+    });
+
+    if (confirmationResult.isConfirmed) {
+      const response = await fetch(editinfo, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(myinfo.value),
+      });
+
+      if (response.ok) {
+        await MyInfo();
+      } else {
+        throw new Error("Failed to delete");
+      }
+    }
+  } catch (error) {
+    console.error("Error deleting data:", error);
+  }
+  window.location.reload(); // Reload the browser after successfully updating the information
+  closeModal();
+}
+
+/* --------------------------------------------------------------------------------------------------- */
+/* --------------------------------------------------------------------------------------------------- */
+
+
+
+// const updateinfouser = async () => {
+//    console.log(myinfo.value.fname);
+
+//    try {
+
+//       const userId = localStorage.getItem('iduser');
+//       const response = await fetch(`${import.meta.env.VITE_BASE_URL}api/patient/getProfile/${userId}`, {
+//          method: 'PUT',
+//          headers: {
+//             'Content-Type': 'application/json',
+//          },
+//          body: JSON.stringify({
+//             fname: myinfo.value.fname,
+//             lname: myinfo.value.lname,
+//             idcard: myinfo.value.idcard,
+//             dob: myinfo.value.dob,
+//             phone: myinfo.value.phone,
+//             address: myinfo.value.address,
+//             user_id: userId,
+//          }),
+//       });
+//       if (response.ok) {
+//          MyInfo()
+//          const data = await response.json();
+//          console.log(data.InformationUser);
+//          localStorage.setItem("idcard", data.user.idcard);
+//          localStorage.setItem("name", data.user.fname);
+//          localStorage.setItem("lname", data.user.lname);
+//          localStorage.setItem("dob", data.user.dob);
+//          localStorage.setItem("phone", data.user.phone);
+//          localStorage.setItem("address", data.user.address);
+//          console.log('Information updated successfully:', data);
+//          Swal.fire({
+//             icon: 'success',
+//             title: 'บันทึกข้อมูลสำเร็จ',
+//             // text: 'Information updated successfully',
+//          });
+//       } else {
+//          const errorMessage = await response.text();
+//          console.error('Failed to update information:', errorMessage);
+//          Swal.fire({
+//             icon: 'error',
+//             title: 'Failed',
+//             text: errorMessage,
+//          });
+//       }
+//    } catch (error) {
+//       console.error('Error updating information:', error);
+//       Swal.fire({
+//          icon: 'error',
+//          title: 'Error',
+//          text: 'Failed to update information. Please try again later.',
+//       });
+//    } closeModal();
+//    // window.location.reload(); 
+// };
 
 
 
@@ -98,30 +215,27 @@ const handleButtonClick = () => {
    isButtonClicked.value = !isButtonClicked.value;
 };
 
-
-const result = ref([]);
-
 const filterByDaily = (data, selectedDate) => {
-  if (selectedDate) {
-    return data.filter(record => {
-      const recordDate = moment(record.updated_at).format('YYYY-MM-DD');
-      return moment(recordDate).isSame(selectedDate, 'day');
-    });
-  } else {
-    return data;
-  }
+   if (selectedDate) {
+      return data.filter(record => {
+         const recordDate = moment(record.updated_at).format('YYYY-MM-DD');
+         return moment(recordDate).isSame(selectedDate, 'day');
+      });
+   } else {
+      return data;
+   }
 };
 
 const filterDataByDate = () => {
-  result.value = filterByDaily(originalData.value, selectedDate.value);
+   result.value = filterByDaily(originalData.value, selectedDate.value);
 };
 
 watch(selectedDate, (newSelectedDate) => {
-  result.value = filterByDaily(originalData.value, newSelectedDate);
+   result.value = filterByDaily(originalData.value, newSelectedDate);
 });
 
 const getCurrentDate = () => {
-    return moment().format('YYYY-MM-DD');
+   return moment().format('YYYY-MM-DD');
 };
 
 /* --------------------------------------------------------------------------------------------------- */
@@ -140,7 +254,7 @@ const editinfo = () => {
    myinfo.value.fname = fname;
    myinfo.value.lname = lname;
    myinfo.value.idcard = idcard;
-   myinfo.value.dob = dob; 
+   myinfo.value.dob = dob;
    myinfo.value.phone = phone;
    myinfo.value.address = address;
    openModal();
@@ -245,25 +359,28 @@ const editinfo = () => {
 
                            <div>
                               <label class="block mb-2 text-sm text-gray-600 dark:text-gray-200">วันเกิด</label>
-                              <div type="text"
+                              <div v-if="dob != null" type="text" 
                                  class="block w-full px-5 py-3 mt-2 text-gray-700 bg-white border border-gray-200 rounded-md dark:placeholder-gray-600 dark:bg-gray-900 dark:text-gray-300 dark:border-gray-700 focus:border-blue-400 dark:focus:border-blue-400 focus:ring-blue-400 focus:outline-none focus:ring focus:ring-opacity-40">
                                  {{ dob }}
                               </div>
+                              <div v-else> - </div>
                            </div>
 
                            <div>
                               <label class="block mb-2 text-sm text-gray-600 dark:text-gray-200">เบอร์โทร</label>
-                              <div type="text"
+                              <div v-if="phone != null" type="text"
                                  class="block w-full px-5 py-3 mt-2 text-gray-700 bg-white border border-gray-200 rounded-md dark:placeholder-gray-600 dark:bg-gray-900 dark:text-gray-300 dark:border-gray-700 focus:border-blue-400 dark:focus:border-blue-400 focus:ring-blue-400 focus:outline-none focus:ring focus:ring-opacity-40">
                                  {{ phone }}
                               </div>
+                              <div v-else> - </div>
                            </div>
                            <div>
                               <label class="block mb-2 text-sm text-gray-600 dark:text-gray-200">ที่อยู่</label>
-                              <div type="text"
+                              <div v-if="address != null" type="text"
                                  class="block w-full px-5 py-3 mt-2 text-gray-700 bg-white border border-gray-200 rounded-md dark:placeholder-gray-600 dark:bg-gray-900 dark:text-gray-300 dark:border-gray-700 focus:border-blue-400 dark:focus:border-blue-400 focus:ring-blue-400 focus:outline-none focus:ring focus:ring-opacity-40">
                                  {{ address }}
                               </div>
+                              <div v-else> - </div>
                            </div>
 
 
@@ -330,8 +447,7 @@ const editinfo = () => {
                               <div class="box-content">
                                  <label for="selectedDate" class="text-md text-gray-800">เลือกวันที่: </label>
                                  <input type="date" id="selectedDate" v-model="myinfo.dob" @change="filterDataByDate"
-                                 :max="getCurrentDate()"
-                                    class="mt-2 px-4 py-2 border rounded-md">
+                                    :max="getCurrentDate()" class="mt-2 px-4 py-2 border rounded-md">
                               </div>
                            </div>
 
