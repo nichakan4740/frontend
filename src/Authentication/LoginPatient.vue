@@ -30,6 +30,9 @@ const loginpatient = async () => {
       localStorage.setItem("iduser", response.user.id);
       localStorage.setItem("name", response.user.fname);
       localStorage.setItem("lname", response.user.lname);
+      localStorage.setItem("dob", response.user.dob);
+      localStorage.setItem("phone", response.user.phone);
+      localStorage.setItem("address", response.user.address);
       localStorage.setItem("accesstoken", response.authorisation.token);
 
       Swal.fire({

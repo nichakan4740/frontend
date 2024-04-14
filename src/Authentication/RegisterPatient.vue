@@ -11,6 +11,9 @@ const lname = ref("");
 const idcard = ref("");
 const password = ref("");
 const passwordcheck = ref("");
+const dob = ref("");
+const phone = ref("");
+const address = ref("");
 
 const registerpatient = async () => {
   const res = await fetch(
@@ -27,6 +30,9 @@ const registerpatient = async () => {
         // my_drug :  my_drug .value,
         idcard:  idcard.value,
         password: password.value,
+        dob: dob.value,
+        phone: phone.value,
+        address: address.value,
       }),
     }
   );
