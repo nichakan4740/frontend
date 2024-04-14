@@ -17,7 +17,7 @@ const address = ref("");
 
 const registerpatient = async () => {
   const res = await fetch(
-    `${import.meta.env.VITE_BASE_URL}api/patient/register`,
+    `http://cp23ssa2.sit.kmutt.ac.th:8000/api/patient/register`,
     {
       method: "POST",
       headers: {

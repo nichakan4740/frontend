@@ -54,7 +54,7 @@ const formatTime = (time) => {
 /* ทำ pop up */
 const isOpen = ref(false);
 
-const closeChat = () => {
+const deleteChat = () => {
   Swal.fire({
     title: 'คุณต้องการปิดแช็ต',
     text: "ถ้าคุณปิดแช็ตบทสนทนาของคุณกับพยาบาลจะหายไป!",
@@ -71,13 +71,26 @@ const closeChat = () => {
       const storedMessages = JSON.parse(localStorage.getItem('chatMessages'));
       const updatedMessages = storedMessages.filter(message => message.iduser !== selectedUserId);
       localStorage.setItem('chatMessages', JSON.stringify(updatedMessages));
-
       reloadPage();
     }
   });
 };
 
-
+const closeChat = () => {
+  Swal.fire({
+    title: 'คุณต้องการปิดแช็ต',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#3085d6',
+    cancelButtonColor: '#d33',
+    confirmButtonText: 'ใช่',
+    cancelButtonText: 'ยกเลิก' 
+  }).then((result) => {
+    if (result.isConfirmed) { 
+      reloadPage();
+    }
+  });
+};
 
 const reloadPage = () => {
   // โหลดหน้าเว็บใหม่
@@ -87,10 +100,18 @@ const reloadPage = () => {
 /* เลือกข้อมูล */
 const selectedMessage = ref(null); // เพิ่มตัวแปร selectedMessage
 
-const selectMessage = (message) => {
+/* const selectMessage = (message) => {
   selectedMessage.value = message;
   isOpen.value = true;
+}; */
+const selectMessage = (message) => {
+  // เพิ่มเงื่อนไขเช็คว่า isOpen.value เป็น false หรือไม่
+  if (!isOpen.value) {
+    selectedMessage.value = message;
+    isOpen.value = true;
+  }
 };
+
 
 
 
@@ -191,7 +212,7 @@ const listenForNewMessagereply = () => {
 };
 
 const sendReply = (adminId, messagereply) => {
-  fetch(`${import.meta.env.VITE_BASE_URL}api/reply/user`, {
+  fetch(`http://cp23ssa2.sit.kmutt.ac.th:8000/api/reply/user`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -279,15 +300,18 @@ onMounted(() => {
 <!-- ตอบกลับข้อความ ฝั่งซ้าย -->
     <div>
     <div v-for="message in messages" :key="message.id" class="message-box box-content bg-white shadow-lg shadow-gray-300 mr-6 mb-4 p-4  rounded-lg" @click="selectMessage(message)">
-      <div>
+      <div class="py-2 px-3 bg-grey-lighter flex flex-row items-center">
+         <div>
         <img class="rounded-full w-6 h-6" src="https://cdn-icons-png.flaticon.com/512/9131/9131529.png" />
       </div>
 
-      <div>
-           {{ message.user.fname }} {{ formatTime(message.createdAt) }}
+      <div class="ml-4 text-sm font-semibold"> {{ message.user.fname }} </div>
+
       </div>
-      <div>{{ message.iduser }}</div>
-      <div>{{ message.message }}</div>
+      
+      <div class="text-xs text-gray-500 ml-4">  {{ formatTime(message.createdAt) }}  </div>
+
+      <div  class="ml-4 mt-2 bg-blue-500 text-white rounded-lg p-2 text-sm">{{ message.message }}</div>
     </div>
   </div>
 </div>
@@ -302,17 +326,18 @@ onMounted(() => {
       <slot>
          
             <!-- Header -->
-            <div class="py-2 px-3 bg-grey-lighter flex flex-row justify-between items-center">
-               <div class="flex items-center">
-                  <div>
-                    <img class="rounded-full w-6 h-6" src="https://cdn-icons-png.flaticon.com/512/9131/9131529.png" />
-                  </div>
-
-                   <div class="ml-2 text-sm font-semibold ">{{ selectedMessage.user.fname }} {{selectedMessage.iduser}}</div>
+            <div class="py-2 px-3 bg-grey-lighter flex flex-row items-center justify-between">
+              <div class="flex items-center">
+                <div>
+                   <img class="rounded-full w-6 h-6" src="https://cdn-icons-png.flaticon.com/512/9131/9131529.png" />
+                </div>
+               <div class="ml-2 text-sm font-semibold">{{ selectedMessage.user.fname }}</div>
                </div>
-                 <button @click="closeChat" class="me-8 px-2 py-2 bg-blue-500 text-white rounded-md">ปิดแช็ต</button>
-                
-            </div>
+                   <div>
+                      <button @click="deleteChat" class="px-2 py-2 bg-blue-500 text-white rounded-md">ลบแช็ต</button>
+                      <button @click="closeChat" class="px-2 py-2 bg-blue-500 text-white rounded-md ml-2">ปิดแช็ต</button>
+                    </div>
+               </div>
 
           
               <!-- -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- -->
@@ -330,7 +355,7 @@ onMounted(() => {
                           </div>
 
                           <div  class="ml-2 bg-blue-500 text-white rounded-lg p-2" >
-                            <span class="text-sm">{{ selectedMessage.message }} {{selectedMessage.iduser}}</span>
+                            <span class="text-sm">{{ selectedMessage.message }}</span>
                           </div>
 
                         </div>

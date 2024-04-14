@@ -14,7 +14,7 @@ const result = ref([]);
 const Mydrug = async () => {
   try {
     const userId = localStorage.getItem('iduser');
-    const response = await fetch(`${import.meta.env.VITE_BASE_URL}api/drug/${userId}`);
+    const response = await fetch(`http://cp23ssa2.sit.kmutt.ac.th:8000/api/drug/${userId}`);
     if (response.ok) {
       const data = await response.json();
       originalData.value = data;
@@ -40,7 +40,7 @@ const my_drug = ref("");
 
 const add_drug = async () => {
   const res = await fetch(
-    `${import.meta.env.VITE_BASE_URL}api/drug`,
+    `http://cp23ssa2.sit.kmutt.ac.th:8000/api/drug`,
     {
       method: "POST",
       headers: {
@@ -84,7 +84,7 @@ const mydrug = ref({
 const updateDrug = async () => {
   try {
     const userId = localStorage.getItem('iduser');
-    const editdrug = `${import.meta.env.VITE_BASE_URL}api/drug/${userId}`;
+    const editdrug = `http://cp23ssa2.sit.kmutt.ac.th:8000/api/drug/${userId}`;
     // Display confirmation dialog using Swal
     const confirmationResult = await Swal.fire({
       title: "คุณแน่ใจหรือไหม",
