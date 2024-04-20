@@ -4,6 +4,9 @@ import Home from '../views/Home.vue'
 import Dashboard from '../views/Dashboard.vue'
 import Chatbot from '../views/Chatbot.vue'
 import SugarValue from '../views/SugarValue.vue';
+import NormalLevel from '../views/NormalLevel.vue';
+import HighLevel from '../views/HighLevel.vue';
+import LowLevel from '../views/LowLevel.vue';
 import Knowledge from '../views/Knowledge.vue';
 import HealthUser  from '../views/HealthUser.vue';
 import InformationUser  from '../views/InformationUser.vue';
@@ -112,6 +115,21 @@ const routes = [
     path: '/knowledge',
     name: 'knowledge',
     component: Knowledge,
+  },
+  {
+    path: '/normal',
+    name: 'normal',
+    component: NormalLevel,
+  },
+  {
+    path: '/high',
+    name: 'high',
+    component: HighLevel,
+  },
+  {
+    path: '/low',
+    name: 'low',
+    component: LowLevel,
   },
 
   {

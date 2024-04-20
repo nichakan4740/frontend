@@ -13,8 +13,7 @@ const loading = ref(false);
 const loginpatient = async () => {
   loading.value = true;
   try {
-    const res = await 
-    fetch(`http://cp23ssa2.sit.kmutt.ac.th:8000/api/patient/login`, {
+    const res = await fetch(`http://cp23ssa2.sit.kmutt.ac.th:8000/api/patient/login`, {
       method: "POST",
       headers: {
         "Content-type": "application/json",
@@ -31,9 +30,6 @@ const loginpatient = async () => {
       localStorage.setItem("iduser", response.user.id);
       localStorage.setItem("name", response.user.fname);
       localStorage.setItem("lname", response.user.lname);
-      localStorage.setItem("dob", response.user.dob);
-      localStorage.setItem("phone", response.user.phone);
-      localStorage.setItem("address", response.user.address);
       localStorage.setItem("accesstoken", response.authorisation.token);
 
       Swal.fire({

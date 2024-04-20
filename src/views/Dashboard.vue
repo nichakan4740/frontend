@@ -486,11 +486,11 @@ const previousPage = () => {
                   'text-red-500': sugarRecord.sugarValue > 125
                 }">
                             <span v-if="sugarRecord.sugarValue < 70"><router-link
-                                to="/knowledge">น้ำตาลต่ำ</router-link></span>
+                                to="/low">น้ำตาลต่ำ</router-link></span>
 
                             <span v-else-if="sugarRecord.sugarValue >= 70 && sugarRecord.sugarValue <= 125"><router-link
-                                to="/knowledge">น้ำตาลปกติ</router-link></span>
-                            <span v-else><router-link to="/knowledge">น้ำตาลสูง</router-link></span>
+                                to="/normal">น้ำตาลปกติ</router-link></span>
+                            <span v-else><router-link to="/high">น้ำตาลสูง</router-link></span>
                           </span>
                         </td>
 

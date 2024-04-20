@@ -57,6 +57,14 @@ const save = async () => {
     return;
   }
 
+  if (parseInt(mysugar.value.sugarValue) <= 0) {
+    Swal.fire({
+      icon: 'error',
+      title: 'น้ำตาลในเลือดต้องมากกว่า 0 mg/dL',
+    });
+    return;
+  }
+
   if (parseInt(mysugar.value.sugarValue) > 1000) {
     Swal.fire({
       icon: 'error',
