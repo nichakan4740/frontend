@@ -85,12 +85,11 @@ const handleSendMessage = () => {
 };
 
 
-
 /* --------------------------------------------------------------------------------------------------------------------  */
 
 
 /* การตอบกลับข้อความ------------------------------------------------------------------ */
-
+/* 
 const messageFromAdmin = ref([]);
 const mergedMessagesAdminUser = ref([]);
 const pusherAdmin = new Pusher("c38b6cfa9a4f7e26bf76", {
@@ -166,11 +165,12 @@ onMounted(() => {
   }
 });
 
-
+ */
 
 /* ------------------------------------------------------------------------------------------------------------- */
 /* ตอบกลับแบบเจาะจง id admin   */
-const conversationreplyadmin = ref([]);
+/* const conversationreplyadmin = ref([]);
+
 const replyadmin = ref("");
 
 const pusherreplyadmin = new Pusher("c38b6cfa9a4f7e26bf76", {
@@ -221,11 +221,6 @@ const sendReplyAdmin = (userId, replyadmin) => {
           JSON.stringify(conversationreplyadmin.value)
         );
 
-      /*   // เพิ่มบันทึกค่า replyDataAdmin ลงใน localStorage เมื่อได้รับข้อมูลตอบกลับใหม่
-        localStorage.setItem(
-          "replyDataAdmin",
-          JSON.stringify(replyDataAdmin.value)
-        ); */
       }
     })
     .catch((error) => {
@@ -236,7 +231,7 @@ const sendReplyAdmin = (userId, replyadmin) => {
 onMounted(() => {
   listenForNewMessagereplyadmin();
 });
-
+ */
 /* เลือก Teb -------------------------------------------------------- */
 const activeTab = ref(1);
 
@@ -349,8 +344,7 @@ const clearLocalStorage = () => {
 
 
 
-
-
+                
 
 
 
@@ -379,33 +373,33 @@ const clearLocalStorage = () => {
         <!-- -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- -->
           <!-- แสดงที่ admin user ตอบกลับไปมา -->
           <div class="chat-container p-4 border-t border-b border-gray-200 border-gray-300 max-h-96 overflow-y-auto" >
-            <div class="message flex items-end justify-end mb-4" v-for="conversation in conversationsFiltered" :key="conversation.id" >
+            <div class="message flex items-end justify-end mb-4" >
             
             <div class="flex flex-col">
-              <div class="text-xs text-gray-500">  {{ formatTime(conversation.createdAt) }}</div>
+              <div class="text-xs text-gray-500">  </div>
               
                 <div class="ml bg-blue-500 text-white rounded-lg p-2">
-                  <span class="text-sm">{{ conversation.messages }}</span>
+                  <span class="text-sm"></span>
               </div>
 
             </div>
           </div>
 <!-- --------------------------------------------------------------------------------------------------------------------------------------------- -->
 
-            <template v-for="(message, index) in mergedMessagesAdminUser" :key="index" >
-              <div v-if="message.user.type === 'admin'" class="message flex items-start mb-4">
+            <template >
+              <div  class="message flex items-start mb-4">
                 <div class="flex flex-col">
 
-                  <div class="text-xs text-gray-500"> {{ formatTime(message.createdAt) }}</div>
+                  <div class="text-xs text-gray-500"> </div>
 
                   <div class="flex items-center">
 
                     <div class="bg-gray-100 rounded-lg p-2">
-                      <span class="text-sm font-semibold">{{ message.user.name }}</span>
+                      <span class="text-sm font-semibold"></span>
                     </div>
 
                     <div class="ml-2 bg-blue-500 text-white rounded-lg p-2">
-                      <span class="text-sm">{{ message.text }}</span>
+                      <span class="text-sm"></span>
                     </div>
 
                   </div>
@@ -413,19 +407,17 @@ const clearLocalStorage = () => {
                 </div>
               </div>
 
-              <div v-else class="message flex items-end justify-end mb-4">
+              <div  class="message flex items-end justify-end mb-4">
                 <div class="flex flex-col">
                   <div class="text-xs text-gray-500">
-                    {{ formatTime(message.createdAt) }}
+    
                   </div>
                   <div class="flex items-center justify-end">
                     <div class="mr-2 bg-blue-500 text-white rounded-lg p-2">
-                      <span class="text-sm">{{ message.text }}</span>
+                      <span class="text-sm"></span>
                     </div>
                     <div class="bg-gray-100 rounded-lg p-2">
-                      <span class="text-sm font-semibold">{{
-                        message.user.name
-                      }}</span>
+                      <span class="text-sm font-semibold"></span>
                     </div>
                   </div>
                 </div>
@@ -438,12 +430,11 @@ const clearLocalStorage = () => {
           <div style="display: flex; align-items: center" class="mt-1">
             <input
               type="text"
-              v-model="replyadmin"
               placeholder="พิมพ์ข้อความที่นี่..."
               class="block w-full p-2 text-gray-900 border-0 focus:ring-white focus:border-white"
             />
 
-            <button @click="replyAdmin">
+            <button >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 24 24"
