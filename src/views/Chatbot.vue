@@ -17,7 +17,7 @@ const pusher = new Pusher("c38b6cfa9a4f7e26bf76", {
 });
 
 const store = () => {
-  sendMessage(userId, message.value);
+  sendMessageAll(userId, message.value); // เรียกใช้ sendMessageAll ด้วย userId และข้อความจาก input
 };
 
 const formatTime = (time) => {
@@ -33,8 +33,8 @@ const listenForNewMessage = () => {
   });
 };
 
-const sendMessage = (userId, message) => {
-  fetch(`${import.meta.env.VITE_BASE_URL}api/conversations`, {
+const sendMessageAll = (userId, message) => {
+  fetch(`${import.meta.env.VITE_BASE_URL}api/sendmessage/all`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -43,37 +43,41 @@ const sendMessage = (userId, message) => {
     body: JSON.stringify({
       message: message,
       user_id: userId,
-      admin_id: "all",
     }),
   })
     .then((response) => response.json())
     .then((data) => {
-      if (data.iduser === userId) {
-        conversations.value.push(data);
-        localStorage.setItem(
-          "conversations",
-          JSON.stringify(conversations.value)
-        );
-      }
+      // ทำตามต้องการหลังจากส่งข้อความไปยังทุก admin สำเร็จ
+      console.log("Message sent successfully", data);
+      conversations.value.push(data); // เพิ่มข้อมูล conversation ที่ส่งไปยัง array
+      localStorage.setItem("conversations", JSON.stringify(conversations.value));
     })
     .catch((error) => {
       console.error("Error:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: "Failed to send message",
+      });
     });
 };
 
-onMounted(() => {
-  listenForNewMessage();
-  const savedConversations = localStorage.getItem("conversations");
-  if (savedConversations) {
-    conversations.value = JSON.parse(savedConversations);
-  }
-});
 
-const conversationsFiltered = computed(() => {
-  return conversations.value.filter(
-    (conversation) => conversation.iduser === userId
-  );
-});
+/* ส่งข้อความ */
+const handleSendMessage = () => {
+  if (message.value.trim() !== '') {
+    sendMessageAll(userId, message.value); // เรียกใช้ sendMessageAll เพื่อส่งข้อความ
+    message.value = ''; // ล้างข้อความใน input หลังจากส่ง
+  } else {
+    Swal.fire({
+      icon: 'error',
+      title: 'Oops...',
+      text: 'Message cannot be empty',
+    });
+  }
+};
+
+
 
 /* --------------------------------------------------------------------------------------------------------------------  */
 
@@ -320,8 +324,8 @@ const clearLocalStorage = () => {
                   <p class="mb-3 font-semibold ">เปิดใหม่แซ็ตเพื่อพูดคุยกับพยาบาล</p>
                      <!-- เปิดข้อความ ------------------------------------------------- -->
                     <div style="display: flex; align-items: center" class="mr-10">
-                         <input type="text" id="small-input" class="block w-1/2 p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500" v-model="message"/>
-                           <button @click="store" class=" bg-blue-500 text-white rounded-lg p-2 ml-2 ">
+                         <input type="text" id="small-input" class="block w-1/2 p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500"  v-model="message" @keyup.enter="handleSendMessage" placeholder="Type your message..."/>
+                           <button @click="handleSendMessage" class=" bg-blue-500 text-white rounded-lg p-2 ml-2 ">
                                ส่งข้อความ
                            </button>
                     </div>
