@@ -41,7 +41,7 @@ const MyInfo = async () => {
       const userId = localStorage.getItem('iduser');
       if (userId) {
          const response = await 
-         fetch(`http://cp23ssa2.sit.kmutt.ac.th:8000/api/patient/getProfile/${userId}`);
+         fetch(`${import.meta.env.VITE_BASE_URL}api/patient/getProfile/${userId}`);
          if (response.ok) {
             const data = await response.json();
             localStorage.setItem("name", data.fname);

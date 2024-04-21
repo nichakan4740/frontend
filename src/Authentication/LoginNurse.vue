@@ -15,7 +15,7 @@ const loginnurse = async () => {
   loading.value = true;
   try {
     const res = await 
-    fetch(`http://cp23ssa2.sit.kmutt.ac.th:8000/api/nurse/login`, {
+    fetch(`${import.meta.env.VITE_BASE_URL}api/nurse/login`, {
       method: "POST",
       headers: {
         "Content-type": "application/json",

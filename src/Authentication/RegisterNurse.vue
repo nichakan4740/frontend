@@ -11,7 +11,7 @@ const passwordcheck = ref("");
 
 const registernurse = async () => {
   const res = await 
-  fetch(`http://cp23ssa2.sit.kmutt.ac.th:8000/api/nurse/register`, {
+  fetch(`${import.meta.env.VITE_BASE_URL}api/nurse/register`, {
     method: "POST",
     headers: {
       "content-type": "application/json",
