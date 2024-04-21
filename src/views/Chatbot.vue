@@ -24,14 +24,21 @@ const formatTime = (time) => {
   return moment(time).format("YYYY-MM-DD HH:mm:ss");
 };
 
-const listenForNewMessage = () => {
-  const channel = pusher.subscribe("live-chat");
+
+/* แสดงข้อความใน chanel */
+const listenForNewMessage = (channelName) => {
+  const channel = pusher.subscribe(channelName);
   channel.bind("message", (data) => {
     if (data.iduser === userId) {
       conversations.value.push(data);
     }
   });
 };
+const adminId = 2; // เปลี่ยนเป็น ID ของ admin ที่ได้จาก backend
+const channelName = `private-chat.admin${adminId}.user${userId}`;
+onMounted(() => {
+  listenForNewMessage(channelName); 
+});
 
 const sendMessageAll = (userId, message) => {
   fetch(`${import.meta.env.VITE_BASE_URL}api/sendmessage/all`, {
@@ -324,11 +331,30 @@ const clearLocalStorage = () => {
                   <p class="mb-3 font-semibold ">เปิดใหม่แซ็ตเพื่อพูดคุยกับพยาบาล</p>
                      <!-- เปิดข้อความ ------------------------------------------------- -->
                     <div style="display: flex; align-items: center" class="mr-10">
-                         <input type="text" id="small-input" class="block w-1/2 p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500"  v-model="message" @keyup.enter="handleSendMessage" placeholder="Type your message..."/>
+                         <input type="text" id="small-input" class="block w-1/2 p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500"  v-model="message" @keyup.enter="handleSendMessage" placeholder="พิมพ์ข้อความของคุณ"/>
                            <button @click="handleSendMessage" class=" bg-blue-500 text-white rounded-lg p-2 ml-2 ">
                                ส่งข้อความ
                            </button>
                     </div>
+                  
+
+                  <!-- แสดงข้อความ -->
+                  <div>
+                  <div v-for="message in conversations" :key="message.id">
+                  <p>{{ message.message }}</p>
+                  <small>จาก: {{ message.user_id }}</small>
+                  </div>
+                  </div>
+                  <!-- --------------------------- -->
+
+
+
+
+
+
+
+
+
                 </div>        
     
       <!-- Right---------------------------------------------------------------------------------------------------------- -->
