@@ -6,39 +6,13 @@ import Swal from "sweetalert2";
 import Pusher from "pusher-js";
 import { ref, onMounted, computed , watch} from "vue";
 
-/* ส่งหา admin id ทุกคน */
 const conversations = ref([]);
-const message = ref("");
-const userId = localStorage.getItem("iduser");
-
-const pusher = new Pusher("c38b6cfa9a4f7e26bf76", {
-  cluster: "ap1",
-  encrypted: true,
-});
-
-const store = () => {
-  sendMessageAll(userId, message.value); // เรียกใช้ sendMessageAll ด้วย userId และข้อความจาก input
-};
+const message = ref('');
+const userId = localStorage.getItem('iduser');
 
 const formatTime = (time) => {
-  return moment(time).format("YYYY-MM-DD HH:mm:ss");
+  return moment(time).format('YYYY-MM-DD HH:mm:ss');
 };
-
-
-/* แสดงข้อความใน chanel */
-const listenForNewMessage = (channelName) => {
-  const channel = pusher.subscribe(channelName);
-  channel.bind("message", (data) => {
-    if (data.iduser === userId) {
-      conversations.value.push(data);
-    }
-  });
-};
-const adminId = 2; // เปลี่ยนเป็น ID ของ admin ที่ได้จาก backend
-const channelName = `private-chat.admin${adminId}.user${userId}`;
-onMounted(() => {
-  listenForNewMessage(channelName); 
-});
 
 const sendMessageAll = (userId, message) => {
   fetch(`${import.meta.env.VITE_BASE_URL}api/sendmessage/all`, {
@@ -68,21 +42,29 @@ const sendMessageAll = (userId, message) => {
       });
     });
 };
-
-
-/* ส่งข้อความ */
 const handleSendMessage = () => {
   if (message.value.trim() !== '') {
-    sendMessageAll(userId, message.value); // เรียกใช้ sendMessageAll เพื่อส่งข้อความ
-    message.value = ''; // ล้างข้อความใน input หลังจากส่ง
+    sendMessageAll(userId, message.value);
   } else {
     Swal.fire({
       icon: 'error',
       title: 'Oops...',
-      text: 'Message cannot be empty',
+      text: 'ข้อความต้องไม่ว่างเปล่า',
     });
   }
 };
+
+onMounted(() => {
+  const storedConversations = localStorage.getItem('conversations');
+  if (storedConversations) {
+    conversations.value = JSON.parse(storedConversations);
+  }
+});
+// สร้าง computed property สำหรับกรอง conversations ที่ตรงกับ userId
+const filteredConversations = computed(() => {
+  return conversations.value.filter(conversation => conversation.user_id === userId);
+});
+
 
 
 /* --------------------------------------------------------------------------------------------------------------------  */
@@ -331,24 +313,6 @@ const clearLocalStorage = () => {
                                ส่งข้อความ
                            </button>
                     </div>
-                  
-
-                  <!-- แสดงข้อความ -->
-                  <div>
-                  <div v-for="message in conversations" :key="message.id">
-                  <p>{{ message.message }}</p>
-                  <small>จาก: {{ message.user_id }}</small>
-                  </div>
-                  </div>
-                  <!-- --------------------------- -->
-
-
-
-                
-
-
-
-
                 </div>        
     
       <!-- Right---------------------------------------------------------------------------------------------------------- -->
@@ -361,9 +325,7 @@ const clearLocalStorage = () => {
                 <a class="hover:underline" href="#">พยาบาล</a>
               </div>
               <div class="text-xs text-gray-600">Online</div>
-            </div>
-
-                 
+            </div>     
                   <button @click="confirmClearLocalStorage" class=" mx-10 px-2 py-2 bg-blue-500 text-white rounded-md">
                    ปิดแช็ต
                   </button>
@@ -372,18 +334,19 @@ const clearLocalStorage = () => {
 
         <!-- -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- -->
           <!-- แสดงที่ admin user ตอบกลับไปมา -->
-          <div class="chat-container p-4 border-t border-b border-gray-200 border-gray-300 max-h-96 overflow-y-auto" >
+          <div class="chat-container p-4 border-t border-b border-gray-200 border-gray-300 max-h-96 overflow-y-auto" v-for="conversation in filteredConversations" :key="conversation.user_id">
             <div class="message flex items-end justify-end mb-4" >
             
             <div class="flex flex-col">
-              <div class="text-xs text-gray-500">  </div>
+              <div class="text-xs text-gray-500">  {{ formatTime( conversation.createdAt) }}</div>
               
                 <div class="ml bg-blue-500 text-white rounded-lg p-2">
-                  <span class="text-sm"></span>
+                  <span class="text-sm">{{ conversation.message }}</span>
               </div>
 
             </div>
           </div>
+
 <!-- --------------------------------------------------------------------------------------------------------------------------------------------- -->
 
             <template >

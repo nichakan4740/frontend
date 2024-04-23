@@ -1,267 +1,46 @@
 <script setup>
-import { ref, onMounted,computed } from "vue";
+import { ref, onMounted } from "vue";
 import LayoutNurse from "../layouts/LayoutNurse.vue";
 import moment from "moment";
 import Swal from "sweetalert2";
 import Pusher from "pusher-js";
 
-/* ------------------------------------------------------------------------ */
-/* เรียกแสดงข้อความที่ user ส่งมาครั้งแรก */
-const isLoadingfromuser = ref(true);
+
+/* แสดงข้อความที่ user ส่งมาให้ตอนต้น */
 const messages = ref([]);
-const pusheruser = new Pusher("c38b6cfa9a4f7e26bf76", {
-  cluster: "ap1",
-  encrypted: true,
-});
+const adminId = localStorage.getItem('idadmin');
+const channelName = `chat.admin${adminId}`;
 
-const channel = pusheruser.subscribe("live-chat");
-channel.bind("message", (data) => {
-  console.log("ข้อมูลที่ได้รับมา:", data);
-
-  if ("text" in data) {
-    const message = {
-      user: {
-        fname: data.fname,
-      },
-      createdAt: new Date(),
-      message: data.text,
-      iduser: data.id,
-    };
-
-    messages.value = [...messages.value, message];
-
-    // บันทึกข้อมูลลงใน local storage
-    localStorage.setItem("chatMessages", JSON.stringify(messages.value));
-
-  } else {
-    console.error('ข้อมูลที่ได้รับมาไม่มี key "text":', data);
-  }
-});
 onMounted(() => {
-  isLoadingfromuser.value = false;
+  const pusher = new Pusher('c38b6cfa9a4f7e26bf76', {
+    cluster: 'ap1',
+    encrypted: true
+  });
 
-  // ตรวจสอบว่ามีข้อมูลใน local storage หรือไม่
-  const storedMessages = localStorage.getItem("chatMessages");
+  const channel = pusher.subscribe(channelName);
+
+  // เพิ่มการโหลดข้อมูลเมื่อ component ถูกโหลด
+  const storedMessages = localStorage.getItem('messages');
   if (storedMessages) {
     messages.value = JSON.parse(storedMessages);
   }
-});
-const formatTime = (time) => {
-  return moment(time).format("YYYY-MM-DD HH:mm:ss");
-};
-/* -------------------------------------------------------------------------------------------------------------- */
 
-/* ทำ pop up */
-const isOpen = ref(false);
-
-const deleteChat = () => {
-  Swal.fire({
-    title: 'คุณต้องการปิดแช็ต',
-    text: "ถ้าคุณปิดแช็ตบทสนทนาของคุณกับพยาบาลจะหายไป!",
-    icon: 'warning',
-    showCancelButton: true,
-    confirmButtonColor: '#3085d6',
-    cancelButtonColor: '#d33',
-    confirmButtonText: 'ใช่',
-    cancelButtonText: 'ยกเลิก' 
-  }).then((result) => {
-    if (result.isConfirmed) { 
-      // ลบข้อมูลใน localStorage โดยใช้ iduser ของ selectedMessage
-      const selectedUserId = selectedMessage.value.iduser;
-      const storedMessages = JSON.parse(localStorage.getItem('chatMessages'));
-      const updatedMessages = storedMessages.filter(message => message.iduser !== selectedUserId);
-      localStorage.setItem('chatMessages', JSON.stringify(updatedMessages));
-      reloadPage();
-    }
-  });
-};
-
-const closeChat = () => {
-  Swal.fire({
-    title: 'คุณต้องการปิดแช็ต',
-    icon: 'warning',
-    showCancelButton: true,
-    confirmButtonColor: '#3085d6',
-    cancelButtonColor: '#d33',
-    confirmButtonText: 'ใช่',
-    cancelButtonText: 'ยกเลิก' 
-  }).then((result) => {
-    if (result.isConfirmed) { 
-      reloadPage();
-    }
-  });
-};
-
-const reloadPage = () => {
-  // โหลดหน้าเว็บใหม่
-  window.location.reload();
-};
-
-/* เลือกข้อมูล */
-const selectedMessage = ref(null); // เพิ่มตัวแปร selectedMessage
-
-/* const selectMessage = (message) => {
-  selectedMessage.value = message;
-  isOpen.value = true;
-}; */
-const selectMessage = (message) => {
-  // เพิ่มเงื่อนไขเช็คว่า isOpen.value เป็น false หรือไม่
-  if (!isOpen.value) {
-    selectedMessage.value = message;
-    isOpen.value = true;
-  }
-};
-
-
-
-
-
-/* แสดงการตอบกลับข้อความของ พยาบาลและผู้ป่วย ------------------------------------------------------------------ */
-
-const messageFromUser = ref([]);
-const mergedMessages = ref([]);
-
-const pusher = new Pusher("c38b6cfa9a4f7e26bf76", {
-  cluster: "ap1",
-  encrypted: true,
-});
-
-const channelUser = pusher.subscribe("replyAdmin");
-channelUser.bind("message", (data) => {
-  if ("text" in data && "admin_ids" in data) {
-    const message = {
-      user: {
-        type: "user",
-        name: data.fname,
-      },
-      createdAt: new Date(),
-      text: data.text,
-      iduser: data.id,
-      idadmin: data.admin_ids[0],
+  channel.bind('message', (data) => {
+    // รับข้อมูลที่ส่งมาจาก Pusher
+    const receivedMessage = {
+      message: data.message,
+      admin_id: data.admin_id,
+      user_id: data.user_id
     };
-    mergedMessages.value.push(message);
-   /*  localStorage.setItem(
-      "chatMessagesfromuser",
-      JSON.stringify(mergedMessages.value)
-    ); */
-    localStorage.setItem("idadmin", data.admin_ids[0]);
-  }
-});
+    // เพิ่มข้อมูลลงใน messages
+    messages.value.push(receivedMessage);
 
-const channelSendofAdmin = pusher.subscribe("replyUser");
-channelSendofAdmin.bind("message", (data) => {
-  if ("text" in data && "admin_ids" in data) {
-    const message = {
-      user: {
-        type: "admin",
-        name: "พยาบาล",
-        nameUser: data.fname,
-      },
-      createdAt: new Date(),
-      text: data.text,
-      iduser: data.id,
-      idadmin: data.admin_ids[0],
-    };
-    mergedMessages.value.push(message);
-  /*   localStorage.setItem(
-      "chatMessagesfromuser",
-      JSON.stringify(mergedMessages.value)
-    ); */
-    localStorage.setItem("idadmin", data.admin_ids[0]);
-  }
-});
-
-// สร้าง computed property สำหรับกรองข้อความที่มี id user ตรงกับข้อมูลที่เก็บไว้ใน selectedMessage
-const filteredMessages = computed(() => {
-  if (!selectedMessage.value) return []; // ถ้าไม่มีข้อความที่ถูกเลือก ให้ return ข้อความว่าง
-  return mergedMessages.value.filter(message => message.iduser === selectedMessage.value.iduser);
-});
-
-
-onMounted(() => {
- /*  const storedMessagesUser = localStorage.getItem("chatMessagesfromuser");
-  if (storedMessagesUser) {
-    mergedMessages.value = JSON.parse(storedMessagesUser);
-  } */
-});
-
-/*------------- ส่งข้อความตอบกลับไปหา user ---------------------------------------------- */
-const conversationreply = ref([]);
-const messagereply = ref("");
-const adminId = localStorage.getItem("idadmin"); // อ่าน adminID จาก local storage
-
-const pusherreply = new Pusher("c38b6cfa9a4f7e26bf76", {
-  cluster: "ap1",
-  encrypted: true,
-});
-
-const replyData = ref(null); // เพิ่มตัวแปร replyData เพื่อเก็บข้อมูลที่ได้รับจากการส่งข้อความตอบกลับ
-
-const replyUser = () => {
-  sendReply(adminId, messagereply.value);
-  messagereply.value = "";
-};
-
-const listenForNewMessagereply = () => {
-  const channel = pusherreply.subscribe("replyUser");
-  channel.bind("message", (data) => {
-    if (data.id === adminId) {
-      conversationreply.value.push(data);
-    }
+    // บันทึก messages ลงใน Local Storage
+    localStorage.setItem('messages', JSON.stringify(messages.value));
   });
-};
-
-const sendReply = (adminId, messagereply) => {
-  fetch(`${import.meta.env.VITE_BASE_URL}api/reply/user`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-    },
-    body: JSON.stringify({
-      message: messagereply,
-      admin_id: adminId,
-      user_id: messages.value[0].iduser, // ใช้ค่า iduser จากข้อมูลแรกใน messages.value
-    }),
-  })
-    .then((response) => response.json())
-    .then((data) => {
-      console.log("Response from sendReply:", data);
-      replyData.value = data;
-      if (data.admin_id === adminId) {
-        conversationreply.value.push(data);
-        localStorage.setItem(
-          "conversationreply",
-          JSON.stringify(conversationreply.value)
-        );
-
-   /*      // เพิ่มบันทึกค่า replyData ลงใน localStorage เมื่อได้รับข้อมูลตอบกลับใหม่
-        localStorage.setItem("replyData", JSON.stringify(replyData.value)); */
-      }
-    })
-
-    .catch((error) => {
-      console.error("Error:", error);
-    });
-};
-onMounted(() => {
-  listenForNewMessagereply();
-  const savedConversations = localStorage.getItem("conversationreply");
-  if (savedConversations) {
-    conversationreply.value = JSON.parse(savedConversations);
-  }
-
-  // ตรวจสอบว่ามี replyData ใน local storage หรือไม่ และกำหนดค่าให้กับ replyData ในกรณีที่มี
-  const savedReplyData = localStorage.getItem("replyData");
-  if (savedReplyData) {
-    replyData.value = JSON.parse(savedReplyData);
-  }
 });
 
-/* -------------------------------------------------------------------------------------------------------------------------- */
-
-
-
+/* ------------------------------------------------------------------------- */
 
 
 
@@ -269,6 +48,38 @@ onMounted(() => {
 
 <template>
   <LayoutNurse class="bg-gradient-to-b from-blue-100">
+   
+
+<!-- ----------------------------------------- -->
+<div>
+    <h2>Messages:</h2>
+    <ul>
+      <li v-for="(message, index) in messages" :key="index">
+        {{ message.user_id }} // {{message.message}}
+      </li>
+    </ul>
+  </div>
+ 
+<!-- ------------------------------------------------- -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     <!-- content -->
     <div class="container mx-auto">
       <div
@@ -299,19 +110,19 @@ onMounted(() => {
 
 <!-- ตอบกลับข้อความ ฝั่งซ้าย -->
     <div>
-    <div v-for="message in messages" :key="message.id" class="message-box box-content bg-white shadow-lg shadow-gray-300 mr-6 mb-4 p-4  rounded-lg" @click="selectMessage(message)">
+    <div  class="message-box box-content bg-white shadow-lg shadow-gray-300 mr-6 mb-4 p-4  rounded-lg">
       <div class="py-2 px-3 bg-grey-lighter flex flex-row items-center">
          <div>
         <img class="rounded-full w-6 h-6" src="https://cdn-icons-png.flaticon.com/512/9131/9131529.png" />
       </div>
 
-      <div class="ml-4 text-sm font-semibold"> {{ message.user.fname }} </div>
+      <div class="ml-4 text-sm font-semibold">  </div>
 
       </div>
       
-      <div class="text-xs text-gray-500 ml-4">  {{ formatTime(message.createdAt) }}  </div>
+      <div class="text-xs text-gray-500 ml-4">  </div>
 
-      <div  class="ml-4 mt-2 bg-blue-500 text-white rounded-lg p-2 text-sm">{{ message.message }}</div>
+      <div  class="ml-4 mt-2 bg-blue-500 text-white rounded-lg p-2 text-sm"></div>
     </div>
   </div>
 </div>
@@ -331,11 +142,11 @@ onMounted(() => {
                 <div>
                    <img class="rounded-full w-6 h-6" src="https://cdn-icons-png.flaticon.com/512/9131/9131529.png" />
                 </div>
-               <div class="ml-2 text-sm font-semibold">{{ selectedMessage.user.fname }}</div>
+               <div class="ml-2 text-sm font-semibold"></div>
                </div>
                    <div>
-                      <button @click="deleteChat" class="px-2 py-2 bg-blue-500 text-white rounded-md">ลบแช็ต</button>
-                      <button @click="closeChat" class="px-2 py-2 bg-blue-500 text-white rounded-md ml-2">ปิดแช็ต</button>
+                      <button  class="px-2 py-2 bg-blue-500 text-white rounded-md">ลบแช็ต</button>
+                      <button  class="px-2 py-2 bg-blue-500 text-white rounded-md ml-2">ปิดแช็ต</button>
                     </div>
                </div>
 
@@ -346,16 +157,16 @@ onMounted(() => {
               <div class="py-2 px-3">
                 <div class="chat-container p-4 rounded-md border-gray-300">
                       <!-- เริ่มต้นแชท -->
-                     <div class="text-xs text-gray-500">{{ formatTime(selectedMessage.createdAt ) }}</div>
+                     <div class="text-xs text-gray-500"></div>
   
                        <div class="flex items-center">
                          
                          <div class="bg-gray-100 rounded-lg p-2">
-                            <span class="text-sm font-semibold"> {{selectedMessage.user.fname}} </span>
+                            <span class="text-sm font-semibold"> </span>
                           </div>
 
                           <div  class="ml-2 bg-blue-500 text-white rounded-lg p-2" >
-                            <span class="text-sm">{{ selectedMessage.message }}</span>
+                            <span class="text-sm"></span>
                           </div>
 
                         </div>
@@ -363,37 +174,37 @@ onMounted(() => {
                     <!-- ------------------------------------------------------------------ -->
       
 
-                  <template  v-for="(message, index) in  mergedMessages " :key="index" >
+                  <template >
                     
-                    <div v-if="message.user.type === 'admin'" class="message flex items-center justify-end mb-4" >
+                    <div  class="message flex items-center justify-end mb-4" >
                       <div class="flex flex-col">
-                        <div class="text-xs text-gray-500"> {{ formatTime(message.createdAt) }} </div>
+                        <div class="text-xs text-gray-500">  </div>
                         
                         <div class="flex items-center justify-end">
                           <div class="mr-2 bg-blue-500 text-white rounded-lg p-2" >
-                            <span class="text-sm">{{ message.text }}</span>
+                            <span class="text-sm"></span>
                           </div>
 
                           <div class="bg-gray-100 rounded-lg p-2">
-                            <span class="text-sm font-semibold">{{ message.user.name}} {{message.idadmin}}</span>
+                            <span class="text-sm font-semibold"></span>
                           </div>
 
                         </div>
                       </div>
                     </div>
                     
-                     <div v-else class="message flex items-center justify-start mb-4" >
+                     <div class="message flex items-center justify-start mb-4" >
                       <div class="flex flex-col">
-                        <div class="text-xs text-gray-500">  {{ formatTime(message.createdAt) }} </div>
+                        <div class="text-xs text-gray-500"> </div>
                         
                         <div class="flex items-center">
                          
                          <div class="bg-gray-100 rounded-lg p-2">
-                            <span class="text-sm font-semibold">{{ message.user.name}} {{message.iduser}}</span>
+                            <span class="text-sm font-semibold"></span>
                           </div>
 
                           <div  class="ml-2 bg-blue-500 text-white rounded-lg p-2" >
-                            <span class="text-sm">{{ message.text }}</span>
+                            <span class="text-sm"></span>
                           </div>
                         </div>       
                       </div>
