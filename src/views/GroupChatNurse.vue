@@ -1,6 +1,6 @@
 
 <script setup>
-import { ref, onMounted, computed } from "vue";
+import { ref, onMounted, computed, watch  } from "vue";
 import LayoutNurse from "../layouts/LayoutNurse.vue";
 import moment from "moment";
 import Pusher from "pusher-js";
@@ -56,32 +56,31 @@ const filteredMessages = computed(() => {
 onMounted(() => {
 });
 
+
+
 /* ------------------------------------------------------------------------------------------------------------------------------------------------------------------- */
 /* แสดงข้อความทั้งหมดเมื่อคลิกเข้าไป */
-const filteredMessagesAll = computed(() => {
-  return messages.value.filter(message => message.admin_id === parseInt(adminId));
-});
-
-
-
+const filteredMessagesAll = ref([]);
 const showModal = ref(false);
 
 const openModal = (message) => {
-  // Call the function to store the clicked data
-  storeClickedMessage(message);
-  showModal.value = true; // Show the Modal
+  storeClickedMessage(message); // เรียกใช้ฟังก์ชันเพื่อบันทึกข้อความใหม่
+  lastMessage.value = message; // อัพเดทค่า lastMessage ใหม่
+  showModal.value = true; // แสดง Modal
+
+  filteredMessagesAll.value = messages.value.filter(msg => {  // อัพเดทค่าใน filteredMessagesAll โดยอ้างอิง lastMessage ที่มีการเปลี่ยนแปลง
+    return msg.admin_id === parseInt(adminId) && msg.user_id === message.user_id;
+  });
 };
 
-
-// Function to store the clicked message data
+// เมื่อต้องการบันทึกข้อความ
 const storeClickedMessage = (message) => {
-  // Do something with the received data, such as saving it to a database or server
-  console.log("Clicked message:", message);
-  // Add your logic here to store the message data as needed
+  // บันทึกข้อความล่าสุดไว้ใน localStorage
+  localStorage.setItem('NewMessageAll', JSON.stringify(message));
 };
 
-
-
+// เรียกข้อความล่าสุดที่บันทึกไว้ใน localStorage
+const lastMessage = ref(JSON.parse(localStorage.getItem('NewMessageAll')));
 /* ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- */
 
 
@@ -119,27 +118,40 @@ const storeClickedMessage = (message) => {
 <!-- ---------------------------------------------------------------------------------------------- -->
 
 
-<!--  แสดงข้อความทั้งหมด  -->
+<!-- แสดงข้อมูลที่บันทึกไว้ใน localStorage -->
 <div>
-  <Modal v-if="showModal" @closeModal="showModal = false">
+  <div v-if="showModal" @closeModal="showModal = false">
     <div class="bg-white rounded-lg p-8 shadow-md relative">
       <button @click="showModal = false" class="absolute top-0 right-0 m-4 text-gray-500 hover:text-gray-700">ปิด</button>
     
-    
-<!--      <div v-for="(message, index) in filteredMessagesAll" :key="index">
-    <div class="max-w-md rounded-lg p-2">
-      <div class="inline-block">
-        <div class="p-3 rounded-lg shadow-md inline-block bg-white">
-          <p class="text-sm text-gray-800">{{ message.message }}</p>
-          <p class="text-sm text-gray-600">admin_id: {{ message.admin_id }}</p>
-          <p class="text-sm text-gray-600">user_id: {{ message.user_id }}</p>
-          <p class="text-sm text-gray-600">CreatedAt: {{ message.createdAt }}</p>     
+      <div class="max-w-md rounded-lg p-2">
+        <div class="inline-block">
+          <div class="p-3 rounded-lg shadow-md inline-block bg-white">
+            <p class="text-sm text-gray-800">{{ lastMessage.message }}</p>
+            <p class="text-sm text-gray-600">admin_id: {{ lastMessage.admin_id }}</p>
+            <p class="text-sm text-gray-600">user_id: {{ lastMessage.user_id }}</p>
+            <p class="text-sm text-gray-600">CreatedAt: {{ lastMessage.createdAt }}</p>     
+          </div>
         </div>
       </div>
+
+      <!-- แสดงข้อความที่ได้กรองแล้ว -->
+          <!-- แสดงข้อความที่ได้กรองแล้ว -->
+      <div v-for="(message, index) in filteredMessagesAll" :key="index">
+         <div class="max-w-md rounded-lg p-2">
+            <div class="inline-block">
+                <div class="p-3 rounded-lg shadow-md inline-block bg-red-50">
+                    <p class="text-sm text-gray-800">{{ message.message }}</p>
+                    <p class="text-sm text-gray-600">admin_id: {{ message.admin_id }}</p>
+                    <p class="text-sm text-gray-600">user_id: {{ message.user_id }}</p>
+                    <p class="text-sm text-gray-600">CreatedAt: {{ message.createdAt }}</p>     
+                </div>
+            </div>
+          </div>
+      </div>
+      <!-- --------------------------------------------------- -->
     </div>
-  </div> -->
-    </div>
-  </Modal>
+  </div>
 </div>
 
 
