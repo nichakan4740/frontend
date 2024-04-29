@@ -35,9 +35,6 @@ if (localStorage.getItem('messagesAllUser')) {
   messages.value = JSON.parse(localStorage.getItem('messagesAllUser'));
 }
 
-/* const filteredMessages = computed(() => {
-  return messages.value.filter(message => message.admin_id === parseInt(adminId));
-}); */
 const filteredMessages = computed(() => {
   // กรองข้อความที่มี admin_id ตรงกับ adminId ที่กำหนด
   const adminMessages = messages.value.filter(message => message.admin_id === parseInt(adminId));
@@ -50,29 +47,45 @@ const filteredMessages = computed(() => {
       latestMessagesByUser[message.user_id] = message;
     }
   });
-
   // แปลงออบเจ็กต์เป็น array ของข้อความล่าสุดของแต่ละ user_id
   const latestMessages = Object.values(latestMessagesByUser);
 
   // เรียงลำดับข้อความตามเวลา createdAt ในลำดับจากมากไปน้อย
   return latestMessages.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 });
-
-
 onMounted(() => {
 });
 
+/* ------------------------------------------------------------------------------------------------------------------------------------------------------------------- */
+/* แสดงข้อความทั้งหมดเมื่อคลิกเข้าไป */
+const filteredMessagesAll = computed(() => {
+  return messages.value.filter(message => message.admin_id === parseInt(adminId));
+});
+
+
+
+const showModal = ref(false);
+
+const openModal = (message) => {
+  // Call the function to store the clicked data
+  storeClickedMessage(message);
+  showModal.value = true; // Show the Modal
+};
+
+
+// Function to store the clicked message data
+const storeClickedMessage = (message) => {
+  // Do something with the received data, such as saving it to a database or server
+  console.log("Clicked message:", message);
+  // Add your logic here to store the message data as needed
+};
+
+
+
+/* ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- */
+
+
 </script>
-
-
-
-
-
-
-
-
-
-
 
 <template>
   <LayoutNurse class="bg-gradient-to-b from-blue-100">
@@ -87,21 +100,48 @@ onMounted(() => {
 
       <!-- ----------------------------------------- -->
 
-<div class="container mx-auto">
-  <div class="flex flex-col space-y-2 items-start mt-10">
-    <div v-for="(message, index) in filteredMessages" :key="index" :class="{ 'self-start': message.user_id === currentUser, 'self-end': message.admin_id === currentAdmin }" class="max-w-md rounded-lg p-2">
-      <div :class="{ 'bg-blue-500 text-white': message.user_id === currentUser, 'bg-gray-300': message.admin_id === currentAdmin }" class="p-3 rounded-lg shadow-md inline-block">
-        <p class="text-sm">{{ message.message }}</p>
-        <p class="text-sm">admin_id :{{ message.admin_id }}</p>
-        <p class="text-sm">user_id :{{ message.user_id}}</p>
-        <p class="text-sm">CreatedAt: {{ message.createdAt }}</p>
+
+<!-- ------------------------------------------------- -->
+
+ <button v-for="(message, index) in filteredMessages" :key="index" @click="openModal(message)">
+  <div class="max-w-md rounded-lg p-2">
+    <div class="inline-block">
+      <div class="p-3 rounded-lg shadow-md inline-block bg-red-50">
+        <p class="text-sm text-gray-800">{{ message.message }}</p>
+        <p class="text-sm text-gray-600">admin_id: {{ message.admin_id }}</p>
+        <p class="text-sm text-gray-600">user_id: {{ message.user_id }}</p>
+        <p class="text-sm text-gray-600">CreatedAt: {{ message.createdAt }}</p>     
       </div>
     </div>
   </div>
+</button>
+
+<!-- ---------------------------------------------------------------------------------------------- -->
+
+
+<!--  แสดงข้อความทั้งหมด  -->
+<div>
+  <Modal v-if="showModal" @closeModal="showModal = false">
+    <div class="bg-white rounded-lg p-8 shadow-md relative">
+      <button @click="showModal = false" class="absolute top-0 right-0 m-4 text-gray-500 hover:text-gray-700">ปิด</button>
+    
+    
+<!--      <div v-for="(message, index) in filteredMessagesAll" :key="index">
+    <div class="max-w-md rounded-lg p-2">
+      <div class="inline-block">
+        <div class="p-3 rounded-lg shadow-md inline-block bg-white">
+          <p class="text-sm text-gray-800">{{ message.message }}</p>
+          <p class="text-sm text-gray-600">admin_id: {{ message.admin_id }}</p>
+          <p class="text-sm text-gray-600">user_id: {{ message.user_id }}</p>
+          <p class="text-sm text-gray-600">CreatedAt: {{ message.createdAt }}</p>     
+        </div>
+      </div>
+    </div>
+  </div> -->
+    </div>
+  </Modal>
 </div>
 
-
-<!-- ------------------------------------------------- -->
 
 
     
