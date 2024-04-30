@@ -4,6 +4,7 @@ import { ref, onMounted, computed, watch  } from "vue";
 import LayoutNurse from "../layouts/LayoutNurse.vue";
 import moment from "moment";
 import Pusher from "pusher-js";
+import Swal from "sweetalert2";
 
 /* เวลา */
 const formatTime = (time) => {
@@ -56,8 +57,6 @@ const filteredMessages = computed(() => {
 onMounted(() => {
 });
 
-
-
 /* ------------------------------------------------------------------------------------------------------------------------------------------------------------------- */
 /* แสดงข้อความทั้งหมดเมื่อคลิกเข้าไป */
 const filteredMessagesAll = ref([]);
@@ -82,6 +81,57 @@ const storeClickedMessage = (message) => {
 // เรียกข้อความล่าสุดที่บันทึกไว้ใน localStorage
 const lastMessage = ref(JSON.parse(localStorage.getItem('NewMessageAll')));
 /* ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- */
+
+
+/* ส่งข้อความตอบกลับ */
+
+const message = ref(''); // เปลี่ยนชื่อตัวแปรเป็น messageToUser และใช้ ref ในการประกาศ
+const userId = 1; // ประกาศ userId อย่างถูกต้อง
+
+const sendMessageToUser = (userId, message) => { // แก้ชื่อตัวแปร message ในพารามิเตอร์
+  fetch(`${import.meta.env.VITE_BASE_URL}api/sendmessage/ToUser/${userId}`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    },
+    body: JSON.stringify({
+      message: message, // แก้ชื่อตัวแปร message ใน object
+      admin_id: adminId, // ต้องประกาศตัวแปร adminId ด้วย
+    }),
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      console.log("Message sent successfully", data);
+      // ตรงนี้ควรมีการดำเนินการเพิ่มข้อมูล conversation ใน state ของแอพ
+    })
+    .catch((error) => {
+      console.error("Error:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: "Failed to send message",
+      });
+    });
+};
+
+const handleSendMessage = () => {
+  if (message.value.trim() !== '') { // ใช้ messageToUser แทน messageTouser
+    sendMessageToUser(userId, message.value); // ใช้ messageToUser แทน messageTouser
+  } else {
+    Swal.fire({
+      icon: 'error',
+      title: 'Oops...',
+      text: 'Message must not be empty',
+    });
+  }
+};
+
+onMounted(() => {
+  // โค้ดที่คุณต้องการให้ทำงานเมื่อ component ถูก mounted
+});
+
+
 
 
 </script>
@@ -156,7 +206,12 @@ const lastMessage = ref(JSON.parse(localStorage.getItem('NewMessageAll')));
 
 
 
-    
+  <!-- ------------------------------------------------------------------------------------ -->
+  <!-- ส่งข้อความตอบกลับ -->
+    <div>
+    <input v-model="message" type="text" placeholder="Type your message">
+    <button @click="handleSendMessage">Send Message</button>
+  </div>
 
       <!-- --------------------------------------------- -->
       <div class="mb-8 ml-2 mr-4 mt-10">

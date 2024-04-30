@@ -65,155 +65,54 @@ const filteredConversations = computed(() => {
   return conversations.value.filter(conversation => conversation.user_id === userId);
 });
 
-
-
 /* --------------------------------------------------------------------------------------------------------------------  */
+/* แสดงข้อความที่ตอบกลับมา */
 
-
-/* การตอบกลับข้อความ------------------------------------------------------------------ */
-/* 
-const messageFromAdmin = ref([]);
-const mergedMessagesAdminUser = ref([]);
-const pusherAdmin = new Pusher("c38b6cfa9a4f7e26bf76", {
-  cluster: "ap1",
+const messagefromAdmin = ref([]);
+const channelName = 'Touserid' + userId;
+const pusherUser = new Pusher('c38b6cfa9a4f7e26bf76', {
+  cluster: 'ap1',
   encrypted: true,
 });
 
-const channelAdmin = pusherAdmin.subscribe("replyAdmin");
-channelAdmin.bind("message", (data) => {
-  if ("text" in data && "admin_ids" in data) {
-    const message = {
-      user: {
-        type: "user",
-        name: data.fname,
-      },
-      createdAt: new Date(),
-      text: data.text,
-      iduser: data.id,
-      idadmin: data.admin_ids[0],
-    };
-    mergedMessagesAdminUser.value.push(message);
-    localStorage.setItem(
-      "chatMessagesfromadmin",
-      JSON.stringify(mergedMessagesAdminUser.value)
-    );
-    localStorage.setItem("idadmin", data.admin_ids[0]);
-  }
-});
-const channelSendofUser = pusher.subscribe("replyUser");
-channelSendofUser.bind("message", (data) => {
-  if ("text" in data && "admin_ids" in data) {
-    const message = {
-      user: {
-        type: "admin",
-        name: "พยาบาล",
-        nameUser: data.fname,
-      },
-      createdAt: new Date(),
-      text: data.text,
-      iduser: data.id,
-      idadmin: data.admin_ids[0],
-    };
-    mergedMessagesAdminUser.value.push(message);
-    localStorage.setItem(
-      "chatMessagesfromadmin",
-      JSON.stringify(mergedMessagesAdminUser.value)
-    );
-    localStorage.setItem("idadmin", data.admin_ids[0]);
-  }
-});
-
-const filterMessagesByUserId = (messages, userId) => {
-  return messages.filter((message) => message.iduser === userId);
-};
-
-// ใช้ filterMessagesByUserId เพื่อกรองข้อมูลก่อนนำไปแสดงผลในตัวแปร mergedMessagesAdminUser.value
-onMounted(() => {
-  const storedMessagesAdmin = localStorage.getItem("chatMessagesfromadmin");
-  const userId = parseInt(localStorage.getItem("iduser")); // แปลงเป็นตัวเลข
-
-  if (storedMessagesAdmin && !isNaN(userId)) {
-    const parsedMessages = JSON.parse(storedMessagesAdmin);
-    mergedMessagesAdminUser.value = filterMessagesByUserId(
-      parsedMessages,
-      userId
-    );
-  }
-});
-onMounted(() => {
-  const storedMessagesAdmin = localStorage.getItem("chatMessagesfromuser");
-  if (storedMessagesAdmin) {
-     mergedMessagesAdminUser.value = JSON.parse(storedMessagesAdmin);
-  }
-});
-
- */
-
-/* ------------------------------------------------------------------------------------------------------------- */
-/* ตอบกลับแบบเจาะจง id admin   */
-/* const conversationreplyadmin = ref([]);
-
-const replyadmin = ref("");
-
-const pusherreplyadmin = new Pusher("c38b6cfa9a4f7e26bf76", {
-  cluster: "ap1",
-  encrypted: true,
-});
-
-const replyDataAdmin = ref(null); // เพิ่มตัวแปร replyData เพื่อเก็บข้อมูลที่ได้รับจากการส่งข้อความตอบกลับ
-
-const replyAdmin = () => {
-  sendReplyAdmin(userId, replyadmin.value);
-  replyadmin.value = "";
-};
-
-const listenForNewMessagereplyadmin = () => {
-  const channel = pusherreplyadmin.subscribe("reply");
-  channel.bind("message", (data) => {
-    if (data.id === userId) {
-      conversationreplyadmin.value.push(data);
-    }
+const channel = pusherUser.subscribe('Touserid');
+// Store messages in localStorage when a new message is received
+channel.bind('message', (data) => {
+  console.log(data); // Check the structure of data
+  messagefromAdmin.value.push({
+    message: data.message,
+    createdAt: formatTime(data.createdAt), // Ensure formatTime function is defined and working correctly
+    admin_id: data.admin_id,
+    user_id: data.user_id,
   });
-};
-
-const sendReplyAdmin = (userId, replyadmin) => {
-  // ดึงค่า idadmin จาก localStorage
-  const idadmin = localStorage.getItem("idadmin");
-
-  fetch(`${import.meta.env.VITE_BASE_URL}api/reply/admin`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-    },
-    body: JSON.stringify({
-      message: replyadmin,
-      admin_id: idadmin,
-      user_id: userId,
-    }),
-  })
-    .then((response) => response.json())
-    .then((data) => {
-      console.log("Response from sendReply:", data);
-      replyDataAdmin.value = data;
-      if (data.user_id === userId) {
-        conversationreplyadmin.value.push(data);
-        localStorage.setItem(
-          "conversationreplyadmin",
-          JSON.stringify(conversationreplyadmin.value)
-        );
-
-      }
-    })
-    .catch((error) => {
-      console.error("Error:", error);
-    });
-};
-
-onMounted(() => {
-  listenForNewMessagereplyadmin();
 });
- */
+onMounted(() => {
+  /*  */ 
+  // Add any post-mount code here
+});
+
+/* -------------------------------------------------------------------------- */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 /* เลือก Teb -------------------------------------------------------- */
 const activeTab = ref(1);
 
@@ -248,6 +147,16 @@ const clearLocalStorage = () => {
 
 
       <!-- Tabs ------------------------------------------------------------------------------------------------->
+      
+  <div>
+    <div v-for="(message, index) in messagefromAdmin" :key="index">
+      <p>{{ message.message }}</p>
+      <p>Created At: {{ message.createdAt }}</p>
+      <p>Admin ID: {{ message.admin_id }}</p>
+      <p>User ID: {{ message.user_id }}</p>
+    </div>
+  </div>
+<!-- ---------------------- -->
       <div class="box-content p-3 ml-5 mr-5 mt-10 bg-gradient-to-b from-blue-900 to-blue-800 shadow-lg shadow-slate-500/50 rounded-lg">
         <div class="flex justify-center items-center ">
         <button
@@ -346,6 +255,8 @@ const clearLocalStorage = () => {
 
             </div>
           </div>
+<!-- ------------------------------------------------------------------------------------- -->
+
 
 <!-- --------------------------------------------------------------------------------------------------------------------------------------------- -->
 
@@ -419,6 +330,8 @@ const clearLocalStorage = () => {
 
 
 <!-- --------------------------------------------------------------------------------------------------------- -->
+
+  <!-- -------------------------------------------------------------- -->
     <div class="mb-8 ml-2 mr-4">
       <p class="text">**ขออภัย กำลังอยู่ในช่วงพัฒนา**</p>
     </div>

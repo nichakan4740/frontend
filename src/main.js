@@ -14,7 +14,7 @@ import 'sweetalert2';
 const app = createApp(App)
 
 
-const echo = new Echo({
+/* const echo = new Echo({
     broadcaster: 'pusher',
     key: 'c38b6cfa9a4f7e26bf76', // ใช้ค่าตรงจาก .env ตรงๆ
     cluster: 'ap1', // ใช้ค่าตรงจาก .env ตรงๆ
@@ -28,6 +28,15 @@ const echo = new Echo({
 })
 
 app.config.globalProperties.$echo = echo
+ */
+
+// สร้างการเชื่อมต่อ Pusher
+const pusher = new Pusher('c38b6cfa9a4f7e26bf76', {
+  cluster: 'ap1',
+  encrypted: true,
+});
+
+app.config.globalProperties.$pusher = pusher;
 
 
 app.use(router)
