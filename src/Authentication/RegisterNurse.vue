@@ -9,9 +9,10 @@ const professional_id = ref("");
 const password = ref("");
 const passwordcheck = ref("");
 
+const appRouter = useRouter();
+
 const registernurse = async () => {
-  const res = await 
-  fetch(`${import.meta.env.VITE_BASE_URL}api/nurse/register`, {
+  const res = await fetch(`${import.meta.env.VITE_BASE_URL}api/nurse/register`, {
     method: "POST",
     headers: {
       "content-type": "application/json",
@@ -20,12 +21,16 @@ const registernurse = async () => {
       name: name.value,
       professional_id: professional_id.value,
       password: password.value,
+      password_confirmation: passwordcheck.value,
     }),
   });
+  // ตรวจสอบข้อมูลที่คืนกลับจาก API ด้วยการแสดงผลในคอนโซล
+  console.log("Response from server:", res);
+  
   if (res.status === 200) {
     Swal.fire("คุณสร้างบัญชีสำเร็จ!");
     setTimeout(function () {
-      close();
+      appRouter.push({ name: "loginNurse" }); // แก้ไขตรงนี้เป็นการเรียกใช้งาน Vue Router
     }, 1500);
     console.log("You add user success");
   } else {
@@ -37,6 +42,8 @@ const registernurse = async () => {
     });
   }
 };
+
+
 
 const checkmatch = () => {
   const pass = password.value;
@@ -53,22 +60,36 @@ const checkmatch = () => {
 const checkinputpassword = () => {
   const pass = password.value;
   const passcheck = passwordcheck.value;
+  const passRegex = /^(?=.*\d)(?=.*[a-zA-Zก-๙]).{8,}$/;
+
   if (pass.length === 0) {
     password.value = null;
     Swal.fire("โปรดใส่รหัสผ่าน");
-  }
-  if (pass.length < 8) {
+  } else if (pass.length < 8 || !passRegex.test(pass)) {
     password.value = null;
-    Swal.fire("รหัสผ่านต้องมีความยาวมากกว่า 8 ตัวอักษร");
-  }
-  if (passcheck !== pass) {
+    Swal.fire("รหัสผ่านต้องประกอบด้วยตัวเลข อักขระพิเศษ และตัวอักษร ที่มีความยาวมากกว่า 8 ตัวอักษร");
+  } else if (passcheck !== pass) {
     password.value = null;
     Swal.fire("รหัสผ่านไม่ตรงกัน");
   }
+
+  if (name.value.length === 0) {
+    name.value = null;
+    Swal.fire("โปรดใส่ชื่อผู้ใช้");
+  }
+
+  if (professional_id.value.length === 0) {
+    professional_id.value = null;
+    Swal.fire("โปรดใส่เลขใบประกอบวิชาชีพ");
+  }
 };
 
-const appRouter = useRouter();
+
+
+
+
 const close = () => appRouter.push({ name: "loginNurse" });
+
 
 </script>
 
@@ -100,10 +121,10 @@ const close = () => appRouter.push({ name: "loginNurse" });
                        <p v-if="name.length" class="input-count">
                       {{ name.length }}/100
                       </p>
-                       <p v-show="name.length < 1" >
+                      <p v-if="name.length < 1">
                       * Please input your name <span></span>
-                       </p>
-                      <p v-show="name.length > 100" >
+                      </p>
+                      <p v-if="name.length > 100" >
                       * Characters must not exceed 100
                       </p>
 
@@ -185,14 +206,12 @@ const close = () => appRouter.push({ name: "loginNurse" });
                 
 
 
-                  <button
-                   class="block w-full bg-blue-900 hover:bg-blue-800 text-white font-bold py-2 px-4 mb-4 border rounded"
+                    <button
+                    class="block w-full bg-blue-900 hover:bg-blue-800 text-white font-bold py-2 px-4 mb-4 border rounded"
                     @click.prevent="registernurse"
-                    :disabled="!name || !professional_id || !password" :class="{ 'bg-blue-900': !idcard || !password }"
-                   >
-                   
-                 สร้างบัญชี
-                  </button>
+                    :disabled="!name || !professional_id || !password" >
+                    สร้างบัญชี
+                   </button>
                   <div class="text-center">
               <router-link :to="{ name: 'loginNurse' }">
                 <p class="text-sm font-medium text-gray-500">
