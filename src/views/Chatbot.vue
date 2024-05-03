@@ -69,13 +69,13 @@ const filteredConversations = computed(() => {
 /* แสดงข้อความที่ตอบกลับมา */
 
 const messagefromAdmin = ref([]);
-const channelName = 'Touserid' + userId;
+const channelName = 'Touserid.' + userId;
 const pusherUser = new Pusher('c38b6cfa9a4f7e26bf76', {
   cluster: 'ap1',
   encrypted: true,
 });
 
-const channel = pusherUser.subscribe('Touserid');
+const channel = pusherUser.subscribe(channelName);
 // Store messages in localStorage when a new message is received
 channel.bind('message', (data) => {
   console.log(data); // Check the structure of data
@@ -90,7 +90,6 @@ onMounted(() => {
   /*  */ 
   // Add any post-mount code here
 });
-
 /* -------------------------------------------------------------------------- */
 
 

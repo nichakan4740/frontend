@@ -63,7 +63,8 @@ const filteredMessagesAll = ref([]);
 const showModal = ref(false);
 
 const openModal = (message) => {
-  storeClickedMessage(message); // เรียกใช้ฟังก์ชันเพื่อบันทึกข้อความใหม่
+  const userId = message.user_id; // ดึงค่า userId จากอ็อบเจกต์ message
+  storeClickedMessage(message, userId); // เรียกใช้ฟังก์ชันเพื่อบันทึกข้อความใหม่และ userId
   lastMessage.value = message; // อัพเดทค่า lastMessage ใหม่
   showModal.value = true; // แสดง Modal
 
@@ -72,11 +73,13 @@ const openModal = (message) => {
   });
 };
 
-// เมื่อต้องการบันทึกข้อความ
-const storeClickedMessage = (message) => {
+const storeClickedMessage = (message, userId) => {
   // บันทึกข้อความล่าสุดไว้ใน localStorage
   localStorage.setItem('NewMessageAll', JSON.stringify(message));
+  localStorage.setItem('userId', JSON.stringify(parseInt(message.user_id)));
 };
+
+
 
 // เรียกข้อความล่าสุดที่บันทึกไว้ใน localStorage
 const lastMessage = ref(JSON.parse(localStorage.getItem('NewMessageAll')));
@@ -84,11 +87,10 @@ const lastMessage = ref(JSON.parse(localStorage.getItem('NewMessageAll')));
 
 
 /* ส่งข้อความตอบกลับ */
+const messageToUser = ref(''); // เปลี่ยนชื่อตัวแปรเป็น messageToUser และใช้ ref ในการประกาศ
+const sendMessageToUser = (message) => { // เพิ่มพารามิเตอร์ adminId
 
-const message = ref(''); // เปลี่ยนชื่อตัวแปรเป็น messageToUser และใช้ ref ในการประกาศ
-const userId = 1; // ประกาศ userId อย่างถูกต้อง
-
-const sendMessageToUser = (userId, message) => { // แก้ชื่อตัวแปร message ในพารามิเตอร์
+  const userId = localStorage.getItem('userId');
   fetch(`${import.meta.env.VITE_BASE_URL}api/sendmessage/ToUser/${userId}`, {
     method: "POST",
     headers: {
@@ -96,28 +98,28 @@ const sendMessageToUser = (userId, message) => { // แก้ชื่อตั�
       Accept: "application/json",
     },
     body: JSON.stringify({
-      message: message, // แก้ชื่อตัวแปร message ใน object
-      admin_id: adminId, // ต้องประกาศตัวแปร adminId ด้วย
+      message: message,
+      admin_id: adminId,
     }),
   })
-    .then((response) => response.json())
-    .then((data) => {
-      console.log("Message sent successfully", data);
-      // ตรงนี้ควรมีการดำเนินการเพิ่มข้อมูล conversation ใน state ของแอพ
-    })
-    .catch((error) => {
-      console.error("Error:", error);
-      Swal.fire({
-        icon: "error",
-        title: "Oops...",
-        text: "Failed to send message",
-      });
+  .then((response) => response.json())
+  .then((data) => {
+    console.log("Message sent successfully", data);
+    // ตรงนี้ควรมีการดำเนินการเพิ่มข้อมูล conversation ใน state ของแอพ
+  })
+  .catch((error) => {
+    console.error("Error:", error);
+    Swal.fire({
+      icon: "error",
+      title: "Oops...",
+      text: "Failed to send message",
     });
+  });
 };
 
 const handleSendMessage = () => {
-  if (message.value.trim() !== '') { // ใช้ messageToUser แทน messageTouser
-    sendMessageToUser(userId, message.value); // ใช้ messageToUser แทน messageTouser
+  if (messageToUser.value.trim() !== '') { // ใช้ messageToUser แทน messageTouser
+    sendMessageToUser(messageToUser.value); // ใช้ messageToUser แทน messageTouser
   } else {
     Swal.fire({
       icon: 'error',
@@ -126,10 +128,12 @@ const handleSendMessage = () => {
     });
   }
 };
-
 onMounted(() => {
   // โค้ดที่คุณต้องการให้ทำงานเมื่อ component ถูก mounted
 });
+/* ---------------------------------------------------------------------------------------------------- */
+
+
 
 
 
@@ -209,9 +213,10 @@ onMounted(() => {
   <!-- ------------------------------------------------------------------------------------ -->
   <!-- ส่งข้อความตอบกลับ -->
     <div>
-    <input v-model="message" type="text" placeholder="Type your message">
-    <button @click="handleSendMessage">Send Message</button>
-  </div>
+  <input v-model="messageToUser" type="text" placeholder="Type your message">
+  <button @click="handleSendMessage">Send Message</button>
+</div>
+
 
       <!-- --------------------------------------------- -->
       <div class="mb-8 ml-2 mr-4 mt-10">
