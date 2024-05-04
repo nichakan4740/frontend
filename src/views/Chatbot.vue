@@ -87,29 +87,46 @@ channel.bind('message', (data) => {
   });
 });
 onMounted(() => {
-  /*  */ 
-  // Add any post-mount code here
+
 });
 /* -------------------------------------------------------------------------- */
 
 
+/* ตอบกลับ admin */
 
+const messagetoadmin = ref('');
+const sendMessagetoadmin = async () => {
+  try {
+    console.log("Admin ID:", messagefromAdmin.value.admin_id);
+    const adminId = messagefromAdmin.value.length > 0 ? messagefromAdmin.value[messagefromAdmin.value.length - 1].admin_id : null;
 
+    console.log("Parsed Admin ID:", adminId);
+    const response = await fetch(`${import.meta.env.VITE_BASE_URL}api/sendmessage/ToAdmin/${adminId}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        user_id: userId,
+        message: messagetoadmin.value,
+        sender_type: 'user', // ระบุว่าเป็น user ที่ส่ง
+      }),
+    });
 
+    if (!response.ok) {
+      const errorMessage = await response.text();
+      throw new Error(errorMessage || 'Failed to send message');
+    }
 
+    const responseData = await response.json();
+    console.log('Message sent successfully:', responseData);
+    // อาจจะต้องทำอะไรบางอย่างหลังจากส่งข้อความสำเร็จ เช่น รีเซ็ตค่า messagetoadmin
+  } catch (error) {
+    console.error('Error sending message:', error);
+  }
+};
 
-
-
-
-
-
-
-
-
-
-
-
-
+/* ------------------------------------------------------------------------------- */
 
 
 /* เลือก Teb -------------------------------------------------------- */
@@ -139,6 +156,15 @@ const clearLocalStorage = () => {
   location.reload();
 };
 </script>
+
+
+
+
+
+
+
+
+
 
 <template>
   <Layout class="bg-gradient-to-b from-blue-100">
@@ -177,7 +203,6 @@ const clearLocalStorage = () => {
       
       </div>
       
-
       <!-- ----------------------------------------------------------------------------------------------------------------------------------- -->
 
       <!-- Tab content ที่ 1 -->
@@ -221,7 +246,30 @@ const clearLocalStorage = () => {
                                ส่งข้อความ
                            </button>
                     </div>
-                </div>        
+                </div> 
+                
+                
+
+
+<!-- ------------------ -->
+
+ <div>
+    <input type="text" v-model="messagetoadmin" placeholder="Type your message">
+    <button @click="sendMessagetoadmin">Send Message to Admin</button>
+  </div>
+
+  <!-- ------------------------ -->
+
+
+
+
+
+
+
+
+
+
+
     
       <!-- Right---------------------------------------------------------------------------------------------------------- -->
           <div class="w-2/3">

@@ -1,4 +1,3 @@
-
 <script setup>
 import { ref, onMounted, computed, watch  } from "vue";
 import LayoutNurse from "../layouts/LayoutNurse.vue";
@@ -58,38 +57,9 @@ onMounted(() => {
 });
 
 /* ------------------------------------------------------------------------------------------------------------------------------------------------------------------- */
-/* แสดงข้อความทั้งหมดเมื่อคลิกเข้าไป */
-const filteredMessagesAll = ref([]);
-const showModal = ref(false);
-
-const openModal = (message) => {
-  const userId = message.user_id; // ดึงค่า userId จากอ็อบเจกต์ message
-  storeClickedMessage(message, userId); // เรียกใช้ฟังก์ชันเพื่อบันทึกข้อความใหม่และ userId
-  lastMessage.value = message; // อัพเดทค่า lastMessage ใหม่
-  showModal.value = true; // แสดง Modal
-
-  filteredMessagesAll.value = messages.value.filter(msg => {  // อัพเดทค่าใน filteredMessagesAll โดยอ้างอิง lastMessage ที่มีการเปลี่ยนแปลง
-    return msg.admin_id === parseInt(adminId) && msg.user_id === message.user_id;
-  });
-};
-
-const storeClickedMessage = (message, userId) => {
-  // บันทึกข้อความล่าสุดไว้ใน localStorage
-  localStorage.setItem('NewMessageAll', JSON.stringify(message));
-  localStorage.setItem('userId', JSON.stringify(parseInt(message.user_id)));
-};
-
-
-
-// เรียกข้อความล่าสุดที่บันทึกไว้ใน localStorage
-const lastMessage = ref(JSON.parse(localStorage.getItem('NewMessageAll')));
-/* ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- */
-
-
 /* ส่งข้อความตอบกลับ */
-const messageToUser = ref(''); // เปลี่ยนชื่อตัวแปรเป็น messageToUser และใช้ ref ในการประกาศ
-const sendMessageToUser = (message) => { // เพิ่มพารามิเตอร์ adminId
-
+const messageToUser = ref('');  
+  const sendMessageToUser = (message) => {
   const userId = localStorage.getItem('userId');
   fetch(`${import.meta.env.VITE_BASE_URL}api/sendmessage/ToUser/${userId}`, {
     method: "POST",
@@ -105,7 +75,13 @@ const sendMessageToUser = (message) => { // เพิ่มพารามิเ
   .then((response) => response.json())
   .then((data) => {
     console.log("Message sent successfully", data);
-    // ตรงนี้ควรมีการดำเนินการเพิ่มข้อมูล conversation ใน state ของแอพ
+    // เพิ่มข้อมูลข้อความที่ส่งกลับไปยัง filteredMessagesAll
+    const newMessage = {
+      message: message,
+      createdAt: formatTime(new Date()), // ใช้เวลาปัจจุบัน
+      admin_id: adminId,
+      user_id: userId,
+    };
   })
   .catch((error) => {
     console.error("Error:", error);
@@ -115,7 +91,7 @@ const sendMessageToUser = (message) => { // เพิ่มพารามิเ
       text: "Failed to send message",
     });
   });
-};
+}; 
 
 const handleSendMessage = () => {
   if (messageToUser.value.trim() !== '') { // ใช้ messageToUser แทน messageTouser
@@ -127,18 +103,42 @@ const handleSendMessage = () => {
       text: 'Message must not be empty',
     });
   }
-};
+}; 
 onMounted(() => {
-  // โค้ดที่คุณต้องการให้ทำงานเมื่อ component ถูก mounted
 });
 /* ---------------------------------------------------------------------------------------------------- */
+/* แสดงข้อความทั้งหมดเมื่อคลิกเข้าไป */
 
+const filteredMessagesAll = ref([]);
+const showModal = ref(false);
 
+const openModal = (message) => {
+  const userId = message.user_id; // ดึงค่า userId จากอ็อบเจกต์ message
+  storeClickedMessage(message, userId); // เรียกใช้ฟังก์ชันเพื่อบันทึกข้อความใหม่และ userId
+  lastMessage.value = message; // อัพเดทค่า lastMessage ใหม่
+  showModal.value = true; // แสดง Modal
 
+  // อัปเดต filteredMessagesAll ใหม่เพื่อแสดงข้อความทั้งหมดที่เกี่ยวข้องกับผู้ใช้งาน
+  filteredMessagesAll.value = messages.value.filter(msg => {  
+    return msg.admin_id === parseInt(adminId) && msg.user_id === message.user_id;
+  });
+};
 
+const storeClickedMessage = (message, userId) => {
+  // บันทึกข้อความล่าสุดไว้ใน localStorage
+  localStorage.setItem('NewMessageAll', JSON.stringify(message));
+  localStorage.setItem('userId', JSON.stringify(parseInt(message.user_id)));
+};
 
+// เรียกข้อความล่าสุดที่บันทึกไว้ใน localStorage
+const lastMessage = ref(JSON.parse(localStorage.getItem('NewMessageAll')));
 
+/* ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- */
 </script>
+
+
+
+
 
 <template>
   <LayoutNurse class="bg-gradient-to-b from-blue-100">
@@ -173,37 +173,37 @@ onMounted(() => {
 
 
 <!-- แสดงข้อมูลที่บันทึกไว้ใน localStorage -->
-<div>
-  <div v-if="showModal" @closeModal="showModal = false">
-    <div class="bg-white rounded-lg p-8 shadow-md relative">
-      <button @click="showModal = false" class="absolute top-0 right-0 m-4 text-gray-500 hover:text-gray-700">ปิด</button>
-    
+ <div v-if="showModal" @closeModal="showModal = false">
+  <!-- ตัวแสดง Modal -->
+  <div class="bg-white rounded-lg p-8 shadow-md relative">
+    <!-- ปุ่มปิด Modal -->
+   <button @click="showModal = false" class="absolute top-0 right-0 m-4 text-gray-500 hover:text-gray-700">ปิด</button>
+  
+
+    <!-- แสดงข้อความล่าสุดที่ผู้ใช้คลิก -->
+    <div class="max-w-md rounded-lg p-2">
+      <div class="inline-block">
+        <div class="p-3 rounded-lg shadow-md inline-block bg-white">
+          <p class="text-sm text-gray-800">{{ lastMessage.message }}</p>
+          <p class="text-sm text-gray-600">admin_id: {{ lastMessage.admin_id }}</p>
+          <p class="text-sm text-gray-600">user_id: {{ lastMessage.user_id }}</p>
+          <p class="text-sm text-gray-600">CreatedAt: {{ lastMessage.createdAt }}</p>     
+        </div>
+      </div>
+    </div>
+
+    <!-- แสดงข้อความที่ผู้ใช้คลิกเพื่อดู -->
+    <div v-for="(message, index) in filteredMessagesAll" :key="index">
       <div class="max-w-md rounded-lg p-2">
         <div class="inline-block">
-          <div class="p-3 rounded-lg shadow-md inline-block bg-white">
-            <p class="text-sm text-gray-800">{{ lastMessage.message }}</p>
-            <p class="text-sm text-gray-600">admin_id: {{ lastMessage.admin_id }}</p>
-            <p class="text-sm text-gray-600">user_id: {{ lastMessage.user_id }}</p>
-            <p class="text-sm text-gray-600">CreatedAt: {{ lastMessage.createdAt }}</p>     
+          <div class="p-3 rounded-lg shadow-md inline-block bg-red-50">
+            <p class="text-sm text-gray-800">{{ message.message }}</p>
+            <p class="text-sm text-gray-600">admin_id: {{ message.admin_id }}</p>
+            <p class="text-sm text-gray-600">user_id: {{ message.user_id }}</p>
+            <p class="text-sm text-gray-600">CreatedAt: {{ message.createdAt }}</p>     
           </div>
         </div>
       </div>
-
-      <!-- แสดงข้อความที่ได้กรองแล้ว -->
-          <!-- แสดงข้อความที่ได้กรองแล้ว -->
-      <div v-for="(message, index) in filteredMessagesAll" :key="index">
-         <div class="max-w-md rounded-lg p-2">
-            <div class="inline-block">
-                <div class="p-3 rounded-lg shadow-md inline-block bg-red-50">
-                    <p class="text-sm text-gray-800">{{ message.message }}</p>
-                    <p class="text-sm text-gray-600">admin_id: {{ message.admin_id }}</p>
-                    <p class="text-sm text-gray-600">user_id: {{ message.user_id }}</p>
-                    <p class="text-sm text-gray-600">CreatedAt: {{ message.createdAt }}</p>     
-                </div>
-            </div>
-          </div>
-      </div>
-      <!-- --------------------------------------------------- -->
     </div>
   </div>
 </div>
