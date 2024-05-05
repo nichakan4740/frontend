@@ -4,52 +4,57 @@ import { useRouter } from "vue-router";
 import moment from "moment";
 import Swal from "sweetalert2";
 import Pusher from "pusher-js";
-import { ref, onMounted, computed , watch} from "vue";
+import { ref, onMounted, computed, watch } from "vue";
 
 const conversations = ref([]);
 const message = ref('');
 const userId = localStorage.getItem('iduser');
 
+
 const formatTime = (time) => {
   return moment(time).format('YYYY-MM-DD HH:mm:ss');
 };
 
-const sendMessageAll = (userId, message) => {
-  fetch(`${import.meta.env.VITE_BASE_URL}api/sendmessage/all`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-    },
-    body: JSON.stringify({
-      message: message,
-      user_id: userId,
-    }),
-  })
-    .then((response) => response.json())
-    .then((data) => {
-      // ทำตามต้องการหลังจากส่งข้อความไปยังทุก admin สำเร็จ
-      console.log("Message sent successfully", data);
-      conversations.value.push(data); // เพิ่มข้อมูล conversation ที่ส่งไปยัง array
-      localStorage.setItem("conversations", JSON.stringify(conversations.value));
-    })
-    .catch((error) => {
-      console.error("Error:", error);
-      Swal.fire({
-        icon: "error",
-        title: "Oops...",
-        text: "Failed to send message",
+const sendMessageAll = async () => {
+  try {
+    if (message.value.trim() !== '') {
+      const response = await fetch(`${import.meta.env.VITE_BASE_URL}api/sendmessage/all`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify({
+          message: message.value,
+          user_id: userId,
+        }),
       });
-    });
-};
-const handleSendMessage = () => {
-  if (message.value.trim() !== '') {
-    sendMessageAll(userId, message.value);
-  } else {
+
+      if (!response.ok) {
+        const errorMessage = await response.text();
+        throw new Error(errorMessage || 'Failed to send message');
+      }
+
+      // หลังจากส่งข้อความเสร็จสมบูรณ์
+      const responseData = await response.json();
+      console.log('Message sent successfully:', responseData);
+      conversations.value.push(responseData);
+      
+      // อัพเดทข้อมูลใน localStorage
+      localStorage.setItem("conversations", JSON.stringify(conversations.value));
+    } else {
+      Swal.fire({
+        icon: 'error',
+        title: 'Oops...',
+        text: 'ข้อความต้องไม่ว่างเปล่า',
+      });
+    }
+  } catch (error) {
+    console.error('Error sending message:', error);
     Swal.fire({
-      icon: 'error',
-      title: 'Oops...',
-      text: 'ข้อความต้องไม่ว่างเปล่า',
+      icon: "error",
+      title: "Oops...",
+      text: "Failed to send message",
     });
   }
 };
@@ -60,6 +65,7 @@ onMounted(() => {
     conversations.value = JSON.parse(storedConversations);
   }
 });
+
 // สร้าง computed property สำหรับกรอง conversations ที่ตรงกับ userId
 const filteredConversations = computed(() => {
   return conversations.value.filter(conversation => conversation.user_id === userId);
@@ -97,9 +103,7 @@ onMounted(() => {
 const messagetoadmin = ref('');
 const sendMessagetoadmin = async () => {
   try {
-    console.log("Admin ID:", messagefromAdmin.value.admin_id);
     const adminId = messagefromAdmin.value.length > 0 ? messagefromAdmin.value[messagefromAdmin.value.length - 1].admin_id : null;
-
     console.log("Parsed Admin ID:", adminId);
     const response = await fetch(`${import.meta.env.VITE_BASE_URL}api/sendmessage/ToAdmin/${adminId}`, {
       method: 'POST',
@@ -157,30 +161,13 @@ const clearLocalStorage = () => {
 };
 </script>
 
-
-
-
-
-
-
-
-
-
 <template>
   <Layout class="bg-gradient-to-b from-blue-100">
     <div class="container mx-auto">
 
 
       <!-- Tabs ------------------------------------------------------------------------------------------------->
-      
-  <div>
-    <div v-for="(message, index) in messagefromAdmin" :key="index">
-      <p>{{ message.message }}</p>
-      <p>Created At: {{ message.createdAt }}</p>
-      <p>Admin ID: {{ message.admin_id }}</p>
-      <p>User ID: {{ message.user_id }}</p>
-    </div>
-  </div>
+    
 <!-- ---------------------- -->
       <div class="box-content p-3 ml-5 mr-5 mt-10 bg-gradient-to-b from-blue-900 to-blue-800 shadow-lg shadow-slate-500/50 rounded-lg">
         <div class="flex justify-center items-center ">
@@ -232,45 +219,21 @@ const clearLocalStorage = () => {
     <!-- Tab conten ที่ 2 -->
     <div v-if="activeTab === 2">
    
-
     <div class="box-content bg-white shadow-lg shadow-gray-300/50 mt-10 ml-5 mr-5 pt-5 pb-5 pl-10 pr-10 rounded-lg">
         
          <div class="flex">
       <!-- Left--------------------------------------------------------------------------------------------------------------- -->
                <div class="w-1/3 border-r">
                   <p class="mb-3 font-semibold ">เปิดใหม่แซ็ตเพื่อพูดคุยกับพยาบาล</p>
-                     <!-- เปิดข้อความ ------------------------------------------------- -->
-                    <div style="display: flex; align-items: center" class="mr-10">
-                         <input type="text" id="small-input" class="block w-1/2 p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500"  v-model="message" @keyup.enter="handleSendMessage" placeholder="พิมพ์ข้อความของคุณ"/>
-                           <button @click="handleSendMessage" class=" bg-blue-500 text-white rounded-lg p-2 ml-2 ">
+                     <!-- ------------------------------------------------- -->
+                      <div style="display: flex; align-items: center" class="mr-10">
+                         <input type="text" v-model="message" placeholder="พิมพ์ข้อความของคุณ" @keyup.enter="sendMessageAll"  class="block w-1/2 p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500"  />
+                           <button @click="sendMessageAll" class=" bg-blue-500 text-white rounded-lg p-2 ml-2 ">
                                ส่งข้อความ
                            </button>
                     </div>
                 </div> 
-                
-                
-
-
-<!-- ------------------ -->
-
- <div>
-    <input type="text" v-model="messagetoadmin" placeholder="Type your message">
-    <button @click="sendMessagetoadmin">Send Message to Admin</button>
-  </div>
-
-  <!-- ------------------------ -->
-
-
-
-
-
-
-
-
-
-
-
-    
+  
       <!-- Right---------------------------------------------------------------------------------------------------------- -->
           <div class="w-2/3">
 
@@ -290,23 +253,40 @@ const clearLocalStorage = () => {
 
         <!-- -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- -->
           <!-- แสดงที่ admin user ตอบกลับไปมา -->
-          <div class="chat-container p-4 border-t border-b border-gray-200 border-gray-300 max-h-96 overflow-y-auto" v-for="conversation in filteredConversations" :key="conversation.user_id">
-            <div class="message flex items-end justify-end mb-4" >
-            
-            <div class="flex flex-col">
-              <div class="text-xs text-gray-500">  {{ formatTime( conversation.createdAt) }}</div>
-              
-                <div class="ml bg-blue-500 text-white rounded-lg p-2">
-                  <span class="text-sm">{{ conversation.message }}</span>
-              </div>
+          
+          <div>
 
+          
+<!-- ----------------------------- -->
+<div class="chat-container p-4 border-t border-b border-gray-200 border-gray-300 max-h-96 overflow-y-auto">
+    <!-- แสดงข้อมูลจาก messagefromAdmin ด้านซ้าย -->
+    <div v-for="(message, index) in messagefromAdmin" :key="index" class="message flex items-end justify-end mb-4">
+        <div class="flex flex-col">
+            <div class="text-xs text-gray-500">{{ message.createdAt }}</div>
+            <div class="ml bg-blue-500 text-white rounded-lg p-2">
+                <span class="text-sm">{{ message.message }}</span>
+                <p>Admin ID: {{ message.admin_id }}</p>
+                <p>User ID: {{ message.user_id }}</p>
             </div>
-          </div>
+        </div>
+    </div>
+
+    <!-- แสดงข้อมูลจาก filteredConversations ด้านขวา -->
+    <div v-for="conversation in filteredConversations" :key="conversation.id" class="message flex items-end justify-start mb-4">
+        <div class="flex flex-col">
+            <div class="text-xs text-gray-500">{{ formatTime(conversation.created_at) }}</div>
+            <div class="mr bg-gray-500 text-white rounded-lg p-2">
+                <span class="text-sm">{{ conversation.message }}</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 <!-- ------------------------------------------------------------------------------------- -->
 
 
 <!-- --------------------------------------------------------------------------------------------------------------------------------------------- -->
-
             <template >
               <div  class="message flex items-start mb-4">
                 <div class="flex flex-col">
@@ -352,10 +332,11 @@ const clearLocalStorage = () => {
             <input
               type="text"
               placeholder="พิมพ์ข้อความที่นี่..."
+              v-model="messagetoadmin"
               class="block w-full p-2 text-gray-900 border-0 focus:ring-white focus:border-white"
             />
 
-            <button >
+            <button @click="sendMessagetoadmin" >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 24 24"
@@ -374,7 +355,6 @@ const clearLocalStorage = () => {
 
       </div>
     </div>
-
 
 <!-- --------------------------------------------------------------------------------------------------------- -->
 
