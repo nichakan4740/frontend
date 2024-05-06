@@ -7,8 +7,9 @@ import Swal from "sweetalert2";
 
 /* เวลา */
 const formatTime = (time) => {
-  return moment(time).format("YYYY-MM-DD HH:mm:ss");
+  return moment(time).format("YYYY-MM-DD");
 };
+
 
 
 const adminId = localStorage.getItem('idadmin');
@@ -27,6 +28,7 @@ channels.bind('message', (data) => {
     createdAt: formatTime(data.createdAt), // เปลี่ยนจาก new Date() เป็น data.createdAt
     admin_id: data.admin_id,
     user_id: data.user_id,
+    user_name: data.user_name
   });
   localStorage.setItem('messagesAllUser', JSON.stringify(messages.value));
 });
@@ -175,7 +177,7 @@ channel.bind('message', (data) => {
     message: data.message,
     createdAt: formatTime(data.createdAt), // Ensure formatTime function is defined and working correctly
     admin_id: data.admin_id,
-    user_id: data.user_id,
+    user_id: data.user_id
   });
 });
 onMounted(() => {
@@ -237,9 +239,7 @@ const firstCharacter = computed(() => {
 
         <div class="flex flex-col items-center bg-indigo-100 border border-gray-200 mt-4 w-full py-6 px-4 rounded-lg" >
           <div class="h-20 w-20 rounded-full border  overflow-hidden">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"  class="h-full w-full ">
-            <path style="fill: #42424D;" fill-rule="evenodd" d="M7.5 6a4.5 4.5 0 1 1 9 0 4.5 4.5 0 0 1-9 0ZM3.751 20.105a8.25 8.25 0 0 1 16.498 0 .75.75 0 0 1-.437.695A18.683 18.683 0 0 1 12 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 0 1-.437-.695Z" clip-rule="evenodd" />
-            </svg>
+             <img src="https://cdn.icon-icons.com/icons2/582/PNG/512/asistante_icon-icons.com_55049.png" class="h-full w-full ">
           </div>
           <div class="text-sm font-semibold mt-2">
            {{ name }} 
@@ -255,19 +255,25 @@ const firstCharacter = computed(() => {
             <!-- ------------------------------------------------------------------------------------------------------------------------------------- -->
           
      <!-- ข้อความด้านซ้ายที่เข้ามา  -->
-            <div class="flex flex-col space-y-1 mt-4 -mx-2 h-48 overflow-y-auto">
-            <button v-for="(message, index) in filteredMessages" :key="index" @click="openModal(message)" class="flex flex-row items-center hover:bg-gray-100 rounded-xl p-2">
-
-              <div class="flex items-center justify-center h-8 w-8 bg-indigo-200 rounded-full">
-               H
-              </div>
-              <div class="ml-2 text-sm font-semibold">{{ message.user_id }}</div>
-              <!-- <p class="text-sm text-gray-600">CreatedAt: {{ message.createdAt }}</p>  -->    
-              <p class="text-sm text-gray-800">{{ message.message }}</p>
-              <p class="text-sm text-gray-600">admin_id: {{ message.admin_id }}</p>
+            <div class="flex flex-col space-y-1 mt-4 -mx-2 h-80 overflow-y-auto">
+            <button v-for="(message, index) in filteredMessages" :key="index" @click="openModal(message)" class="flex flex-row items-center hover:bg-gray-100 rounded-xl p-2">  
+             <div>
+               <div class="flex items-center space-x-2 rtl:space-x-reverse">
+                  <div class="flex items-center justify-center h-10 w-10 bg-indigo-200 rounded-full overflow-hidden">
+                      <img src="https://cdn.icon-icons.com/icons2/2265/PNG/512/patient_coronavirus_icon_140453.png" alt="Coronavirus Patient Icon" class="h-8 w-8 object-cover">
+                  </div>
+                 <span class="text-sm font-semibold text-gray-900 dark:text-white">{{message.user_name}}</span>
+                 <span class="text-sm font-normal text-gray-500 dark:text-gray-400">{{message.createdAt}}</span>
+             </div>
+                 <p class="text-sm font-normal py-2.5 text-gray-900 dark:text-white">{{ message.message }} </p>
+             </div>
             </button>
           </div>
          <!-- ---------------------------------------------------------------------------------------------------- -->
+
+
+
+
         </div>
       </div>   
      
