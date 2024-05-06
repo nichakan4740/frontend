@@ -12,7 +12,7 @@ const navigation = [
 const mobileMenuOpen = ref(false);
 
 
-// เพิ่ม pusher
+/* // เพิ่ม pusher
 const pusherScript = document.createElement('script');
 pusherScript.src = 'https://js.pusher.com/8.2.0/pusher.min.js';
 document.head.appendChild(pusherScript);
@@ -33,7 +33,7 @@ pusherScript.onload = () => {
     alert('live-chat'+data)
     console.log(data)
   });
-};
+}; */
  
 
 </script>

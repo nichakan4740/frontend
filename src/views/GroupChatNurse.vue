@@ -185,9 +185,15 @@ onMounted(() => {
 
 
 
-
-// สร้างตัวแปร ref เพื่อเก็บสถานะการแสดง/ซ่อนข้อมูลทางขวา
-const showRightPanel = ref(false);
+// ดึงข้อมูล name จาก Local Storage
+const name = ref('')
+onMounted(() => {
+  // ดึงข้อมูล name จาก Local Storage เมื่อ component ถูก mount
+  name.value = localStorage.getItem('name') || ''
+})
+const firstCharacter = computed(() => {
+  return name.value.charAt(0)
+})
 
 </script>
 
@@ -199,13 +205,8 @@ const showRightPanel = ref(false);
         <h2 class="font-semibold text-xl text-center text-slate-200">คุยกับผู้ป่วย</h2>
       </div>
 
-    
-
   
-
-      <!-- --------------------------------------------------------------------------------- -->
-
-      <!-- Display messages from user -->
+   <!--  
       <div>
         <div v-for="(message, index) in messagefromUser" :key="index">
           <p>{{ message.message }}</p>
@@ -215,7 +216,6 @@ const showRightPanel = ref(false);
         </div>
       </div>
 
-      <!-- Display messages sent to user -->
       <div>
         <div v-for="(message, index) in messagesendToUser" :key="index">
           <p>{{ message.message }}</p>
@@ -223,35 +223,17 @@ const showRightPanel = ref(false);
           <p>Admin ID: {{ message.admin_id }}</p>
           <p>User ID: {{ message.user_id }}</p>
         </div>
-      </div>
+      </div> -->
 
       <!-- Input field for sending message to user -->
-      <div>
-        <input type="text" v-model="messageToUser" placeholder="Type your message...">
-        <button @click="handleSendMessage">Send</button>
-      </div>
+  
     </div>
     <!-- -------------------------------------------------------------------------------------------- -->
 
-
-
-
-
-
-
-
 <!-- component -->
-<div class="flex h-screen antialiased text-gray-800">
-    <div class="flex flex-row h-full w-full overflow-x-hidden">
-      <div class="flex flex-col py-8 pl-6 pr-2 w-64 bg-white flex-shrink-0">
-        <div class="flex flex-row items-center justify-center h-12 w-full">
-          <div class="flex items-center justify-center rounded-2xl text-indigo-700 bg-indigo-100 h-10 w-10">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path>
-            </svg>    
-          </div>
-        </div>
+<div class="flex h-screen antialiased text-gray-800 container mx-auto mt-6  ">
+    <div class="flex flex-row h-full w-full overflow-x-hidden ">
+      <div class="flex flex-col py-8 pl-6 pr-2 w-64 bg-white flex-shrink-0 rounded-xl">
 
         <div class="flex flex-col items-center bg-indigo-100 border border-gray-200 mt-4 w-full py-6 px-4 rounded-lg" >
           <div class="h-20 w-20 rounded-full border  overflow-hidden">
@@ -260,7 +242,7 @@ const showRightPanel = ref(false);
             </svg>
           </div>
           <div class="text-sm font-semibold mt-2">
-            Aminos Co.
+           {{ name }} 
           </div>
         </div>
 
@@ -292,12 +274,11 @@ const showRightPanel = ref(false);
      <!-- ข้อความด้านขวา -->
      
       <div class="flex flex-col flex-auto h-full p-6" v-if="showModal" @closeModal="showModal = false">
-        <button @click="showModal = false" class="absolute top-0 right-0 m-4 text-gray-500 hover:text-gray-700">ปิด</button>
         <div class="flex flex-col flex-auto flex-shrink-0 rounded-2xl bg-gray-100 h-full p-4" >
           <div class="flex flex-col h-full overflow-x-auto mb-4">
             <div class="flex flex-col h-full">
               <div class="grid grid-cols-12 gap-y-2">
-          
+               
 <!-- ------------------------------------------------------------------------------------------------ -->
                 <div class="col-start-1 col-end-8 p-3 rounded-lg" v-for="(message, index) in filteredMessagesAll" :key="index">
                   <div class="flex flex-row items-center">
@@ -318,7 +299,7 @@ const showRightPanel = ref(false);
                 <div class="col-start-6 col-end-13 p-3 rounded-lg">
                   <div class="flex items-center justify-start flex-row-reverse">
                     <div class="flex items-center justify-center h-10 w-10 rounded-full bg-indigo-500 flex-shrink-0">
-                      A
+                          {{ firstCharacter }} 
                     </div>
                     <div class="relative mr-3 text-sm bg-indigo-100 py-2 px-4 shadow rounded-xl">
                       <div>I'm ok what about you?</div>
@@ -336,14 +317,15 @@ const showRightPanel = ref(false);
               <div class="relative w-full">
                 <input
                   type="text"
-                  class="flex w-full border rounded-xl focus:outline-none focus:border-indigo-300 pl-4 h-10"
-                />
+                  v-model="messageToUser"
+                  placeholder="ส่งข้อความที่นี้..."
+                  class="flex w-full border rounded-xl focus:outline-none focus:border-indigo-300 pl-4 h-10" />
               </div>
             </div>
 
             <!-- -------- -->
             <div class="ml-4">
-              <button class="flex items-center justify-center bg-indigo-500 hover:bg-indigo-600 rounded-xl text-white px-4 py-1 flex-shrink-0">
+              <button  @click="handleSendMessage" class="flex items-center justify-center bg-indigo-500 hover:bg-indigo-600 rounded-xl text-white px-4 py-1 flex-shrink-0">
                 <span>Send</span>
                 <span class="ml-2">
                   <svg
@@ -363,6 +345,7 @@ const showRightPanel = ref(false);
                 </span>
               </button>
             </div>
+          <!-- ------------------------------------ -->
           </div>
         </div>
       </div>
