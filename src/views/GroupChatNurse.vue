@@ -228,13 +228,11 @@ const firstCharacter = computed(() => {
       </div> -->
 
       <!-- Input field for sending message to user -->
-  
-    </div>
-    <!-- -------------------------------------------------------------------------------------------- -->
 
+      
 <!-- component -->
-<div class="flex h-screen antialiased text-gray-800 container mx-auto mt-6  ">
-    <div class="flex flex-row h-full w-full overflow-x-hidden ">
+<div class="flex h-screen antialiased text-gray-800 container  mt-6   ">
+    <div class="flex flex-row h-full w-full overflow-x-hidden ml-6  ">
       <div class="flex flex-col py-8 pl-6 pr-2 w-64 bg-white flex-shrink-0 rounded-xl">
 
         <div class="flex flex-col items-center bg-indigo-100 border border-gray-200 mt-4 w-full py-6 px-4 rounded-lg" >
@@ -255,20 +253,24 @@ const firstCharacter = computed(() => {
             <!-- ------------------------------------------------------------------------------------------------------------------------------------- -->
           
      <!-- ข้อความด้านซ้ายที่เข้ามา  -->
-            <div class="flex flex-col space-y-1 mt-4 -mx-2 h-80 overflow-y-auto">
-            <button v-for="(message, index) in filteredMessages" :key="index" @click="openModal(message)" class="flex flex-row items-center hover:bg-gray-100 rounded-xl p-2">  
-             <div>
-               <div class="flex items-center space-x-2 rtl:space-x-reverse">
-                  <div class="flex items-center justify-center h-10 w-10 bg-indigo-200 rounded-full overflow-hidden">
-                      <img src="https://cdn.icon-icons.com/icons2/2265/PNG/512/patient_coronavirus_icon_140453.png" alt="Coronavirus Patient Icon" class="h-8 w-8 object-cover">
-                  </div>
-                 <span class="text-sm font-semibold text-gray-900 dark:text-white">{{message.user_name}}</span>
-                 <span class="text-sm font-normal text-gray-500 dark:text-gray-400">{{message.createdAt}}</span>
-             </div>
-                 <p class="text-sm font-normal py-2.5 text-gray-900 dark:text-white">{{ message.message }} </p>
-             </div>
-            </button>
-          </div>
+<div class="flex flex-col space-y-1 mt-4 -mx-2 h-80 overflow-y-auto mr-2 ">
+  <button v-for="(message, index) in filteredMessages" :key="index" @click="openModal(message)" class="flex flex-row items-center hover:bg-gray-100 rounded-xl p-3">
+    <div class="flex items-center"> <!-- แก้ไขที่นี่ -->
+      <div class="h-10 w-10 bg-indigo-200 rounded-full overflow-hidden flex items-center justify-center">
+         <img src="https://cdn.icon-icons.com/icons2/2265/PNG/512/patient_coronavirus_icon_140453.png" alt="Coronavirus Patient Icon" class="h-8 w-8 object-cover">
+      </div>
+      <div class="ml-2 flex flex-col items-start pl-2">
+        <p class="text-sm font-semibold text-gray-900">{{message.user_name}}</p>
+        <p class="text-xs text-gray-500">{{ message.createdAt }}</p>
+        <p class="text-sm font-normal text-gray-900">{{ message.message }}</p>
+  
+      </div>
+    </div>
+  </button>
+</div>
+
+
+
          <!-- ---------------------------------------------------------------------------------------------------- -->
 
 
@@ -357,6 +359,10 @@ const firstCharacter = computed(() => {
       </div>
     </div>
   </div>
+  
+    </div>
+    <!-- -------------------------------------------------------------------------------------------- -->
+
 
   </LayoutNurse>
 </template>
