@@ -282,15 +282,11 @@ const showChatInput = ref(false);
                   </button>
           </div>
                
-
+    <div>
         <!-- -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- -->
-          <!-- แสดงที่ admin user ตอบกลับไปมา -->
-          
-          <div>
-
-          
-<!-- ----------------------------- -->
-<div class="chat-container p-4 border-t border-b border-gray-200 border-gray-300 max-h-96 overflow-y-auto">
+        
+<!-- แสดงที่ admin user ตอบกลับไปมา -->          
+<div class="chat-container p-4 border-t border-b border-gray-200 border-gray-300  h-fit overflow-y-auto">
     <!-- แสดงข้อมูลจาก messagefromAdmin ด้านซ้าย -->
     <div v-for="(message, index) in messagefromAdmin" :key="index" class="message flex items-end justify-end mb-4">
         <div class="flex flex-col">
@@ -314,15 +310,10 @@ const showChatInput = ref(false);
     </div>
 </div>
 </div>
-<!-- ------------------------------------------------------------------------------------- -->
-
-
-<!-- --------------------------------------------------------------------------------------------------------------------------------------------- -->
-          
-      
-          <!-- -------------------------------- -->
+<!-- ------------------------------------------------------------------------------------- -->        
           
           
+       <!-- -ข้อความตอบกลับ -->   
           <div style="display: flex; align-items: center" class="mt-1">
             <input
               type="text"
@@ -341,12 +332,10 @@ const showChatInput = ref(false);
                 <path d="M3.478 2.404a.75.75 0 0 0-.926.941l2.432 7.905H13.5a.75.75 0 0 1 0 1.5H4.984l-2.432 7.905a.75.75 0 0 0 .926.94 60.519 60.519 0 0 0 18.445-8.986.75.75 0 0 0 0-1.218A60.517 60.517 0 0 0 3.478 2.404Z" />
               </svg>
             </button>
-          </div>
-
-          
-          </div>
-
-    </div>
+            
+          </div>   
+       </div>
+</div>    
 
  
     
