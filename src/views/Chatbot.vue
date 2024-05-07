@@ -233,68 +233,42 @@ const showChatInput = ref(false);
 
     <!-- ----------------------------------------------------------------------------------------------------------------------------------------------------------- -->
     <!-- Tab conten ที่ 2 -->
-    <div v-if="activeTab === 2">
-
-    <div  class="box-content bg-white shadow-lg shadow-gray-300/50 mt-10 ml-20 mr-20  mb-10 pt-5 pb-5 pl-5 pr-10 rounded-lg h-fit">
-             <div>
+  <!-- Tab content ที่ 2 -->
+<div v-if="activeTab === 2">
+  <div class="box-content bg-white shadow-lg shadow-gray-300/50 mt-10 ml-20 mr-20 mb-10 pt-5 pb-5 pl-5 pr-10 rounded-lg h-fit">
+    <div>
       <div v-if="showChatInput">
-        <p class=" ml-4 mb-3 font-semibold">เปิดใหม่แซ็ตเพื่อพูดคุยกับพยาบาล</p>     
-           <div class="flex flex-row items-center h-16 rounded-xl bg-white w-full px-4" >
-              <div class="flex-grow">
-              <div class="relative w-full">
-                <input
-                  type="text"
-                  v-model="message"
-                  @keyup.enter="sendMessageAll" 
-                  placeholder="ส่งข้อความที่นี้..."
-                  class="flex w-full border rounded-xl focus:outline-none focus:border-indigo-300 pl-4 h-10" />
-              </div>
+        <p class="ml-4 mb-3 font-semibold">เปิดใหม่แช็ตเพื่อพูดคุยกับพยาบาล</p>
+        <div class="flex flex-row items-center h-16 rounded-xl bg-white w-full px-4">
+          <div class="flex-grow">
+            <div class="relative w-full">
+              <input type="text" v-model="message" placeholder="ส่งข้อความที่นี้..." class="flex w-full border rounded-xl focus:outline-none focus:border-indigo-300 pl-4 h-10" />
             </div>
-        <div class="ml-4">
-              <button @click="sendMessageAll"   class="flex items-center justify-center bg-indigo-500 hover:bg-indigo-600 rounded-xl text-white px-4 py-1 flex-shrink-0">
-                <span>Send</span>
-                <span class="ml-2">
-                  <svg
-                    class="w-4 h-4 transform rotate-45 -mt-px"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
-                    ></path>
-                  </svg>
-                </span>
-              </button>
-            </div>
-        </div>   
+          </div>
+          <div class="ml-4">
+            <button @click="sendMessageAll" class="flex items-center justify-center bg-indigo-500 hover:bg-indigo-600 rounded-xl text-white px-4 py-1 flex-shrink-0">
+              <span>Send</span>
+              <span class="ml-2">
+                <svg class="w-4 h-4 transform rotate-45 -mt-px" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+                </svg>
+              </span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <button v-else @click="showChatInput = true" class="mr-20 bg-blue-500 text-white rounded-lg p-2 mt-2 ml-2">
+        เปิดใหม่แซ็ตเพื่อพูดคุยกับพยาบาล
+      </button>
     </div>
-    
-    <button v-if="!showChatInput" @click="showChatInput = true" class="mr-20 bg-blue-500 text-white rounded-lg p-2 mt-2 ml-2">
-      เปิดใหม่แซ็ตเพื่อพูดคุยกับพยาบาล
-    </button>
   </div>
 
-   </div>
 
 
    
+   <!-- ล่าง -->
     <div  class="box-content bg-white shadow-lg shadow-gray-300/50 mt-10 ml-20 mr-20  mb-10 pt-5 pb-5 pl-5 pr-10 rounded-lg h-screen">
-       
-      <!-- Left--------------------------------------------------------------------------------------------------------------- -->
-      
- 
-
-
-
-
-      <!-- Right---------------------------------------------------------------------------------------------------------- -->
-        
-
           <div class="flex  mb-2 ml-2">
             <img class="rounded-full w-10 h-10" src="https://media.istockphoto.com/id/1253022688/th/%E0%B9%80%E0%B8%A7%E0%B8%84%E0%B9%80%E0%B8%95%E0%B8%AD%E0%B8%A3%E0%B9%8C/%E0%B9%84%E0%B8%AD%E0%B8%84%E0%B8%AD%E0%B8%99%E0%B9%81%E0%B8%9E%E0%B8%97%E0%B8%A2%E0%B9%8C%E0%B9%81%E0%B8%A5%E0%B8%B0%E0%B8%9E%E0%B8%A2%E0%B8%B2%E0%B8%9A%E0%B8%B2%E0%B8%A5%E0%B8%81%E0%B8%B2%E0%B8%A3%E0%B9%8C%E0%B8%95%E0%B8%B9%E0%B8%99.jpg?s=612x612&w=0&k=20&c=n1nvQUuq3wjco_oY59OgzrpthJfEkXwfxeJzrPsnCOs="/>
             <div class="pl-2">
@@ -339,52 +313,15 @@ const showChatInput = ref(false);
         </div>
     </div>
 </div>
-
-
+</div>
 <!-- ------------------------------------------------------------------------------------- -->
 
 
 <!-- --------------------------------------------------------------------------------------------------------------------------------------------- -->
-            <template >
-              <div  class="message flex items-start mb-4">
-                <div class="flex flex-col">
-
-                  <div class="text-xs text-gray-500"> </div>
-
-                  <div class="flex items-center">
-
-                    <div class="bg-gray-100 rounded-lg p-2">
-                      <span class="text-sm font-semibold"></span>
-                    </div>
-
-                    <div class="ml-2 bg-blue-500 text-white rounded-lg p-2">
-                      <span class="text-sm"></span>
-                    </div>
-
-                  </div>
-
-                </div>
-              </div>
-
-              <div  class="message flex items-end justify-end mb-4">
-                <div class="flex flex-col">
-                  <div class="text-xs text-gray-500">
-    
-                  </div>
-                  <div class="flex items-center justify-end">
-                    <div class="mr-2 bg-blue-500 text-white rounded-lg p-2">
-                      <span class="text-sm"></span>
-                    </div>
-                    <div class="bg-gray-100 rounded-lg p-2">
-                      <span class="text-sm font-semibold"></span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </template>
-          </div>
+          
+      
           <!-- -------------------------------- -->
-          <div></div>
+          
           
           <div style="display: flex; align-items: center" class="mt-1">
             <input
