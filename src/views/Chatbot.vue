@@ -57,6 +57,9 @@ const sendMessageAll = async () => {
       text: "Failed to send message",
     });
   }
+
+  
+
 };
 
 onMounted(() => {
@@ -159,6 +162,13 @@ const clearLocalStorage = () => {
   // รีเฟรชหน้าเพื่อให้แสดงการเปลี่ยนแปลงในข้อมูลที่ถูกลบออก
   location.reload();
 };
+
+
+
+/* ----------- */
+const showChatInput = ref(false);
+
+
 </script>
 
 <template>
@@ -215,27 +225,75 @@ const clearLocalStorage = () => {
       </div>
     </div>
 
+
+
+
+
+
+
     <!-- ----------------------------------------------------------------------------------------------------------------------------------------------------------- -->
     <!-- Tab conten ที่ 2 -->
     <div v-if="activeTab === 2">
+
+    <div  class="box-content bg-white shadow-lg shadow-gray-300/50 mt-10 ml-20 mr-20  mb-10 pt-5 pb-5 pl-5 pr-10 rounded-lg h-fit">
+             <div>
+      <div v-if="showChatInput">
+        <p class=" ml-4 mb-3 font-semibold">เปิดใหม่แซ็ตเพื่อพูดคุยกับพยาบาล</p>     
+           <div class="flex flex-row items-center h-16 rounded-xl bg-white w-full px-4" >
+              <div class="flex-grow">
+              <div class="relative w-full">
+                <input
+                  type="text"
+                  v-model="message"
+                  @keyup.enter="sendMessageAll" 
+                  placeholder="ส่งข้อความที่นี้..."
+                  class="flex w-full border rounded-xl focus:outline-none focus:border-indigo-300 pl-4 h-10" />
+              </div>
+            </div>
+        <div class="ml-4">
+              <button @click="sendMessageAll"   class="flex items-center justify-center bg-indigo-500 hover:bg-indigo-600 rounded-xl text-white px-4 py-1 flex-shrink-0">
+                <span>Send</span>
+                <span class="ml-2">
+                  <svg
+                    class="w-4 h-4 transform rotate-45 -mt-px"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
+                    ></path>
+                  </svg>
+                </span>
+              </button>
+            </div>
+        </div>   
+    </div>
+    
+    <button v-if="!showChatInput" @click="showChatInput = true" class="mr-20 bg-blue-500 text-white rounded-lg p-2 mt-2 ml-2">
+      เปิดใหม่แซ็ตเพื่อพูดคุยกับพยาบาล
+    </button>
+  </div>
+
+   </div>
+
+
    
-    <div class="box-content bg-white shadow-lg shadow-gray-300/50 mt-10 ml-5 mr-5 pt-5 pb-5 pl-10 pr-10 rounded-lg">
-        
-         <div class="flex">
+    <div  class="box-content bg-white shadow-lg shadow-gray-300/50 mt-10 ml-20 mr-20  mb-10 pt-5 pb-5 pl-5 pr-10 rounded-lg h-screen">
+       
       <!-- Left--------------------------------------------------------------------------------------------------------------- -->
-               <div class="w-1/3 border-r">
-                  <p class="mb-3 font-semibold ">เปิดใหม่แซ็ตเพื่อพูดคุยกับพยาบาล</p>
-                     <!-- ------------------------------------------------- -->
-                      <div style="display: flex; align-items: center" class="mr-10">
-                         <input type="text" v-model="message" placeholder="พิมพ์ข้อความของคุณ" @keyup.enter="sendMessageAll"  class="block w-1/2 p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500"  />
-                           <button @click="sendMessageAll" class=" bg-blue-500 text-white rounded-lg p-2 ml-2 ">
-                               ส่งข้อความ
-                           </button>
-                    </div>
-                </div> 
-  
+      
+ 
+
+
+
+
       <!-- Right---------------------------------------------------------------------------------------------------------- -->
-          <div class="w-2/3">
+        
 
           <div class="flex  mb-2 ml-2">
             <img class="rounded-full w-10 h-10" src="https://media.istockphoto.com/id/1253022688/th/%E0%B9%80%E0%B8%A7%E0%B8%84%E0%B9%80%E0%B8%95%E0%B8%AD%E0%B8%A3%E0%B9%8C/%E0%B9%84%E0%B8%AD%E0%B8%84%E0%B8%AD%E0%B8%99%E0%B9%81%E0%B8%9E%E0%B8%97%E0%B8%A2%E0%B9%8C%E0%B9%81%E0%B8%A5%E0%B8%B0%E0%B8%9E%E0%B8%A2%E0%B8%B2%E0%B8%9A%E0%B8%B2%E0%B8%A5%E0%B8%81%E0%B8%B2%E0%B8%A3%E0%B9%8C%E0%B8%95%E0%B8%B9%E0%B8%99.jpg?s=612x612&w=0&k=20&c=n1nvQUuq3wjco_oY59OgzrpthJfEkXwfxeJzrPsnCOs="/>
@@ -353,8 +411,8 @@ const clearLocalStorage = () => {
 
     </div>
 
-      </div>
-    </div>
+ 
+    
 
 <!-- --------------------------------------------------------------------------------------------------------- -->
 

@@ -320,7 +320,7 @@ const firstCharacter = computed(() => {
             </div>
           </div>
           <div class="flex flex-row items-center h-16 rounded-xl bg-white w-full px-4" >
-    
+  
             <div class="flex-grow ml-4">
               <div class="relative w-full">
                 <input
