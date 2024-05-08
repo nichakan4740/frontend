@@ -70,6 +70,9 @@ const openModal = (message) => {
   storeClickedMessage(message, userId); // เรียกใช้ฟังก์ชันเพื่อบันทึกข้อความใหม่และ userId
   lastMessage.value = message; // อัพเดทค่า lastMessage ใหม่
   showModal.value = true; // แสดง Modal
+  clickedUserId.value = userId; // กำหนดค่า clickedUserId เมื่อมีการคลิก
+
+
 
   // อัปเดต filteredMessagesAll ใหม่เพื่อแสดงข้อความทั้งหมดที่เกี่ยวข้องกับผู้ใช้งาน
   filteredMessagesAll.value = messages.value.filter(msg => {  
@@ -86,8 +89,10 @@ const storeClickedMessage = (message, userId) => {
 
 /* -------------------------------------------------------------------------------------------------------------------------- */
 /* ส่งข้อความตอบกลับ */
+const clickedUserId = ref(null);
 
 const messageToUser = ref('');  
+
 const sendMessageToUser = (message) => {
   const userId = localStorage.getItem('userId');
   fetch(`${import.meta.env.VITE_BASE_URL}api/sendmessage/ToUser/${userId}`, {
@@ -111,6 +116,8 @@ const sendMessageToUser = (message) => {
       admin_id: adminId,
       user_id: userId,
     });
+    // บันทึก messagesendToUser ใน localStorage
+    localStorage.setItem('messagesendToUser', JSON.stringify(messagesendToUser.value));
   })
   .catch((error) => {
     console.error("Error:", error);
@@ -120,7 +127,7 @@ const sendMessageToUser = (message) => {
       text: "Failed to send message",
     });
   });
-}; 
+};
 
 const handleSendMessage = () => {
   if (messageToUser.value.trim() !== '') {
@@ -151,9 +158,21 @@ channelsendToUser.bind('message', (data) => {
     user_id: data.user_id,
   });
 }); 
+
 onMounted(() => {
-  // ทำสิ่งที่ต้องการเมื่อ component ถูก mount
+  // อ่านข้อมูล messagesendToUser จาก localStorage
+  if (localStorage.getItem('messagesendToUser')) {
+    messagesendToUser.value = JSON.parse(localStorage.getItem('messagesendToUser'));
+  }
 });
+
+const filteredMessagesToSend = computed(() => {
+  return messagesendToUser.value.filter(msg => {
+    return msg.user_id === clickedUserId.value; // กรองเฉพาะข้อความที่มี user_id เท่ากับค่าที่ถูกคลิก
+  });
+});
+
+
 
 
 
@@ -186,8 +205,6 @@ onMounted(() => {
 
 });
 /* ---------------------------------------------------------------------------------------------------------- */
-
-
 
 // ดึงข้อมูล name จาก Local Storage
 const name = ref('')
@@ -279,7 +296,7 @@ const firstCharacter = computed(() => {
                 </div>
 <!-- ---------------------------------------------------------------------------------------------------- -->
               
-                <div class="col-start-6 col-end-13 p-3 rounded-lg" v-for="(message, index) in messagesendToUser" :key="index" >
+                <div class="col-start-6 col-end-13 p-3 rounded-lg" v-for="(message, index) in filteredMessagesToSend" :key="index" >
                   <div class="flex items-center justify-start flex-row-reverse">
                     <div class="flex items-center justify-center h-10 w-10 rounded-full bg-indigo-500 flex-shrink-0">
                           {{ firstCharacter }} 
@@ -291,22 +308,6 @@ const firstCharacter = computed(() => {
                     </div>
                   </div>
                 </div>
-<!-- ---------------------------------------- -->
-
-<div>
-    <!-- ส่วนที่แสดงผลข้อความที่ตอบกลับมาจาก user -->
-   <!--  <div class="mt-4">
-      <h2 class="text-lg font-semibold">Messages from User</h2>
-      <div class="mt-2">
-        <div v-for="msg in messagefromUser" :key="msg.createdAt">
-          <div class="bg-gray-100 p-2 rounded mb-2">
-            <p class="text-sm">{{ msg.message }}</p>
-            <p class="text-xs text-gray-500">{{ msg.createdAt }}</p>
-          </div>
-        </div>
-      </div>
-    </div> -->
-</div>
 <!-- --------------------------------------------------------------------------------------------------------- -->
            
           
