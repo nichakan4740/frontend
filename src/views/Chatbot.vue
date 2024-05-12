@@ -186,14 +186,14 @@ const showChatInput = ref(false);
           :class="{ active: activeTab === 1 }"
           @click="activeTab = 1"
         >
-          Chatbot สอบถามข้อสงสัยเบื้องต้น
+           คุยกับพยาบาล   
         </button>
         <button
           class="tab font-semibold text-xl text-center text-slate-800"
           :class="{ active: activeTab === 2 }"
           @click="activeTab = 2"
         >
-          คุยกับพยาบาล
+         Chatbot สอบถามข้อสงสัยเบื้องต้น   
         </button>
       </div>
       
@@ -204,38 +204,10 @@ const showChatInput = ref(false);
 
       <!-- Tab content ที่ 1 -->
       <div v-if="activeTab === 1">
-        <div class="box-content bg-white shadow-lg shadow-gray-300/50 mt-10 ml-5 mr-5 pt-1 pb-6 pl-20 pr-20 mb-5 rounded-lg" >
-          <iframe
-            src="https://www.chatbase.co/chatbot-iframe/2ZD0Ya4vIQNlG8lowAn8m"
-            width="100%"
-            style="height: 100%; min-height: 500px"
-            frameborder="0"
-          ></iframe>
-        </div>
 
-        <div class="mb-8 ml-2 mr-4">
-          <p class="text">
-            หากมีคำถามเพิ่มเติมหรือต้องการความช่วยเหลือเพิ่มเติมใด ๆ
-            ก็อย่าลังเลที่จะสอบถามมานะคะ ฉันยินดีที่ได้ช่วยเสมอค่ะ!
-          </p>
-          <p class="text">
-            **ขออภัยในเรื่องของขอมูลในการตอบคำถาม กำลังอยู่ในช่วงพัฒนา**
-          </p>
-        </div>
-      </div>
-    </div>
+      
 
-
-
-
-
-
-
-    <!-- ----------------------------------------------------------------------------------------------------------------------------------------------------------- -->
-    <!-- Tab conten ที่ 2 -->
-  <!-- Tab content ที่ 2 -->
-<div v-if="activeTab === 2">
-  <div class="box-content bg-white shadow-lg shadow-gray-300/50 mt-10 ml-20 mr-20 mb-10 pt-5 pb-5 pl-5 pr-10 rounded-lg h-fit">
+ <div class="box-content bg-white shadow-lg shadow-gray-300/50 mt-10 ml-20 mr-20 mb-10 pt-5 pb-5 pl-5 pr-10 rounded-lg h-fit">
     <div>
       <div v-if="showChatInput">
         <p class="ml-4 mb-3 font-semibold">เปิดใหม่แช็ตเพื่อพูดคุยกับพยาบาล</p>
@@ -335,6 +307,41 @@ const showChatInput = ref(false);
             
           </div>   
        </div>
+
+
+        
+      </div>
+    </div>
+
+
+
+
+
+
+
+    <!-- ----------------------------------------------------------------------------------------------------------------------------------------------------------- -->
+  
+  <!-- Tab content ที่ 2 -->
+<div v-if="activeTab === 2">
+<div class="box-content bg-white shadow-lg shadow-gray-300/50 mt-10 ml-5 mr-5 pt-1 pb-6 pl-20 pr-20 mb-5 rounded-lg" >
+          <iframe
+            src="https://www.chatbase.co/chatbot-iframe/2ZD0Ya4vIQNlG8lowAn8m"
+            width="100%"
+            style="height: 100%; min-height: 500px"
+            frameborder="0"
+          ></iframe>
+        </div>
+
+        <div class="mb-8 ml-2 mr-4">
+          <p class="text">
+            หากมีคำถามเพิ่มเติมหรือต้องการความช่วยเหลือเพิ่มเติมใด ๆ
+            ก็อย่าลังเลที่จะสอบถามมานะคะ ฉันยินดีที่ได้ช่วยเสมอค่ะ!
+          </p>
+          <p class="text">
+            **ขออภัยในเรื่องของขอมูลในการตอบคำถาม กำลังอยู่ในช่วงพัฒนา**
+          </p>
+        </div>
+ 
 </div>    
 
  

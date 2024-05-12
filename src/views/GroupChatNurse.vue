@@ -5,6 +5,7 @@ import moment from "moment";
 import Pusher from "pusher-js";
 import Swal from "sweetalert2";
 
+/* --------------------------------------------------------------------------------- */
 /* เวลา */
 const formatTime = (time) => {
   return moment(time).format("YYYY-MM-DD");
@@ -70,26 +71,29 @@ const openModal = (message) => {
   storeClickedMessage(message, userId); // เรียกใช้ฟังก์ชันเพื่อบันทึกข้อความใหม่และ userId
   lastMessage.value = message; // อัพเดทค่า lastMessage ใหม่
   showModal.value = true; // แสดง Modal
+  clickedUserId.value = userId; // กำหนดค่า clickedUserId เมื่อมีการคลิก
+
+
 
   // อัปเดต filteredMessagesAll ใหม่เพื่อแสดงข้อความทั้งหมดที่เกี่ยวข้องกับผู้ใช้งาน
   filteredMessagesAll.value = messages.value.filter(msg => {  
     return msg.admin_id === parseInt(adminId) && msg.user_id === message.user_id;
   });
-
-  // เรียกใช้งานฟังก์ชัน sendMessageToUser ในที่นี้หลังจากกดเปิด Modal
-  sendMessageToUser(messageToUser.value);
 };
 
 const storeClickedMessage = (message, userId) => {
   // บันทึกข้อความล่าสุดไว้ใน localStorage
   localStorage.setItem('NewMessageAll', JSON.stringify(message));
   localStorage.setItem('userId', JSON.stringify(parseInt(message.user_id)));
-};
+}; 
 
 
 /* -------------------------------------------------------------------------------------------------------------------------- */
 /* ส่งข้อความตอบกลับ */
+const clickedUserId = ref(null);
+
 const messageToUser = ref('');  
+
 const sendMessageToUser = (message) => {
   const userId = localStorage.getItem('userId');
   fetch(`${import.meta.env.VITE_BASE_URL}api/sendmessage/ToUser/${userId}`, {
@@ -106,13 +110,15 @@ const sendMessageToUser = (message) => {
   .then((response) => response.json())
   .then((data) => {
     console.log("Message sent successfully", data);
-    // เพิ่มข้อมูลข้อความที่ส่งกลับไปยัง filteredMessagesAll
-    const newMessage = {
+    // เพิ่มข้อมูลข้อความที่ส่งกลับไปยัง messagesendToUser
+    messagesendToUser.value.push({
       message: message,
       createdAt: formatTime(new Date()), // ใช้เวลาปัจจุบัน
       admin_id: adminId,
       user_id: userId,
-    };
+    });
+    // บันทึก messagesendToUser ใน localStorage
+    localStorage.setItem('messagesendToUser', JSON.stringify(messagesendToUser.value));
   })
   .catch((error) => {
     console.error("Error:", error);
@@ -122,7 +128,8 @@ const sendMessageToUser = (message) => {
       text: "Failed to send message",
     });
   });
-}; 
+};
+
 const handleSendMessage = () => {
   if (messageToUser.value.trim() !== '') {
     sendMessageToUser(messageToUser.value);
@@ -134,8 +141,6 @@ const handleSendMessage = () => {
     });
   }
 }; 
-/* ------------------------------------------------------------------------------------------------- */
-
 
 const messagesendToUser = ref([]);
 const userIds = localStorage.getItem('userId');
@@ -145,21 +150,33 @@ const pushersendToUser = new Pusher('c38b6cfa9a4f7e26bf76', {
   encrypted: true,
 });
 const channelsendToUser = pushersendToUser.subscribe(channelNamesendToUser);
-// Store messages in localStorage when a new message is received
 channelsendToUser.bind('message', (data) => {
-  console.log(data); // Check the structure of data
-   messagesendToUser.value.push({
+  console.log(data); // ตรวจสอบโครงสร้างข้อมูล
+  messagesendToUser.value.push({
     message: data.message,
-    createdAt: formatTime(data.createdAt), // Ensure formatTime function is defined and working correctly
+    createdAt: formatTime(data.createdAt),
     admin_id: data.admin_id,
     user_id: data.user_id,
   });
-});
+}); 
+
 onMounted(() => {
+  // อ่านข้อมูล messagesendToUser จาก localStorage
+  if (localStorage.getItem('messagesendToUser')) {
+    messagesendToUser.value = JSON.parse(localStorage.getItem('messagesendToUser'));
+  }
+});
 
+const filteredMessagesToSend = computed(() => {
+  return messagesendToUser.value.filter(msg => {
+    return msg.user_id === clickedUserId.value; // กรองเฉพาะข้อความที่มี user_id เท่ากับค่าที่ถูกคลิก
+  });
 });
 
 
+
+
+/* ------------------------------------------------------------------------------------------------------------------------------------ */
 /* แสดงข้อความที่ตอบกลับมาจาก user */
 
 const messagefromUser = ref([]);
@@ -168,7 +185,6 @@ const pusherAdmin = new Pusher('c38b6cfa9a4f7e26bf76', {
   cluster: 'ap1',
   encrypted: true,
 });
-
 const channel = pusherAdmin.subscribe(channelName);
 // Store messages in localStorage when a new message is received
 channel.bind('message', (data) => {
@@ -181,11 +197,8 @@ channel.bind('message', (data) => {
   });
 });
 onMounted(() => {
-
 });
 /* ---------------------------------------------------------------------------------------------------------- */
-
-
 
 // ดึงข้อมูล name จาก Local Storage
 const name = ref('')
@@ -207,29 +220,7 @@ const firstCharacter = computed(() => {
         <h2 class="font-semibold text-xl text-center text-slate-200">คุยกับผู้ป่วย</h2>
       </div>
 
-  
-   <!--  
-      <div>
-        <div v-for="(message, index) in messagefromUser" :key="index">
-          <p>{{ message.message }}</p>
-          <p>Created At: {{ message.createdAt }}</p>
-          <p>Admin ID: {{ message.admin_id }}</p>
-          <p>User ID: {{ message.user_id }}</p>
-        </div>
-      </div>
-
-      <div>
-        <div v-for="(message, index) in messagesendToUser" :key="index">
-          <p>{{ message.message }}</p>
-          <p>Created At: {{ message.createdAt }}</p>
-          <p>Admin ID: {{ message.admin_id }}</p>
-          <p>User ID: {{ message.user_id }}</p>
-        </div>
-      </div> -->
-
-      <!-- Input field for sending message to user -->
-
-      
+     
 <!-- component -->
 <div class="flex h-screen antialiased text-gray-800 container  mt-6   ">
     <div class="flex flex-row h-full w-full overflow-x-hidden ml-6  ">
@@ -269,12 +260,7 @@ const firstCharacter = computed(() => {
   </button>
 </div>
 
-
-
          <!-- ---------------------------------------------------------------------------------------------------- -->
-
-
-
 
         </div>
       </div>   
@@ -302,20 +288,38 @@ const firstCharacter = computed(() => {
                     </div>
                   </div>
                 </div>
+
+                <div>
+    <!-- วนลูปข้อความที่ตอบกลับมาจากผู้ใช้ -->
+    <div v-for="(message, index) in messagefromUser" :key="index" class="flex items-center justify-start flex-row-reverse">
+      <div class="flex items-center justify-center h-10 w-10 rounded-full bg-indigo-500 flex-shrink-0">
+        {{ firstCharacter }}
+      </div>
+      <div class="relative mr-3 text-sm bg-indigo-100 py-2 px-4 shadow rounded-xl">
+        <div>{{ message.message }}</div>
+        <p class="text-sm text-gray-600">CreatedAt: {{ message.createdAt }}</p>
+        <p class="text-sm text-gray-600">admin_id: {{ message.admin_id }}</p>
+      </div>
+    </div>
+  </div>
 <!-- ---------------------------------------------------------------------------------------------------- -->
               
-                <div class="col-start-6 col-end-13 p-3 rounded-lg">
+                <div class="col-start-6 col-end-13 p-3 rounded-lg" v-for="(message, index) in filteredMessagesToSend" :key="message.user_id">
                   <div class="flex items-center justify-start flex-row-reverse">
                     <div class="flex items-center justify-center h-10 w-10 rounded-full bg-indigo-500 flex-shrink-0">
                           {{ firstCharacter }} 
                     </div>
                     <div class="relative mr-3 text-sm bg-indigo-100 py-2 px-4 shadow rounded-xl">
-                      <div>I'm ok what about you?</div>
+                      <div>{{ message.message }}</div>
+                      <p class="text-sm text-gray-600">CreatedAt:{{ message.createdAt }}</p>
+                      <p class="text-sm text-gray-600">admin_id: {{ message.user_id}}</p>
                     </div>
                   </div>
                 </div>
 <!-- --------------------------------------------------------------------------------------------------------- -->
            
+
+          
            </div>
             </div>
           </div>
