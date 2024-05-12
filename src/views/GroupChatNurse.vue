@@ -5,6 +5,7 @@ import moment from "moment";
 import Pusher from "pusher-js";
 import Swal from "sweetalert2";
 
+/* --------------------------------------------------------------------------------- */
 /* เวลา */
 const formatTime = (time) => {
   return moment(time).format("YYYY-MM-DD");
@@ -175,12 +176,6 @@ const filteredMessagesToSend = computed(() => {
 
 
 
-
-
-
-
-
-
 /* ------------------------------------------------------------------------------------------------------------------------------------ */
 /* แสดงข้อความที่ตอบกลับมาจาก user */
 
@@ -202,7 +197,6 @@ channel.bind('message', (data) => {
   });
 });
 onMounted(() => {
-
 });
 /* ---------------------------------------------------------------------------------------------------------- */
 
@@ -294,9 +288,23 @@ const firstCharacter = computed(() => {
                     </div>
                   </div>
                 </div>
+
+                <div>
+    <!-- วนลูปข้อความที่ตอบกลับมาจากผู้ใช้ -->
+    <div v-for="(message, index) in messagefromUser" :key="index" class="flex items-center justify-start flex-row-reverse">
+      <div class="flex items-center justify-center h-10 w-10 rounded-full bg-indigo-500 flex-shrink-0">
+        {{ firstCharacter }}
+      </div>
+      <div class="relative mr-3 text-sm bg-indigo-100 py-2 px-4 shadow rounded-xl">
+        <div>{{ message.message }}</div>
+        <p class="text-sm text-gray-600">CreatedAt: {{ message.createdAt }}</p>
+        <p class="text-sm text-gray-600">admin_id: {{ message.admin_id }}</p>
+      </div>
+    </div>
+  </div>
 <!-- ---------------------------------------------------------------------------------------------------- -->
               
-                <div class="col-start-6 col-end-13 p-3 rounded-lg" v-for="(message, index) in filteredMessagesToSend" :key="index" >
+                <div class="col-start-6 col-end-13 p-3 rounded-lg" v-for="(message, index) in filteredMessagesToSend" :key="message.user_id">
                   <div class="flex items-center justify-start flex-row-reverse">
                     <div class="flex items-center justify-center h-10 w-10 rounded-full bg-indigo-500 flex-shrink-0">
                           {{ firstCharacter }} 
@@ -310,6 +318,7 @@ const firstCharacter = computed(() => {
                 </div>
 <!-- --------------------------------------------------------------------------------------------------------- -->
            
+
           
            </div>
             </div>
