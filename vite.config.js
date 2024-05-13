@@ -6,6 +6,6 @@ export default defineConfig({
   plugins: [
     vue(),
   ],
-  // base:'/ssa2/'
+  base:'/ssa2/'
 })
 
