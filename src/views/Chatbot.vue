@@ -57,10 +57,10 @@ const sendMessageAll = async () => {
       text: "Failed to send message",
     });
   }
-
-  
-
 };
+
+
+
 
 onMounted(() => {
   const storedConversations = localStorage.getItem('conversations');
@@ -77,37 +77,56 @@ const filteredConversations = computed(() => {
 /* --------------------------------------------------------------------------------------------------------------------  */
 /* แสดงข้อความที่ตอบกลับมา */
 
+
+
 const messagefromAdmin = ref([]);
-const channelName = 'Touserid.' + userId;
-const pusherUser = new Pusher('c38b6cfa9a4f7e26bf76', {
-  cluster: 'ap1',
-  encrypted: true,
-});
+  const channelName = 'Touserid' + userId; 
 
-const channel = pusherUser.subscribe(channelName);
-// Store messages in localStorage when a new message is received
-channel.bind('message', (data) => {
-  console.log(data); // Check the structure of data
-  messagefromAdmin.value.push({
-    message: data.message,
-    createdAt: formatTime(data.createdAt), // Ensure formatTime function is defined and working correctly
-    admin_id: data.admin_id,
-    user_id: data.user_id,
+
+  const pusherUser = new Pusher('c38b6cfa9a4f7e26bf76', {
+    cluster: 'ap1',
+    encrypted: true,
   });
-});
-onMounted(() => {
+  
+  const channel = pusherUser.subscribe(channelName);
+  // Store messages in localStorage when a new message is received
+  channel.bind('message', (data) => {
+    console.log(data); // Check the structure of data
+    messagefromAdmin.value.push ({
+      message: data.message,
+      createdAt: formatTime(data.createdAt),
+      admin_id: data.admin_id,
+      user_id: data.user_id,
+    });
 
+    localStorage.setItem("messagefromAdmin", JSON.stringify(messagefromAdmin.value));
+  });
+
+onMounted(() => {
+  
+  if (localStorage.getItem("messagefromAdmin")) {
+    messagefromAdmin.value = JSON.parse(
+     localStorage.getItem("messagefromAdmin"));
+  }
 });
+
 /* -------------------------------------------------------------------------- */
 
 
 /* ตอบกลับ admin */
-
+// Define reactive variables
+const router = useRouter();
 const messagetoadmin = ref('');
+const responseMessages = ref([]);
+
+// Function to send message to admin
 const sendMessagetoadmin = async () => {
   try {
+    // Your logic to get adminId
     const adminId = messagefromAdmin.value.length > 0 ? messagefromAdmin.value[messagefromAdmin.value.length - 1].admin_id : null;
     console.log("Parsed Admin ID:", adminId);
+    
+    // Fetch API to send message
     const response = await fetch(`${import.meta.env.VITE_BASE_URL}api/sendmessage/ToAdmin/${adminId}`, {
       method: 'POST',
       headers: {
@@ -120,21 +139,39 @@ const sendMessagetoadmin = async () => {
       }),
     });
 
+    // Handle response
     if (!response.ok) {
       const errorMessage = await response.text();
       throw new Error(errorMessage || 'Failed to send message');
     }
 
-    const responseData = await response.json();
-    console.log('Message sent successfully:', responseData);
-    // อาจจะต้องทำอะไรบางอย่างหลังจากส่งข้อความสำเร็จ เช่น รีเซ็ตค่า messagetoadmin
+    // Push the sent message to responseMessages array
+    responseMessages.value.push({
+      user_id: userId,
+      message: messagetoadmin.value,
+    });
+
+    // Save responseMessages array to localStorage
+    localStorage.setItem("responseMessages", JSON.stringify(responseMessages.value));
+
+    // Clear message input
+    messagetoadmin.value = '';
   } catch (error) {
     console.error('Error sending message:', error);
+    responseMessage.value = 'Failed to send message';
   }
 };
 
-/* ------------------------------------------------------------------------------- */
+// Load responseMessages array from localStorage on component mount
+onMounted(() => {
+  const storedResponseMessages = localStorage.getItem('responseMessages');
+  if (storedResponseMessages) {
+    responseMessages.value = JSON.parse(storedResponseMessages);
+  }
+});
 
+
+/* ------------------------------------------------------------------------------------------------ */
 
 /* เลือก Teb -------------------------------------------------------- */
 const activeTab = ref(1);
@@ -282,31 +319,36 @@ const showChatInput = ref(false);
     </div>
 </div>
 </div>
+
+<!-- แสดงข้อความที่ส่งมาจากผู้ใช้ไปยังผู้ดูแลระบบ -->
+   <div v-for="(response, index) in responseMessages" :key="index" class="response-message">
+  <p>User ID: {{ response.user_id }}</p>
+  <p>Message: {{ response.message }}</p>
+</div>
+
 <!-- ------------------------------------------------------------------------------------- -->        
           
           
-       <!-- -ข้อความตอบกลับ -->   
-          <div style="display: flex; align-items: center" class="mt-1">
-            <input
-              type="text"
-              placeholder="พิมพ์ข้อความที่นี่..."
-              v-model="messagetoadmin"
-              class="block w-full p-2 text-gray-900 border-0 focus:ring-white focus:border-white"
-            />
-
-            <button @click="sendMessagetoadmin" >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="currentColor"
-                class="w-6 h-6 text-gray-600"
-              >
-                <path d="M3.478 2.404a.75.75 0 0 0-.926.941l2.432 7.905H13.5a.75.75 0 0 1 0 1.5H4.984l-2.432 7.905a.75.75 0 0 0 .926.94 60.519 60.519 0 0 0 18.445-8.986.75.75 0 0 0 0-1.218A60.517 60.517 0 0 0 3.478 2.404Z" />
-              </svg>
-            </button>
-            
-          </div>   
-       </div>
+       <!-- ปุ่มสำหรับส่งข้อความจากผู้ใช้ไปยังผู้ดูแลระบบ -->
+<div style="display: flex; align-items: center" class="mt-1">
+    <input
+        type="text"
+        placeholder="พิมพ์ข้อความที่นี่..."
+        v-model="messagetoadmin"
+        class="block w-full p-2 text-gray-900 border-0 focus:ring-white focus:border-white"
+    />
+    <button @click="sendMessagetoadmin" >
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+            class="w-6 h-6 text-gray-600"
+        >
+            <path d="M3.478 2.404a.75.75 0 0 0-.926.941l2.432 7.905H13.5a.75.75 0 0 1 0 1.5H4.984l-2.432 7.905a.75.75 0 0 0 .926.94 60.519 60.519 0 0 0 18.445-8.986.75.75 0 0 0 0-1.218A60.517 60.517 0 0 0 3.478 2.404Z" />
+        </svg>
+    </button>
+</div> 
+</div>
 
 
         
