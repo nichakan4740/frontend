@@ -80,61 +80,40 @@ const filteredConversations = computed(() => {
 
 
 const messagefromAdmin = ref([]);
-const channelName = 'Touserid' + userId; 
+  const channelName = 'Touserid' + userId; 
 
-const pusherUser = new Pusher('c38b6cfa9a4f7e26bf76', {
-  cluster: 'ap1',
-  encrypted: true,
-});
 
-const channel = pusherUser.subscribe(channelName);
-// Store messages in localStorage when a new message is received
-channel.bind('message', (data) => {
-  console.log(data); // Check the structure of data
-  messagefromAdmin.value.push({
-    message: data.message,
-    createdAt: formatTime(data.createdAt), // Ensure formatTime function is defined and working correctly
-    admin_id: data.admin_id,
-    user_id: data.user_id,
+  const pusherUser = new Pusher('c38b6cfa9a4f7e26bf76', {
+    cluster: 'ap1',
+    encrypted: true,
   });
-});
-onMounted(() => {
+  
+  const channel = pusherUser.subscribe(channelName);
+  // Store messages in localStorage when a new message is received
+  channel.bind('message', (data) => {
+    console.log(data); // Check the structure of data
+    messagefromAdmin.value.push ({
+      message: data.message,
+      createdAt: formatTime(data.createdAt),
+      admin_id: data.admin_id,
+      user_id: data.user_id,
+    });
 
+    localStorage.setItem("messagefromAdmin", JSON.stringify(messagefromAdmin.value));
+  });
+
+onMounted(() => {
+  
+  if (localStorage.getItem("messagefromAdmin")) {
+    messagefromAdmin.value = JSON.parse(
+     localStorage.getItem("messagefromAdmin"));
+  }
 });
+
 /* -------------------------------------------------------------------------- */
 
 
 /* ตอบกลับ admin */
-
-/* const messagetoadmin = ref('');
-const sendMessagetoadmin = async () => {
-  try {
-    const adminId = messagefromAdmin.value.length > 0 ? messagefromAdmin.value[messagefromAdmin.value.length - 1].admin_id : null;
-    console.log("Parsed Admin ID:", adminId);
-    const response = await fetch(`${import.meta.env.VITE_BASE_URL}api/sendmessage/ToAdmin/${adminId}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        user_id: userId,
-        message: messagetoadmin.value,
-        sender_type: 'user', // ระบุว่าเป็น user ที่ส่ง
-      }),
-    });
-
-    if (!response.ok) {
-      const errorMessage = await response.text();
-      throw new Error(errorMessage || 'Failed to send message');
-    }
-
-    const responseData = await response.json();
-    console.log('Message sent successfully:', responseData);
-    // อาจจะต้องทำอะไรบางอย่างหลังจากส่งข้อความสำเร็จ เช่น รีเซ็ตค่า messagetoadmin
-  } catch (error) {
-    console.error('Error sending message:', error);
-  }
-}; */
 // Define reactive variables
 const router = useRouter();
 const messagetoadmin = ref('');
@@ -369,7 +348,7 @@ const showChatInput = ref(false);
         </svg>
     </button>
 </div> 
-       </div>
+</div>
 
 
         
