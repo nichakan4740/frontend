@@ -81,7 +81,7 @@ const openModal = (message) => {
   lastMessage.value = message; // อัพเดตค่า lastMessage ใหม่
   showModal.value = true; // แสดง Modal
   clickedUserId.value = userId; // กำหนดค่า clickedUserId เมื่อมีการคลิก
-  clickedIdUser.value = userId
+  
 
 
   // อัปเดต filteredMessagesAll ใหม่เพื่อแสดงข้อความทั้งหมดที่เกี่ยวข้องกับผู้ใช้งาน
@@ -90,12 +90,7 @@ const openModal = (message) => {
       msg.admin_id === parseInt(adminId) && msg.user_id === message.user_id
     );
   });
-
- 
-
-
 };
-
 
 const storeClickedMessage = (message, userId) => {
   // บันทึกข้อความล่าสุดไว้ใน localStorage
@@ -103,13 +98,6 @@ const storeClickedMessage = (message, userId) => {
   localStorage.setItem("userId", JSON.stringify(parseInt(message.user_id)));
 };
 /* -------------------------------------------------------------------------------------------------------------------------- */
-
-
-
-
-
-
-
 
 /* ส่งข้อความตอบกลับ */
 const clickedUserId = ref(null);
@@ -151,7 +139,7 @@ const handleSendMessage = () => {
 };
 
 
-const clickedIdUser = ref(null);
+
 const messagesendToUser = ref([]);
 const userIds = localStorage.getItem("userId");
 const channelNamesendToUser = "Touserid" + userIds;
@@ -168,7 +156,6 @@ channelsendToUser.bind("message", (data) => {
   // เพิ่มข้อมูลเข้าไปใน messagesendToUser.value
   messagesendToUser.value.push({
     message: data.message,
-  /*   createdAt: formatTime(data.createdAt), */
     admin_id: data.admin_id,
     user_id: data.user_id,
   });
@@ -191,7 +178,7 @@ onMounted(() => {
 
 const filteredMessagesToSend = computed(() => {
   return  messagesendToUser.value.filter((msg) => {
-    return msg.user_id === clickedIdUser.value; // กรองเฉพาะข้อความที่มี user_id เท่ากับค่าที่ถูกคลิก
+    return msg.user_id ===  clickedUserId.value; // กรองเฉพาะข้อความที่มี user_id เท่ากับค่าที่ถูกคลิก
   });
 });
 
@@ -199,21 +186,26 @@ const filteredMessagesToSend = computed(() => {
 
 /* ------------------------------------------------------------------------------------------------------------------------------------ */
 /* แสดงข้อความที่ตอบกลับมาจาก user */
+
 const messagefromUser = ref([]);
 const adminIds = localStorage.getItem("idadmin");
 const channelNamemessagefromUser = "Toadminid" + adminIds;
 
-const channel = pusher.subscribe(channelNamemessagefromUser);
+
+const pusherfromUser = new Pusher("c38b6cfa9a4f7e26bf76", {
+  cluster: "ap1",
+  encrypted: true,
+});
+
+const channel = pusherfromUser.subscribe(channelNamemessagefromUser);
 channel.bind("message", (data) => {
   console.log(data); // Check the structure of data
   messagefromUser.value.push({
     message: data.message,
-   /*  createdAt: formatTime(data.createdAt), // Ensure formatTime function is defined and working correctly */
     admin_id: data.admin_id,
     user_id: data.user_id,
   });
 
-  // Store messages in localStorage when a new message is received
   localStorage.setItem("messagefromUser", JSON.stringify(messagefromUser.value));
 });
 
@@ -223,11 +215,6 @@ onMounted(() => {
     messagefromUser.value = JSON.parse(
      localStorage.getItem("messagefromUser"));
   }
-});
-const filteredMessagefromUser  = computed(() => {
-  return messagesendToUser.value.filter((msg) => {
-    return msg.user_id === clickedUserId.value; // กรองเฉพาะข้อความที่มี user_id เท่ากับค่าที่ถูกคลิก
-  });
 });
 
 
@@ -284,9 +271,7 @@ const firstCharacter = computed(() => {
               <!-- ------------------------------------------------------------------------------------------------------------------------------------- -->
 
               <!-- ข้อความด้านซ้ายที่เข้ามา  -->
-              <div
-                class="flex flex-col space-y-1 mt-4 -mx-2 h-80 overflow-y-auto mr-2"
-              >
+              <div class="flex flex-col space-y-1 mt-4 -mx-2 h-80 overflow-y-auto mr-2">
                 <button
                   v-for="(message, index) in filteredMessages"
                   :key="'user_' + index"
@@ -367,7 +352,9 @@ const firstCharacter = computed(() => {
                       </div>
                     </template>
 
-                    <template   v-for="(message, index) in filteredMessagesToSend" :key="index">
+
+                    <template   v-for="(message, index) in messagefromUser" :key="index"> 
+
                       <div class="col-start-1 col-end-8 p-3 rounded-lg">
                         <div class="flex flex-row items-center">
                           <div class="flex items-center justify-center h-10 w-10 rounded-full bg-indigo-500 flex-shrink-0">

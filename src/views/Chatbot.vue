@@ -57,10 +57,10 @@ const sendMessageAll = async () => {
       text: "Failed to send message",
     });
   }
-
-  
-
 };
+
+
+
 
 onMounted(() => {
   const storedConversations = localStorage.getItem('conversations');
@@ -106,7 +106,7 @@ onMounted(() => {
 
 /* ตอบกลับ admin */
 
-const messagetoadmin = ref('');
+/* const messagetoadmin = ref('');
 const sendMessagetoadmin = async () => {
   try {
     const adminId = messagefromAdmin.value.length > 0 ? messagefromAdmin.value[messagefromAdmin.value.length - 1].admin_id : null;
@@ -134,10 +134,65 @@ const sendMessagetoadmin = async () => {
   } catch (error) {
     console.error('Error sending message:', error);
   }
+}; */
+// Define reactive variables
+const router = useRouter();
+const messagetoadmin = ref('');
+const responseMessages = ref([]);
+
+// Function to send message to admin
+const sendMessagetoadmin = async () => {
+  try {
+    // Your logic to get adminId
+    const adminId = messagefromAdmin.value.length > 0 ? messagefromAdmin.value[messagefromAdmin.value.length - 1].admin_id : null;
+    console.log("Parsed Admin ID:", adminId);
+    
+    // Fetch API to send message
+    const response = await fetch(`${import.meta.env.VITE_BASE_URL}api/sendmessage/ToAdmin/${adminId}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        user_id: userId,
+        message: messagetoadmin.value,
+        sender_type: 'user', // ระบุว่าเป็น user ที่ส่ง
+      }),
+    });
+
+    // Handle response
+    if (!response.ok) {
+      const errorMessage = await response.text();
+      throw new Error(errorMessage || 'Failed to send message');
+    }
+
+    // Push the sent message to responseMessages array
+    responseMessages.value.push({
+      user_id: userId,
+      message: messagetoadmin.value,
+    });
+
+    // Save responseMessages array to localStorage
+    localStorage.setItem("responseMessages", JSON.stringify(responseMessages.value));
+
+    // Clear message input
+    messagetoadmin.value = '';
+  } catch (error) {
+    console.error('Error sending message:', error);
+    responseMessage.value = 'Failed to send message';
+  }
 };
 
-/* ------------------------------------------------------------------------------- */
+// Load responseMessages array from localStorage on component mount
+onMounted(() => {
+  const storedResponseMessages = localStorage.getItem('responseMessages');
+  if (storedResponseMessages) {
+    responseMessages.value = JSON.parse(storedResponseMessages);
+  }
+});
 
+
+/* ------------------------------------------------------------------------------------------------ */
 
 /* เลือก Teb -------------------------------------------------------- */
 const activeTab = ref(1);
@@ -285,30 +340,35 @@ const showChatInput = ref(false);
     </div>
 </div>
 </div>
+
+<!-- แสดงข้อความที่ส่งมาจากผู้ใช้ไปยังผู้ดูแลระบบ -->
+   <div v-for="(response, index) in responseMessages" :key="index" class="response-message">
+  <p>User ID: {{ response.user_id }}</p>
+  <p>Message: {{ response.message }}</p>
+</div>
+
 <!-- ------------------------------------------------------------------------------------- -->        
           
           
-       <!-- -ข้อความตอบกลับ -->   
-          <div style="display: flex; align-items: center" class="mt-1">
-            <input
-              type="text"
-              placeholder="พิมพ์ข้อความที่นี่..."
-              v-model="messagetoadmin"
-              class="block w-full p-2 text-gray-900 border-0 focus:ring-white focus:border-white"
-            />
-
-            <button @click="sendMessagetoadmin" >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="currentColor"
-                class="w-6 h-6 text-gray-600"
-              >
-                <path d="M3.478 2.404a.75.75 0 0 0-.926.941l2.432 7.905H13.5a.75.75 0 0 1 0 1.5H4.984l-2.432 7.905a.75.75 0 0 0 .926.94 60.519 60.519 0 0 0 18.445-8.986.75.75 0 0 0 0-1.218A60.517 60.517 0 0 0 3.478 2.404Z" />
-              </svg>
-            </button>
-            
-          </div>   
+       <!-- ปุ่มสำหรับส่งข้อความจากผู้ใช้ไปยังผู้ดูแลระบบ -->
+<div style="display: flex; align-items: center" class="mt-1">
+    <input
+        type="text"
+        placeholder="พิมพ์ข้อความที่นี่..."
+        v-model="messagetoadmin"
+        class="block w-full p-2 text-gray-900 border-0 focus:ring-white focus:border-white"
+    />
+    <button @click="sendMessagetoadmin" >
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+            class="w-6 h-6 text-gray-600"
+        >
+            <path d="M3.478 2.404a.75.75 0 0 0-.926.941l2.432 7.905H13.5a.75.75 0 0 1 0 1.5H4.984l-2.432 7.905a.75.75 0 0 0 .926.94 60.519 60.519 0 0 0 18.445-8.986.75.75 0 0 0 0-1.218A60.517 60.517 0 0 0 3.478 2.404Z" />
+        </svg>
+    </button>
+</div> 
        </div>
 
 
