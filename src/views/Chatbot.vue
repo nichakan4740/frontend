@@ -77,8 +77,11 @@ const filteredConversations = computed(() => {
 /* --------------------------------------------------------------------------------------------------------------------  */
 /* แสดงข้อความที่ตอบกลับมา */
 
+
+
 const messagefromAdmin = ref([]);
-const channelName = 'Touserid.' + userId;
+const channelName = 'Touserid' + userId; 
+
 const pusherUser = new Pusher('c38b6cfa9a4f7e26bf76', {
   cluster: 'ap1',
   encrypted: true,
