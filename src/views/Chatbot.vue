@@ -127,7 +127,7 @@ const sendMessagetoadmin = async () => {
     console.log("Parsed Admin ID:", adminId);
     
     // Fetch API to send message
-    const response = await fetch(`${import.meta.env.VITE_BASE_URL}api/sendmessage/ToAdmin/${adminId}`, {
+    const response = await fetch(`${import.meta.env.VITE_BASE_URL}api/sendmessage/ToAdmin`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
