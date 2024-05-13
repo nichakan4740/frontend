@@ -16,7 +16,7 @@
     "cors": "^2.8.5",
     "firebase": "^10.11.1",
     "flowbite": "^2.3.0",
-    "laravel-echo": "^1.16.0",
+    "laravel-echo": "^1.16.1",
     "moment": "^2.29.4",
     "pusher-js": "^8.4.0-rc2",
     "sweetalert2": "^11.10.1",

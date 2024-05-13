@@ -1,53 +1,47 @@
 <script setup>
-
 import { ref, onMounted, computed, watch, reactive } from "vue";
 import LayoutNurse from "../layouts/LayoutNurse.vue";
 import moment from "moment";
 import Pusher from "pusher-js";
 import Swal from "sweetalert2";
+
+/* --------------------------------------------------------------------------------- */
+/* เวลา */
 const formatTime = (time) => {
   return moment(time).format("YYYY-MM-DD");
 };
+
+const adminId = localStorage.getItem("idadmin");
+const messages = ref([]);
 
 const pusher = new Pusher("c38b6cfa9a4f7e26bf76", {
   cluster: "ap1",
   encrypted: true,
 });
 
-/* ----------------------------------------------------------------- */
-const adminId = localStorage.getItem("idadmin");
-const state = reactive({
-  message: [],
-  filteredMessages: [],
-});
+const channels = pusher.subscribe('messageUser');
 
-onMounted(() => {
-  const channel = pusher.subscribe('messageUser');
-  channel.bind("message", (data) => {
-    const newMessage = {
-      message: data.message,
-      timestamp: formatTime(data.timestamp), 
-      admin_id: data.admin_id,
-      user_id: data.user_id,
-      user_name: data.user_name,
-    };
-    state.message.push(newMessage);
-    if (parseInt(data.admin_id) === parseInt(adminId)) {
-      state.filteredMessages.push(newMessage);
-      // Save to local storage
-      localStorage.setItem("filteredMessages", JSON.stringify(state.filteredMessages));
-    }
-    window.scrollTo(0,document.body.scrollHeight);
+channels.bind("message", (data) => {
+  messages.value.push({
+    message: data.message,
+    createdAt: formatTime(data.createdAt), 
+    admin_id: data.admin_id,
+    user_id: data.user_id,
+    user_name: data.user_name,
   });
-
-  //แสดงข้อความที่มี id ตรงกับที่ login มา (admin)
-  const filteredMessagesFromStorage = localStorage.getItem("filteredMessages");
-  if (filteredMessagesFromStorage) {
-    state.filteredMessages = JSON.parse(filteredMessagesFromStorage);
-  }
+  localStorage.setItem("messagesAllUser", JSON.stringify(messages.value));
 });
-/* ------------------------------------------------------------------------------ */
 
+if (localStorage.getItem("messagesAllUser")) {
+  messages.value = JSON.parse(localStorage.getItem("messagesAllUser"));
+}
+
+
+
+const filteredMessages = computed(() => {
+  const adminMessages = messages.value.filter(
+    (message) => message.admin_id === parseInt(adminId)
+  );
 
   // สร้างออบเจ็กต์เพื่อเก็บข้อความล่าสุดของแต่ละ user_id
   const latestMessagesByUser = {};
@@ -103,6 +97,132 @@ const storeClickedMessage = (message, userId) => {
 };
 /* -------------------------------------------------------------------------------------------------------------------------- */
 
+
+
+
+/* ส่งข้อความตอบกลับ */
+const clickedUserId = ref(null);
+const messageToUser = ref("");
+
+const sendMessageToUser = (message) => {
+  const userId = localStorage.getItem("userId");
+  fetch(`${import.meta.env.VITE_BASE_URL}api/sendmessage/ToUser/${userId}`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    },
+    body: JSON.stringify({
+      message: message,
+      admin_id: adminId,
+    }),
+  })
+    .then((response) => response.json())
+    .catch((error) => {
+      console.error("Error:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: "Failed to send message",
+      });
+    });
+};
+const handleSendMessage = () => {
+  if (messageToUser.value.trim() !== "") {
+    sendMessageToUser(messageToUser.value);
+  } else {
+    Swal.fire({
+      icon: "error",
+      title: "Oops...",
+      text: "Message must not be empty",
+    });
+  }
+};
+
+
+
+const messagesendToUser = ref([]);
+const userIds = localStorage.getItem("userId");
+/* const channelNamesendToUser = "Touserid" + userIds; */
+ const channelNamesendToUser ='Conversation';
+
+const pushersendToUser = new Pusher("c38b6cfa9a4f7e26bf76", {
+  cluster: "ap1",
+  encrypted: true,
+});
+
+const channelsendToUser = pushersendToUser.subscribe(channelNamesendToUser);
+
+channelsendToUser.bind("message", (data) => {
+ // console.log(data); // ตรวจสอบโครงสร้างข้อมูล 
+  // เพิ่มข้อมูลเข้าไปใน messagesendToUser.value
+  messagesendToUser.value.push({
+    message: data.message,
+    admin_id: data.admin_id,
+    user_id: data.user_id,
+  });
+
+  // บันทึก messagesendToUser ใน localStorage เฉพาะเมื่อมีข้อความใหม่ถูกส่งมา
+  localStorage.setItem(
+    "messagesendToUser",
+    JSON.stringify(messagesendToUser.value)
+  );
+});
+
+onMounted(() => {
+  // อ่านข้อมูล messagesendToUser จาก localStorage
+  if (localStorage.getItem("messagesendToUser")) {
+    messagesendToUser.value = JSON.parse(
+      localStorage.getItem("messagesendToUser")
+    );
+  }
+  console.log(localStorage.getItem("messagesendToUser"))
+}); 
+
+const filteredMessagesToSend = computed(() => {
+  return  messagesendToUser.value.filter((msg) => {
+    return msg.user_id ===  clickedUserId.value; // กรองเฉพาะข้อความที่มี user_id เท่ากับค่าที่ถูกคลิก
+  });
+});
+ 
+
+
+/* ------------------------------------------------------------------------------------------------------------------------------------ */
+/* แสดงข้อความที่ตอบกลับมาจาก user */
+ 
+const messagefromUser = ref([]);
+const adminIds = localStorage.getItem("idadmin");
+/* const channelNamemessagefromUser = "Toadminid" + adminIds; */
+const channelNamemessagefromUser = 'Conversation';
+
+const pusherfromUser = new Pusher("c38b6cfa9a4f7e26bf76", {
+  cluster: "ap1",
+  encrypted: true,
+});
+
+const channel = pusherfromUser.subscribe(channelNamemessagefromUser);
+channel.bind("message", (data) => {
+  console.log(data); // Check the structure of data
+  messagefromUser.value.push({
+    message: data.message,
+    admin_id: data.admin_id,
+    user_id: data.user_id,
+  });
+
+  localStorage.setItem("messagefromUser", JSON.stringify(messagefromUser.value));
+});
+
+onMounted(() => {
+  
+  if (localStorage.getItem("messagefromUser")) {
+    messagefromUser.value = JSON.parse(
+     localStorage.getItem("messagefromUser"));
+  }
+}); 
+
+
+/* ---------------------------------------------------------------------------------------------------------- */
+
 // ดึงข้อมูล name จาก Local Storage
 const name = ref("");
 onMounted(() => {
@@ -112,22 +232,10 @@ onMounted(() => {
 const firstCharacter = computed(() => {
   return name.value.charAt(0);
 });
-
-
-
-
-
-
-
-
-
-
-
-
 </script>
- 
+
 <template>
- <LayoutNurse class="bg-gradient-to-b from-blue-100">
+  <LayoutNurse class="bg-gradient-to-b from-blue-100">
     <!-- Content -->
     <div class="container mx-auto">
       <div
@@ -168,7 +276,7 @@ const firstCharacter = computed(() => {
               <!-- ข้อความด้านซ้ายที่เข้ามา  -->
               <div class="flex flex-col space-y-1 mt-4 -mx-2 h-80 overflow-y-auto mr-2">
                 <button
-                  v-for="(msg, index)  in filteredMessages"
+                  v-for="(message, index) in filteredMessages"
                   :key="'user_' + index"
                   @click="openModal(message)"
                   class="flex flex-row items-center hover:bg-gray-100 rounded-xl p-3"
@@ -185,13 +293,13 @@ const firstCharacter = computed(() => {
                     </div>
                     <div class="ml-2 flex flex-col items-start pl-2">
                       <p class="text-sm font-semibold text-gray-900">
-                        {{ msg.user_name }}
+                        {{ message.user_name }}
                       </p>
                       <p class="text-xs text-gray-500">
-                        {{ msg.timestamp }}
+                        {{ message.createdAt }}
                       </p>
                       <p class="text-sm font-normal text-gray-900">
-                        {{ msg.message }} 
+                        {{ message.message }}
                       </p>
                     </div>
                   </div>
@@ -214,7 +322,7 @@ const firstCharacter = computed(() => {
                   <div class="grid grid-cols-12 gap-y-2">
                     <!-- ----------------------------------------------- ข้อความอันแรก -->
                     <div
-                      class="col-start-1 col-end-8 p-3 rounded-lg" >
+                      class="col-start-1 col-end-8 p-3 rounded-lg" v-for="(message, index) in filteredMessagesAll" :key="index" >
                       <div class="flex flex-row items-center">
                         <div  class="flex items-center justify-center h-10 w-10 rounded-full bg-indigo-500 flex-shrink-0">
                          {{ message.user_name }}
@@ -232,7 +340,7 @@ const firstCharacter = computed(() => {
                     <div></div>
 
                     <!-- ข้อความด้านขวา และข้อความที่ส่งกลับ -->
-                    <template >
+                    <template v-for="(message, index) in filteredMessagesToSend" :key="index">
                       <div class="col-start-6 col-end-13 p-3 rounded-lg">
                         <div class="flex items-center justify-start flex-row-reverse" >
                           <div class="flex items-center justify-center h-10 w-10 rounded-full bg-indigo-500 flex-shrink-0">
@@ -240,14 +348,15 @@ const firstCharacter = computed(() => {
                           </div>
                           <div  class="relative mr-3 text-sm bg-indigo-100 py-2 px-4 shadow rounded-xl">
                             <div>{{ message.message }}</div>
-                      
+                            <!-- <p class="text-sm text-gray-600"> CreatedAt: {{ message.createdAt }}</p> -->
+                            <!-- <p class="text-sm text-gray-600"> admin_id: {{ message.user_id }}</p> -->
                           </div>
                         </div>
                       </div>
                     </template>
 
 
-                    <template   > 
+                    <template   v-for="(message, index) in messagefromUser" :key="index"> 
 
                       <div class="col-start-1 col-end-8 p-3 rounded-lg">
                         <div class="flex flex-row items-center">
@@ -256,7 +365,8 @@ const firstCharacter = computed(() => {
                           </div>
                           <div class="relative ml-3 text-sm bg-white py-2 px-4 shadow rounded-xl" >
                             <div>{{ message.message}}</div>
-    
+                            <!-- <p class="text-sm text-gray-600"> CreatedAt: {{ message.createdAt }}</p> -->
+                            <!-- <p class="text-sm text-gray-600"> admin_id: {{ message.admin_id }}</p> -->
                           </div>
                         </div>
                       </div>
@@ -273,7 +383,7 @@ const firstCharacter = computed(() => {
                   <div class="relative w-full">
                     <input
                       type="text"
-                     
+                      v-model="messageToUser"
                       placeholder="ส่งข้อความที่นี้..."
                       class="flex w-full border rounded-xl focus:outline-none focus:border-indigo-300 pl-4 h-10"
                     />
@@ -281,7 +391,7 @@ const firstCharacter = computed(() => {
                 </div>
                 <div class="ml-4">
                   <button
-                  
+                    @click="handleSendMessage"
                     class="flex items-center justify-center bg-indigo-500 hover:bg-indigo-600 rounded-xl text-white px-4 py-1 flex-shrink-0"
                   >
                     <span>Send</span>
@@ -313,9 +423,6 @@ const firstCharacter = computed(() => {
     </div>
     <!-- -------------------------------------------------------------------------------------------- -->
   </LayoutNurse>
-
 </template>
- 
-<style>
 
-</style>
+<style></style>

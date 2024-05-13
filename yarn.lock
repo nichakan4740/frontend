@@ -1207,10 +1207,10 @@
   "resolved" "https://registry.npmjs.org/jiti/-/jiti-1.21.0.tgz"
   "version" "1.21.0"
 
-"laravel-echo@^1.16.0":
-  "integrity" "sha512-BJGUa4tcKvYmTkzTmcBGMHiO2tq+k7Do5wPmLbRswWfzKwyfZEUR+J5iwBTPEfLLwNPZlA9Kjo6R/NV6pmyIpg=="
-  "resolved" "https://registry.npmjs.org/laravel-echo/-/laravel-echo-1.16.0.tgz"
-  "version" "1.16.0"
+"laravel-echo@^1.16.1":
+  "integrity" "sha512-++Ylb6M3ariC9Rk5WE5gZjj6wcEV5kvLF8b+geJ5/rRIfdoOA+eG6b9qJPrarMD9rY28Apx+l3eelIrCc2skVg=="
+  "resolved" "https://registry.npmjs.org/laravel-echo/-/laravel-echo-1.16.1.tgz"
+  "version" "1.16.1"
 
 "lilconfig@^2.1.0":
   "integrity" "sha512-utWOt/GHzuUxnLKxB6dk81RoOeoNeHgbrXiuGk4yyF5qlRz+iIVWu56E2fqGHFrXz0QNUhLB/8nKqvRH66JKGQ=="
