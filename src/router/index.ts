@@ -169,8 +169,6 @@ const routes = [
   /* chat  เปิดหน้า chat*/
  
 
-
-
 ]
 const router = createRouter({ history, routes })
 export default router
