@@ -59,7 +59,7 @@ onMounted(() => {
     });
   }
 });
-
+/* --------------------------------------------------------------------------------------------------- */
 // Function to open the modal and show messages of the selected user
 const openModal = (userId) => {
   // Find all messages from the selected user
@@ -75,7 +75,7 @@ const openModal = (userId) => {
     });
   }
 };
-
+/* ---------------------------------------------------------------------------------------------------- */
 // Function to send a message to the selected user
 const sendMessageToUser = async () => {
   const message = state.newMessage;
@@ -154,6 +154,7 @@ const firstCharacter = computed(() => {
   return name.value.charAt(0);
 });
 
+
 </script>
 
 <template>
@@ -227,6 +228,7 @@ const firstCharacter = computed(() => {
             </div>
           </div>
 
+<!-- ------------------------------------------------------------------------------------------------ -->
           <!-- ข้อความด้านขวา -->
           <div v-if="state.selectedUserMessages" class="flex flex-col flex-auto h-full p-6">
             <div
@@ -269,6 +271,7 @@ const firstCharacter = computed(() => {
                 </div>
               </div>
 
+<!-- --------------------------------------------------------------------------------------------------------------------------------------------------- -->
               <!-- ข้อความที่ส่ง -->
               <div class="flex flex-row items-center h-16 rounded-xl bg-white w-full px-4">
                 <div class="flex-grow ml-4">
