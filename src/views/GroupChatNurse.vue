@@ -24,6 +24,7 @@ const state = reactive({
   newMessage: "", // Store the new message input
 });
 
+
 onMounted(() => {
   const channel = pusher.subscribe('messageUser');
   channel.bind("message", (data) => {

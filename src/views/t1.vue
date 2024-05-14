@@ -81,7 +81,6 @@ const openModal = (message) => {
   clickedUserId.value = userId; // กำหนดค่า clickedUserId เมื่อมีการคลิก
   
 
-
   // อัปเดต filteredMessagesAll ใหม่เพื่อแสดงข้อความทั้งหมดที่เกี่ยวข้องกับผู้ใช้งาน
   filteredMessagesAll.value = messages.value.filter((msg) => {
     return (

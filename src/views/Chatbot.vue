@@ -6,6 +6,8 @@ import Swal from "sweetalert2";
 import Pusher from "pusher-js";
 import { ref, onMounted, computed, watch } from "vue";
 
+
+/* ส่งข้อความหา Admin ทุกคน  ---------------------------------------------------------------- */
 const formatTime = (time) => {
   return moment(time).format('YYYY-MM-DD HH:mm:ss');
 };
@@ -67,8 +69,41 @@ const filteredConversations = computed(() => {
   return conversations.value.filter(conversation => conversation.user_id === userId);
 });
 
-
 /* ------------------------------------------------------------------------------------------------ */
+
+/* แสดงข้อความที่ Admin ส่งมาหา */
+const messagefromAdmin = ref([]);
+  /* const channelName = 'Touserid' + userId;  */
+   const channelName ='Conversation';
+
+  const pusherUser = new Pusher('c38b6cfa9a4f7e26bf76', {
+    cluster: 'ap1',
+    encrypted: true,
+  });
+  
+  const channel = pusherUser.subscribe(channelName);
+  // Store messages in localStorage when a new message is received
+  channel.bind('message', (data) => {
+    console.log(data); // Check the structure of data
+    messagefromAdmin.value.push ({
+      message: data.message,
+      timestamp: formatTime(data.timestamp),
+      admin_id: data.admin_id,
+      user_id: data.user_id,
+      admin_name: data.admin_name
+
+    });
+
+    localStorage.setItem("messagefromAdmin", JSON.stringify(messagefromAdmin.value));
+  });
+
+onMounted(() => {
+  
+  if (localStorage.getItem("messagefromAdmin")) {
+    messagefromAdmin.value = JSON.parse(
+     localStorage.getItem("messagefromAdmin"));
+  }
+});
 
 /* เลือก Teb -------------------------------------------------------- */
 const activeTab = ref(1);
@@ -99,9 +134,7 @@ const activeTab = ref(1);
         >
          Chatbot สอบถามข้อสงสัยเบื้องต้น   
         </button>
-      </div>
-      
-      
+      </div>  
       </div>
       
       <!-- ----------------------------------------------------------------------------------------------------------------------------------- -->
@@ -130,6 +163,26 @@ const activeTab = ref(1);
   </div>
   <!-- -------------------------------- -->
  
+
+<!-- ข้อความที่มาจาก Admin -->
+ <div v-if="messagefromAdmin.length > 0">
+  <ul>
+    <li v-for="(message, index) in messagefromAdmin" :key="index">
+      <p>{{ message.message }}</p>
+      <p>{{ message.timestamp }}</p>
+      <p>{{ message.admin_name }}</p>
+    </li>
+  </ul>
+</div>
+<div v-else>
+  <p>ไม่มีข้อความ</p>
+</div>
+
+
+
+
+
+
  </div>
    
    
