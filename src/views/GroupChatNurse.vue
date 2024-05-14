@@ -1,12 +1,12 @@
 <script setup>
-import { ref, onMounted, computed, watch, reactive } from "vue";
+import { ref, onMounted, computed, reactive } from "vue";
 import LayoutNurse from "../layouts/LayoutNurse.vue";
 import moment from "moment";
 import Pusher from "pusher-js";
 import Swal from "sweetalert2";
 
 const formatTime = (time) => {
-  return moment(time).format("YYYY-MM-DD");
+  return moment(time).format("YYYY-MM-DD HH:mm:ss");
 };
 
 const pusher = new Pusher("c38b6cfa9a4f7e26bf76", {
@@ -20,6 +20,7 @@ const state = reactive({
   filteredMessages: [],
   latestMessagesByUserId: {}, // Object to store the latest message of each user
   selectedUserMessages: null, // Store messages of the selected user for modal
+  selectedUserId: null, // Store the selected userId
   newMessage: "", // Store the new message input
 });
 
@@ -65,6 +66,7 @@ const openModal = (userId) => {
   const userMessages = state.filteredMessages.filter(msg => msg.user_id === userId);
   if (userMessages.length > 0) {
     state.selectedUserMessages = userMessages;
+    state.selectedUserId = userId;
   } else {
     Swal.fire({
       icon: 'info',
@@ -72,11 +74,9 @@ const openModal = (userId) => {
       text: 'ไม่พบข้อมูลสำหรับผู้ใช้นี้',
     });
   }
-    state.selectedUserId = userId;
 };
-/* ---------------------------------------------------------------------------------------------- */
 
-/* ส่งข้อความตอบกลับ */
+// Function to send a message to the selected user
 const sendMessageToUser = async () => {
   const message = state.newMessage;
   const userId = state.selectedUserId;
@@ -100,8 +100,26 @@ const sendMessageToUser = async () => {
     });
 
     if (response.ok) {
-      // Optionally handle success (e.g., clear input, show confirmation)
+      // Update the state with the new message
+      const newMessage = {
+        message: message,
+        timestamp: formatTime(new Date()), // Use current time for timestamp
+        admin_id: adminId,
+        user_id: userId,
+        user_name: state.selectedUserMessages[0]?.user_name || "Unknown", // Assuming user_name is the same for the selected user's messages
+      };
+
+      state.selectedUserMessages.push(newMessage);
+      state.filteredMessages.push(newMessage);
+      state.latestMessagesByUserId[userId] = newMessage;
+
+      // Save to local storage
+      localStorage.setItem("filteredMessages", JSON.stringify(state.filteredMessages));
+
+      // Clear the input field
       state.newMessage = "";
+
+      // Optionally, show success message
       Swal.fire({
         icon: 'success',
         title: 'ส่งข้อความสำเร็จ',
@@ -123,24 +141,8 @@ const sendMessageToUser = async () => {
     });
   }
 };
-/* --------------------------------------------------------------------- */
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+/* ---------------------------------------------------------------------------------------------- */
 
 // ดึงข้อมูล name จาก Local Storage
 const name = ref("");
@@ -151,8 +153,6 @@ onMounted(() => {
 const firstCharacter = computed(() => {
   return name.value.charAt(0);
 });
-
-
 
 </script>
 
@@ -235,10 +235,27 @@ const firstCharacter = computed(() => {
               <div class="flex flex-col h-full overflow-x-auto mb-4">
                 <div class="flex flex-col h-full">
                   <div class="grid grid-cols-12 gap-y-2">
-                    <div v-for="(msg, index) in state.selectedUserMessages" :key="index" class="col-start-1 col-end-8 p-3 rounded-lg">
-                      <div class="flex flex-row items-center">
-                        <div class="flex items-center justify-center h-10 w-10 rounded-full bg-indigo-500 flex-shrink-0">
-                          {{ msg.user_name.charAt(0) }}
+                    <div 
+                      v-for="(msg, index) in state.selectedUserMessages" 
+                      :key="index" 
+                      :class="{
+                        'col-start-1 col-end-8 p-3 rounded-lg': msg.admin_id !== adminId,
+                        'col-start-6 col-end-13 p-3 rounded-lg justify-end flex': msg.admin_id === adminId
+                      }"
+                    >
+                      <div 
+                        :class="{
+                          'flex flex-row items-center': msg.admin_id !== adminId,
+                          'flex flex-row-reverse items-center': msg.admin_id === adminId
+                        }"
+                      >
+                        <div 
+                          :class="{
+                            'flex items-center justify-center h-10 w-10 rounded-full bg-indigo-500 flex-shrink-0': msg.admin_id !== adminId,
+                            'flex items-center justify-center h-10 w-10 rounded-full bg-green-500 flex-shrink-0': msg.admin_id === adminId
+                          }"
+                        >
+                           {{ msg.admin_id !== adminId ? msg.user_name.charAt(0) : firstCharacter }}
                         </div>
                         <div class="relative ml-3 text-sm bg-white py-2 px-4 shadow rounded-xl">
                           <div>{{ msg.message }}</div>
