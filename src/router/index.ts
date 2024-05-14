@@ -40,7 +40,8 @@ import WhatIs from '../views/WhatIs.vue';
 import GroupChatNurse from '../views/GroupChatNurse.vue'
 
 
-const history = createWebHistory(`${import.meta.env.VITE_BASE_URL}`)
+const history = createWebHistory()
+// const history = createWebHistory(`${import.meta.env.VITE_BASE_URL}`)
 
 const routes = [
 
@@ -172,5 +173,8 @@ const routes = [
 
 
 ]
-const router = createRouter({ history, routes })
+const router = createRouter({
+  history: createWebHistory(),
+  routes
+})
 export default router
