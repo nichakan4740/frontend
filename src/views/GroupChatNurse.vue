@@ -63,7 +63,7 @@ onMounted(() => {
 });
 /* --------------------------------------------------------------------------------------------------- */
 // Function to open the modal and show messages of the selected user
-const openModal = (userId) => {
+/* const openModal = (userId) => {
   // Find all messages from the selected user
   const userMessages = state.filteredMessages.filter(msg => msg.user_id === userId);
   if (userMessages.length > 0) {
@@ -76,7 +76,25 @@ const openModal = (userId) => {
       text: 'ไม่พบข้อมูลสำหรับผู้ใช้นี้',
     });
   }
+}; */
+const openModal = (userId) => {
+  // Find all messages from the selected user
+  const userMessages = state.filteredMessages.filter(msg => msg.user_id === userId);
+  const userMessagesFromStorage = messagefromUser.value.filter(msg => msg.user_id === userId); // Filter messages from user stored in messagefromUser
+  if (userMessages.length > 0) {
+    // Concatenate userMessages and userMessagesFromStorage to include all messages
+    const allUserMessages = [...userMessages, ...userMessagesFromStorage];
+    state.selectedUserMessages = allUserMessages;
+    state.selectedUserId = userId;
+  } else {
+    Swal.fire({
+      icon: 'info',
+      title: 'ไม่พบข้อมูล',
+      text: 'ไม่พบข้อมูลสำหรับผู้ใช้นี้',
+    });
+  }
 };
+
 /* ---------------------------------------------------------------------------------------------------- */
 // Function to send a message to the selected user
 const sendMessageToUser = async () => {
@@ -147,20 +165,29 @@ const sendMessageToUser = async () => {
 onMounted(() => {
  
 });
-
+const messagefromUser = ref([]);
 const channel = pusher.subscribe('Conversation');
 channel.bind('message', (data) => {
   console.log(data); // Check the structure of data
-  messagefromUser.value.push({
-    message: data.message,
-    timestamp: formatTime(data.timestamp),
-    admin_id: data.admin_id,
-    user_id: data.user_id,
-    admin_name: data.admin_name,
-  });
-
-  localStorage.setItem("messagefromUser", JSON.stringify(messagefromUser.value));
+messagefromUser.value.push({
+  message: data.message,
+  timestamp: formatTime(data.timestamp),
+  admin_id: data.admin_id,
+  user_id: data.user_id,
+  user_name: data.user_name,
 });
+
+ localStorage.setItem("messagefromUser", JSON.stringify(messagefromUser.value));
+
+});
+ onMounted(() => {
+  const storedMessages = JSON.parse(localStorage.getItem("messagefromUser")) || [];
+  messagefromUser.value = storedMessages;
+}); 
+
+
+
+
 
 /* ---------------------------------------------------------------------------------------------- */
 
@@ -249,7 +276,7 @@ const firstCharacter = computed(() => {
           </div>
 
 <!-- ------------------------------------------------------------------------------------------------ -->
-          <!-- ข้อความด้านขวา -->
+   <!-- ข้อความด้านขวา -->
           <div v-if="state.selectedUserMessages" class="flex flex-col flex-auto h-full p-6">
             <div
               class="flex flex-col flex-auto flex-shrink-0 rounded-2xl bg-gray-100 h-full p-4"
@@ -289,13 +316,10 @@ const firstCharacter = computed(() => {
                     </div>
                   </div>
                 </div>
-              </div>
-
-
-              <!-- ข้อความที่เก็บไว้ใน messagefromUser -->
+<!-- ------------------------------------------------------------------------------------------------------ -->
 <div class="grid grid-cols-12 gap-y-2">
   <div 
-    v-for="(msg, index) in state.messagefromUser" 
+    v-for="(msg, index) in messagefromUser" 
     :key="index" 
     :class="{
       'col-start-1 col-end-8 p-3 rounded-lg': msg.admin_id !== adminId,
@@ -314,7 +338,7 @@ const firstCharacter = computed(() => {
           'flex items-center justify-center h-10 w-10 rounded-full bg-green-500 flex-shrink-0': msg.admin_id === adminId
         }"
       >
-         {{ msg.admin_id !== adminId ? msg.user_name.charAt(0) : firstCharacter }}
+        {{ msg.user_name }} 
       </div>
       <div class="relative ml-3 text-sm bg-white py-2 px-4 shadow rounded-xl">
         <div>{{ msg.message }}</div>
@@ -325,8 +349,9 @@ const firstCharacter = computed(() => {
     </div>
   </div>
 </div>
+<!-- ------------------------- -->
 
-
+              </div>
 <!-- --------------------------------------------------------------------------------------------------------------------------------------------------- -->
               <!-- ข้อความที่ส่ง -->
               <div class="flex flex-row items-center h-16 rounded-xl bg-white w-full px-4">
