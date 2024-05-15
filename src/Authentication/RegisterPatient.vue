@@ -75,14 +75,17 @@ const checkinputpassword = () => {
   if (pass.length === 0) {
     password.value = null;
     Swal.fire("โปรดใส่รหัสผ่าน");
+    return;
   }
   if (pass.length < 8) {
     password.value = null;
     Swal.fire("รหัสผ่านต้องมีความยาวมากกว่า 8 ตัวอักษร");
+    return;
   }
   if (passcheck !== pass) {
     password.value = null;
     Swal.fire("รหัสผ่านไม่ตรงกัน");
+    return;
   }
 };
 
@@ -92,13 +95,16 @@ const checkinputidcard = () => {
   if (idc.length === 0) {
     idcard.value = null;
     Swal.fire("โปรดใส่เลขบัตรประชาชน");
+    return;
   }
   if (idc.length < 13) {
     idcard.value = null;
     Swal.fire("เลขบัตรประชาชนต้องมี 13 หลัก");
+    return;
   } else if (!isNumeric) {
     idcard.value = null;
     Swal.fire("เลขบัตรประชาชนต้องเป็นตัวเลขเท่านั้น");
+    return;
   }
 };
 
