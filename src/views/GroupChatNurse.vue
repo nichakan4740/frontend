@@ -315,43 +315,32 @@ const firstCharacter = computed(() => {
                       </div>
                     </div>
                   </div>
-                </div>
+ 
+ 
+ 
 <!-- ------------------------------------------------------------------------------------------------------ -->
-<div class="grid grid-cols-12 gap-y-2">
-  <div 
-    v-for="(msg, index) in messagefromUser" 
-    :key="index" 
-    :class="{
-      'col-start-1 col-end-8 p-3 rounded-lg': msg.admin_id !== adminId,
-      'col-start-6 col-end-13 p-3 rounded-lg justify-end flex': msg.admin_id === adminId
-    }"
-  >
-    <div 
-      :class="{
-        'flex flex-row items-center': msg.admin_id !== adminId,
-        'flex flex-row-reverse items-center': msg.admin_id === adminId
-      }"
-    >
-      <div 
-        :class="{
-          'flex items-center justify-center h-10 w-10 rounded-full bg-indigo-500 flex-shrink-0': msg.admin_id !== adminId,
-          'flex items-center justify-center h-10 w-10 rounded-full bg-green-500 flex-shrink-0': msg.admin_id === adminId
-        }"
-      >
-        {{ msg.user_name }} 
-      </div>
-      <div class="relative ml-3 text-sm bg-white py-2 px-4 shadow rounded-xl">
-        <div>{{ msg.message }}</div>
-        <p class="text-xs text-gray-600">
-          {{ msg.timestamp }}
-        </p>
-      </div>
-    </div>
-  </div>
-</div>
+
 <!-- ------------------------- -->
 
-              </div>
+</div>
+
+</div>
+<!-- ข้อความด้านซ้ายที่เข้ามาจาก   -->
+<div class="flex flex-col space-y-1 mt-4 -mx-2 h-80 overflow-y-auto mr-2">
+  <div v-for="(msg, index) in messagefromUser" :key="index" class="flex flex-row items-start justify-start p-3">
+  <!-- กรองข้อความเฉพาะของผู้ใช้ที่ถูกเลือก -->
+ <!--  <template v-if="msg.user_id === state.selectedUserId"> -->
+    <div class="flex flex-col items-start pl-2">
+      <p class="text-sm font-semibold text-gray-900">{{ msg.user_name }}</p>
+      <p class="text-xs text-gray-500">{{ msg.timestamp }}</p>
+      <p class="text-sm font-normal text-gray-900">{{ msg.message }}</p>
+    </div>
+<!--   </template> -->
+</div>
+
+</div>
+
+
 <!-- --------------------------------------------------------------------------------------------------------------------------------------------------- -->
               <!-- ข้อความที่ส่ง -->
               <div class="flex flex-row items-center h-16 rounded-xl bg-white w-full px-4">
