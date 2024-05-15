@@ -4,16 +4,33 @@ import { useRouter } from "vue-router";
 import moment from "moment";
 import Swal from "sweetalert2";
 import Pusher from "pusher-js";
-import { ref, onMounted, computed, watch } from "vue";
+import { ref, onMounted, computed } from "vue";
 
-
-/* ส่งข้อความหา Admin ทุกคน  ---------------------------------------------------------------- */
 const formatTime = (time) => {
   return moment(time).format('YYYY-MM-DD HH:mm:ss');
 };
 const userId = localStorage.getItem('iduser');
 const conversations = ref([]);
 const message = ref('');
+const messageFromAdmin = ref([]);
+
+// Fetch initial messages from the backend
+const fetchMessages = async () => {
+  try {
+    const response = await fetch(`${import.meta.env.VITE_BASE_URL}api/messages/${userId}`);
+    if (!response.ok) throw new Error(await response.text() || 'Failed to fetch messages');
+    const data = await response.json();
+    conversations.value = data;
+  } catch (error) {
+    console.error('Error fetching messages:', error);
+    Swal.fire({
+      icon: "error",
+      title: "Oops...",
+      text: "Failed to load messages",
+    });
+  }
+};
+
 const sendMessageAll = async () => {
   try {
     if (message.value.trim() !== '') {
@@ -34,13 +51,9 @@ const sendMessageAll = async () => {
         const errorMessage = await response.text();
         throw new Error(errorMessage || 'Failed to send message');
       }
-      // หลังจากส่งข้อความเสร็จสมบูรณ์
+
       const responseData = await response.json();
-      console.log('Message sent successfully:', responseData);
       conversations.value.push(responseData);
-      
-      // อัพเดทข้อมูลใน localStorage
-      localStorage.setItem("conversations", JSON.stringify(conversations.value));
     } else {
       Swal.fire({
         icon: 'error',
@@ -57,189 +70,99 @@ const sendMessageAll = async () => {
     });
   }
 };
+
+// Pusher setup
+const channelName = 'Conversation';
+const pusherUser = new Pusher('c38b6cfa9a4f7e26bf76', {
+  cluster: 'ap1',
+  encrypted: true,
+});
+const channel = pusherUser.subscribe(channelName);
+
+channel.bind('message', (data) => {
+  messageFromAdmin.value.push({
+    message: data.message,
+    timestamp: formatTime(data.timestamp),
+    admin_id: data.admin_id,
+    user_id: data.user_id,
+    admin_name: data.admin_name,
+  });
+
+  // Update local storage
+  localStorage.setItem("messageFromAdmin", JSON.stringify(messageFromAdmin.value));
+});
+
 onMounted(() => {
-  const storedConversations = localStorage.getItem('conversations');
-  if (storedConversations) {
-    conversations.value = JSON.parse(storedConversations);
+  fetchMessages();
+
+  if (localStorage.getItem("messageFromAdmin")) {
+    messageFromAdmin.value = JSON.parse(localStorage.getItem("messageFromAdmin"));
   }
 });
 
-// สร้าง computed property สำหรับกรอง conversations ที่ตรงกับ userId
+// Computed property for filtering user-specific conversations
 const filteredConversations = computed(() => {
   return conversations.value.filter(conversation => conversation.user_id === userId);
 });
 
-/* ------------------------------------------------------------------------------------------------ */
-
-/* แสดงข้อความที่ Admin ส่งมาหา */
-const messagefromAdmin = ref([]);
-  /* const channelName = 'Touserid' + userId;  */
-   const channelName ='Conversation';
-
-  const pusherUser = new Pusher('c38b6cfa9a4f7e26bf76', {
-    cluster: 'ap1',
-    encrypted: true,
-  });
-  
-  const channel = pusherUser.subscribe(channelName);
-  // Store messages in localStorage when a new message is received
-  channel.bind('message', (data) => {
-    console.log(data); // Check the structure of data
-    messagefromAdmin.value.push ({
-      message: data.message,
-      timestamp: formatTime(data.timestamp),
-      admin_id: data.admin_id,
-      user_id: data.user_id,
-      admin_name: data.admin_name
-
-    });
-
-    localStorage.setItem("messagefromAdmin", JSON.stringify(messagefromAdmin.value));
-  });
-
-onMounted(() => {
-  
-  if (localStorage.getItem("messagefromAdmin")) {
-    messagefromAdmin.value = JSON.parse(
-     localStorage.getItem("messagefromAdmin"));
-  }
-});
-
-/* เลือก Teb -------------------------------------------------------- */
-const activeTab = ref(1);
-
-
 </script>
-
 <template>
-  <Layout class="bg-gradient-to-b from-blue-100">
+ <Layout class="bg-gradient-to-b from-blue-100">
     <div class="container mx-auto">
-
-
-      <!-- Tabs ------------------------------------------------------------------------------------------------->
-    
       <div class="box-content p-3 ml-5 mr-5 mt-10 bg-gradient-to-b from-blue-900 to-blue-800 shadow-lg shadow-slate-500/50 rounded-lg">
         <div class="flex justify-center items-center ">
-        <button
-          class="tab font-semibold text-xl text-center text-slate-800"
-          :class="{ active: activeTab === 1 }"
-          @click="activeTab = 1"
-        >
-           คุยกับพยาบาล   
-        </button>
-        <button
-          class="tab font-semibold text-xl text-center text-slate-800"
-          :class="{ active: activeTab === 2 }"
-          @click="activeTab = 2"
-        >
-         Chatbot สอบถามข้อสงสัยเบื้องต้น   
-        </button>
-      </div>  
+          <button
+            class="tab font-semibold text-xl text-center text-slate-800"
+            :class="{ active: activeTab === 1 }"
+            @click="activeTab = 1"
+          >
+            คุยกับพยาบาล
+          </button>
+          <button
+            class="tab font-semibold text-xl text-center text-slate-800"
+            :class="{ active: activeTab === 2 }"
+            @click="activeTab = 2"
+          >
+            Chatbot สอบถามข้อสงสัยเบื้องต้น
+          </button>
+        </div>
       </div>
-      
-      <!-- ----------------------------------------------------------------------------------------------------------------------------------- -->
 
-      <!-- Tab content ที่ 1 -->
-      <div v-if="activeTab === 1">  
+      <div v-if="activeTab === 1">
+        <div class="box-content bg-white shadow-lg shadow-gray-300/50 mt-10 ml-20 mr-20 mb-10 pt-5 pb-5 pl-5 pr-10 rounded-lg h-fit">
+          <div>
+            <textarea v-model="message" placeholder="กรุณากรอกข้อความ"></textarea>
+            <button @click="sendMessageAll">ส่งข้อความ</button>
 
- <div class="box-content bg-white shadow-lg shadow-gray-300/50 mt-10 ml-20 mr-20 mb-10 pt-5 pb-5 pl-5 pr-10 rounded-lg h-fit">
- <div>
-    <!-- ส่วนสำหรับกรอกข้อความ -->
-    <textarea v-model="message" placeholder="กรุณากรอกข้อความ"></textarea>
-    <!-- ปุ่มสำหรับส่งข้อความ -->
-    <button @click="sendMessageAll">ส่งข้อความ</button>
+            <div v-if="filteredConversations.length > 0">
+              <ul>
+                <li v-for="(conversation, index) in filteredConversations" :key="index">
+                  <p>{{ conversation.message }}</p>
+                </li>
+              </ul>
+            </div>
+            <div v-else>
+              <p>ไม่มีข้อความ</p>
+            </div>
+          </div>
 
-    <!-- แสดง conversation ที่กรองตาม userId -->
-    <div v-if="filteredConversations.length > 0">
-      <ul>
-        <li v-for="(conversation, index) in filteredConversations" :key="index">
-          <p>{{ conversation.message }}</p>
-        </li>
-      </ul>
-    </div>
-    <div v-else>
-      <p>ไม่มีข้อความ</p>
-    </div>
-  </div>
-  <!-- -------------------------------- -->
- 
+          <div v-if="messageFromAdmin.length > 0">
+            <ul>
+              <li v-for="(message, index) in messageFromAdmin" :key="index">
+                <p>{{ message.message }}</p>
+                <p>{{ message.timestamp }}</p>
+                <p>{{ message.admin_name }}</p>
+              </li>
+            </ul>
+          </div>
+          <div v-else>
+            <p>ไม่มีข้อความ</p>
+          </div>
+        </div>
+      </div>
 
-<!-- ข้อความที่มาจาก Admin -->
- <div v-if="messagefromAdmin.length > 0">
-  <ul>
-    <li v-for="(message, index) in messagefromAdmin" :key="index">
-      <p>{{ message.message }}</p>
-      <p>{{ message.timestamp }}</p>
-      <p>{{ message.admin_name }}</p>
-    </li>
-  </ul>
-</div>
-<div v-else>
-  <p>ไม่มีข้อความ</p>
-</div>
-
-
-
-
-
-
- </div>
-   
-   
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-   <!-- ----------------------------------------------------- -->
-    </div>
-    </div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    <!-- ----------------------------------------------------------------------------------------------------------------------------------------------------------- -->
-  
-  <!-- Tab content ที่ 2 -->
-<div v-if="activeTab === 2">
-<div class="box-content bg-white shadow-lg shadow-gray-300/50 mt-10 ml-5 mr-5 pt-1 pb-6 pl-20 pr-20 mb-5 rounded-lg" >
+      <div v-if="activeTab === 2">
+        <div class="box-content bg-white shadow-lg shadow-gray-300/50 mt-10 ml-5 mr-5 pt-1 pb-6 pl-20 pr-20 mb-5 rounded-lg">
           <iframe
             src="https://www.chatbase.co/chatbot-iframe/2ZD0Ya4vIQNlG8lowAn8m"
             width="100%"
@@ -247,7 +170,6 @@ const activeTab = ref(1);
             frameborder="0"
           ></iframe>
         </div>
-
         <div class="mb-8 ml-2 mr-4">
           <p class="text">
             หากมีคำถามเพิ่มเติมหรือต้องการความช่วยเหลือเพิ่มเติมใด ๆ
@@ -257,18 +179,13 @@ const activeTab = ref(1);
             **ขออภัยในเรื่องของขอมูลในการตอบคำถาม กำลังอยู่ในช่วงพัฒนา**
           </p>
         </div>
- 
-</div>    
+      </div>
 
- 
-    
+      <div class="mb-8 ml-2 mr-4">
+        <p class="text">**ขออภัย กำลังอยู่ในช่วงพัฒนา**</p>
+      </div>
 
-<!-- --------------------------------------------------------------------------------------------------------- -->
-
-  <!-- -------------------------------------------------------------- -->
-    <div class="mb-8 ml-2 mr-4">
-      <p class="text">**ขออภัย กำลังอยู่ในช่วงพัฒนา**</p>
-    </div>
+</div>
   </Layout>
 </template>
 
