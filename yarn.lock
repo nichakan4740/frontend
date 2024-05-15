@@ -1625,10 +1625,10 @@
   "resolved" "https://registry.npmjs.org/supports-preserve-symlinks-flag/-/supports-preserve-symlinks-flag-1.0.0.tgz"
   "version" "1.0.0"
 
-"sweetalert2@^11.10.1":
-  "integrity" "sha512-q9eE3EKhMcpIDU/Xcz7z5lk8axCGkgxwK47gXGrrfncnBJWxHPPHnBVAjfsVXcTt8Yi8U6HNEcBRSu+qGeyFdA=="
-  "resolved" "https://registry.npmjs.org/sweetalert2/-/sweetalert2-11.10.5.tgz"
-  "version" "11.10.5"
+"sweetalert2@^11.11.0":
+  "integrity" "sha512-wKCTtoE6lQVDKaJ5FFq+znk/YykJmJlD8RnLZps8C7DyivctCoRlVeeOwnKfgwKS+QJYon7s++3dmNi3/am1tw=="
+  "resolved" "https://registry.npmjs.org/sweetalert2/-/sweetalert2-11.11.0.tgz"
+  "version" "11.11.0"
 
 "tailwindcss@^3.3.5":
   "integrity" "sha512-qAYmXRfk3ENzuPBakNK0SRrUDipP8NQnEY6772uDhflcQz5EhRdD7JNZxyrFHVQNCwULPBn6FNPp9brpO7ctcA=="
