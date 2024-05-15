@@ -22,6 +22,7 @@ const state = reactive({
   selectedUserMessages: null, // Store messages of the selected user for modal
   selectedUserId: null, // Store the selected userId
   newMessage: "", // Store the new message input
+  messagefromUser: ref([]) // Store messages from users
 });
 
 
@@ -142,6 +143,24 @@ const sendMessageToUser = async () => {
     });
   }
 };
+/* แสดงข้อความตอบกลับจาก user---------------------------------------------------------------------------------------------- */
+onMounted(() => {
+ 
+});
+
+const channel = pusher.subscribe('Conversation');
+channel.bind('message', (data) => {
+  console.log(data); // Check the structure of data
+  messagefromUser.value.push({
+    message: data.message,
+    timestamp: formatTime(data.timestamp),
+    admin_id: data.admin_id,
+    user_id: data.user_id,
+    admin_name: data.admin_name,
+  });
+
+  localStorage.setItem("messagefromUser", JSON.stringify(messagefromUser.value));
+});
 
 /* ---------------------------------------------------------------------------------------------- */
 
@@ -162,17 +181,17 @@ const firstCharacter = computed(() => {
   <LayoutNurse class="bg-gradient-to-b from-blue-100">
     <!-- Content -->
     <div class="container mx-auto">
-      <div
-        class="box-content-small p-3 ml-5 mr-5 mt-10 bg-gradient-to-b from-blue-900 to-blue-800 shadow-lg shadow-slate-500/50 rounded-lg"
-      >
+     
+     <div class="box-content-small p-3 ml-5 mr-5 mt-10 bg-gradient-to-b from-blue-900 to-blue-800 shadow-lg shadow-slate-500/50 rounded-lg">
         <h2 class="font-semibold text-xl text-center text-slate-200">
           คุยกับผู้ป่วย
         </h2>
       </div>
-
+<!-- ---------------------------------- -->
+ <div class="lg:flex lg:h-screen antialiased text-gray-800 box-content bg-white shadow-lg shadow-gray-300/50 mt-10  mb-10  ml-10  mr-10  rounded-lg">
       <!-- component -->
-      <div class="flex h-screen antialiased text-gray-800 container mt-6">
-        <div class="flex flex-row h-full w-full overflow-x-hidden ml-6">
+      <div class="flex h-screen antialiased text-gray-800 container">
+        <div class="flex flex-row h-full w-full overflow-x-hidden ">
           <div
             class="flex flex-col py-8 pl-6 pr-2 w-64 bg-white flex-shrink-0 rounded-xl"
           >
@@ -207,7 +226,7 @@ const firstCharacter = computed(() => {
                       class="h-10 w-10 bg-indigo-200 rounded-full overflow-hidden flex items-center justify-center"
                     >
                       <img
-                        src="https://cdn.icon-icons.com/icons2/2265/PNG/512/patient_coronavirus_icon_140453.png"
+                        src="https://cdn.icon-icons.com/icons2/2266/PNG/512/patient_icon_140481.png"
                         alt="Coronavirus Patient Icon"
                         class="h-8 w-8 object-cover"
                       />
@@ -272,6 +291,42 @@ const firstCharacter = computed(() => {
                 </div>
               </div>
 
+
+              <!-- ข้อความที่เก็บไว้ใน messagefromUser -->
+<div class="grid grid-cols-12 gap-y-2">
+  <div 
+    v-for="(msg, index) in state.messagefromUser" 
+    :key="index" 
+    :class="{
+      'col-start-1 col-end-8 p-3 rounded-lg': msg.admin_id !== adminId,
+      'col-start-6 col-end-13 p-3 rounded-lg justify-end flex': msg.admin_id === adminId
+    }"
+  >
+    <div 
+      :class="{
+        'flex flex-row items-center': msg.admin_id !== adminId,
+        'flex flex-row-reverse items-center': msg.admin_id === adminId
+      }"
+    >
+      <div 
+        :class="{
+          'flex items-center justify-center h-10 w-10 rounded-full bg-indigo-500 flex-shrink-0': msg.admin_id !== adminId,
+          'flex items-center justify-center h-10 w-10 rounded-full bg-green-500 flex-shrink-0': msg.admin_id === adminId
+        }"
+      >
+         {{ msg.admin_id !== adminId ? msg.user_name.charAt(0) : firstCharacter }}
+      </div>
+      <div class="relative ml-3 text-sm bg-white py-2 px-4 shadow rounded-xl">
+        <div>{{ msg.message }}</div>
+        <p class="text-xs text-gray-600">
+          {{ msg.timestamp }}
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+
 <!-- --------------------------------------------------------------------------------------------------------------------------------------------------- -->
               <!-- ข้อความที่ส่ง -->
               <div class="flex flex-row items-center h-16 rounded-xl bg-white w-full px-4">
@@ -313,6 +368,7 @@ const firstCharacter = computed(() => {
         </div>
       </div>
     </div>
+</div>
   </LayoutNurse>
 </template>
 
