@@ -7,7 +7,7 @@ import Pusher from "pusher-js";
 import { ref, onMounted, computed } from "vue";
 
 const formatTime = (time) => {
-  return moment(time).format('YYYY-MM-DD HH:mm:ss');
+  return moment(time).format('YYYY-MM-DD');
 };
 const userId = localStorage.getItem('iduser');
 const conversations = ref([]);
@@ -105,6 +105,11 @@ const filteredConversations = computed(() => {
   return conversations.value.filter(conversation => conversation.user_id === userId);
 });
 
+
+
+
+/* เลือก teb */
+const activeTab = ref(1);
 </script>
 <template>
  <Layout class="bg-gradient-to-b from-blue-100">
