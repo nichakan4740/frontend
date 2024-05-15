@@ -145,15 +145,18 @@ const close = () => appRouter.push({ name: "loginNurse" });
                       v-model.trim="name"
                       maxlength="100"
                       >
-                       <p v-if="name" class="input-count">
-                      {{ name.length }}/100
-                      </p>
-                      <p v-if="name.length < 1">
-                      * Please input your name <span></span>
-                      </p>
-                      <p v-if="name.length > 100" >
-                      * Characters must not exceed 100
-                      </p>
+                      <div v-if="name">
+                        <p class="input-count">
+                          {{ name.length }}/100
+                        </p>
+                        <p v-if="name.length < 1">
+                          * Please input your name <span></span>
+                        </p>
+                        <p v-if="name.length > 100" >
+                          * Characters must not exceed 100
+                        </p>
+                      </div>
+                      
 
                   </div>
 
@@ -232,6 +235,7 @@ const close = () => appRouter.push({ name: "loginNurse" });
                      minlength="8"
                      @keyup="checkmatch"
                      @blur="checkinputpassword"
+                     ref="passwordCheckInput"
                       >
                       <div v-if="passwordcheck">
                         <p class="input-count">{{ passwordcheck.length }}/14</p>
@@ -246,7 +250,7 @@ const close = () => appRouter.push({ name: "loginNurse" });
                     <button
                     class="block w-full bg-blue-900 hover:bg-blue-800 text-white font-bold py-2 px-4 mb-4 border rounded"
                     @click.prevent="registernurse"
-                    :disabled="!name || !professional_id || !password" >
+                    :disabled="!name || !professional_id || !password || !passwordcheck || professional_id.length !== 10"  >
                     สร้างบัญชี
                    </button>
                   <div class="text-center">
