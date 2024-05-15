@@ -74,38 +74,39 @@ const checkinputpassword = () => {
   const passcheck = passwordcheck.value;
   if (pass.length === 0) {
     password.value = null;
+    passwordcheck.value = null;
     Swal.fire("โปรดใส่รหัสผ่าน");
-    return;
   }
   if (pass.length < 8) {
     password.value = null;
+    passwordcheck.value = null;
     Swal.fire("รหัสผ่านต้องมีความยาวมากกว่า 8 ตัวอักษร");
-    return;
   }
   if (passcheck !== pass) {
     password.value = null;
+    passwordcheck.value = null;
     Swal.fire("รหัสผ่านไม่ตรงกัน");
-    return;
   }
 };
 
 const checkinputidcard = () => {
   const idc = idcard.value;
   const isNumeric = /^\d+$/.test(idc);
-  if (idc.length === 0) {
+  if(idc) {
+    if (idc.length === 0) {
     idcard.value = null;
     Swal.fire("โปรดใส่เลขบัตรประชาชน");
-    return;
   }
   if (idc.length < 13) {
     idcard.value = null;
     Swal.fire("เลขบัตรประชาชนต้องมี 13 หลัก");
-    return;
   } else if (!isNumeric) {
     idcard.value = null;
     Swal.fire("เลขบัตรประชาชนต้องเป็นตัวเลขเท่านั้น");
-    return;
   }
+
+  }
+  
 };
 
 const appRouter = useRouter();
@@ -170,9 +171,11 @@ const close = () => appRouter.push({ name: "loginPatient" });
                 @blur="checkinputidcard"
                 class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:placeholder-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500"
               />
-              <p v-if="idcard.length" class="input-count"> {{ idcard.length }}/13</p>
-              <p v-show="idcard.length < 13">  * Please input your id_card <span></span></p>
-              <p v-show="idcard.length > 13"> * Characters must not exceed 13</p>
+              <div  v-if="idcard">
+                <p class="input-count"> {{ idcard.length }}/13</p>
+                <p v-show="idcard.length < 13">  * Please input your id_card <span></span></p>
+                <p v-show="idcard.length > 13"> * Characters must not exceed 13</p>
+              </div>
             </div>
             <!-- รหัส -->
             <div>
@@ -187,11 +190,13 @@ const close = () => appRouter.push({ name: "loginPatient" });
                 minlength="8"
                 ref="passwordInput"
               />
-              <p v-if="password" class="input-count" id="count"> {{ password.length }}/14 </p>
-              <p v-show="password.length < 8" id="checkname"> * Password must not be less than 8 characters</p>
-              <p v-show="password.length > 14" id="checkname">* Password must not be more than 14 characters</p>
+              <div v-if="password">
+                <p class="input-count" id="count"> {{ password.length }}/14 </p>
+                <p v-show="password.length < 8" id="checkname"> * Password must not be less than 8 characters</p>
+                <p v-show="password.length > 14" id="checkname">* Password must not be more than 14 characters</p>
+              </div>
             </div>
-            <div v-show="password.length >= 1">
+            <div v-show="password">
               <label class="block mb-2 text-sm font-medium text-gray-900">ยืนยันรหัสผ่าน</label>
               <input
                 placeholder="xxxxxxxx"
@@ -205,9 +210,12 @@ const close = () => appRouter.push({ name: "loginPatient" });
                 @blur="checkinputpassword"
                 ref="passwordCheckInput"
               />
-              <p v-if="passwordcheck" class="input-count"> {{ passwordcheck.length }}/14 </p>
-              <p v-show="passwordcheck.length < 8" class="checkname">* Password must be at least 8 characters long</p>
-              <p v-show="passwordcheck.length > 14" class="checkname">* Password must not exceed 14 characters</p>
+              <div v-if="passwordcheck">
+                <p class="input-count"> {{ passwordcheck.length }}/14 </p>
+                <p v-show="passwordcheck.length < 8" class="checkname">* Password must be at least 8 characters long</p>
+                <p v-show="passwordcheck.length > 14" class="checkname">* Password must not exceed 14 characters</p>
+              </div>
+           
             </div>
             <button
               class="block w-full bg-blue-900 hover:bg-blue-800 text-white font-bold py-2 px-4 mb-4 border rounded"
