@@ -165,8 +165,10 @@ const sendMessageToUser = async () => {
 onMounted(() => {
  
 });
+
+const channelmessagefromUser = "Toadminid" + adminId;
 const messagefromUser = ref([]);
-const channel = pusher.subscribe('Conversation');
+const channel = pusher.subscribe(channelmessagefromUser);
 channel.bind('message', (data) => {
   console.log(data); // Check the structure of data
 messagefromUser.value.push({
@@ -315,12 +317,9 @@ const firstCharacter = computed(() => {
                       </div>
                     </div>
                   </div>
- 
- 
- 
+
 <!-- ------------------------------------------------------------------------------------------------------ -->
 <!-- ------------------------- -->
-
 </div>
 
 </div>
