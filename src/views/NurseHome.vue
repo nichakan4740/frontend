@@ -58,18 +58,20 @@ onMounted(MysugarLoad);
 const originalData = ref([]);
 const result = ref([]);
 /* ------------------------------------------------------------------------------------------------------------ */
-
-
-
-/* ------------------------------------------------------------------------------------------------------- */
-// พยาบาลเพิ่มข้อมูลผู้ป่วย
+// เพิ่มผู้ป่วย ----------------------------------------
 const fname = ref("");
 const lname = ref("");
-const allergic_drug = ref("");
-const my_drug = ref("");
 const idcard = ref("");
-const password = ref("telenursing");
-const adduser = async () => {
+const password = ref("");
+const passwordcheck = ref("");
+const dob = ref("");
+const phone = ref("");
+const address = ref("");
+
+const passwordInput = ref(null);
+const passwordCheckInput = ref(null);
+
+const registerpatient = async () => {
   const res = await fetch(
     `${import.meta.env.VITE_BASE_URL}api/patient/register`,
     {
@@ -80,10 +82,11 @@ const adduser = async () => {
       body: JSON.stringify({
         fname: fname.value,
         lname: lname.value,
-        allergic_drug: allergic_drug.value,
-        my_drug: my_drug.value,
         idcard: idcard.value,
         password: password.value,
+        dob: dob.value,
+        phone: phone.value,
+        address: address.value,
       }),
     }
   );
@@ -93,8 +96,7 @@ const adduser = async () => {
       close();
     }, 1500);
     console.log("You add user success");
-    // เพิ่มบัญชีผู้ใช้งานสำเร็จแล้ว ทำการดึงข้อมูลผู้ป่วยอีกครั้งโดยไม่ต้องรีโหลดหน้าเว็บ
-    patientProfile.value = await getPatient();
+
   } else {
     console.log("error,cannot add");
     Swal.fire({
@@ -103,7 +105,67 @@ const adduser = async () => {
       text: "ไม่สามารถสร้างบัญชีได้ โปรดตรวจสอบความถูกต้อง!",
     });
   }
+  closeModal()
 };
+
+const checkmatch = () => {
+  const pass = password.value;
+  const passcheck = passwordcheck.value;
+  if (passwordInput.value && passwordCheckInput.value) {
+    if (pass === passcheck) {
+      passwordInput.value.style.backgroundColor = "#e9f7e3";
+      passwordCheckInput.value.style.backgroundColor = "#e9f7e3";
+    } else {
+      passwordInput.value.style.backgroundColor = "#fae2e0";
+      passwordCheckInput.value.style.backgroundColor = "#fae2e0";
+    }
+  }
+};
+
+const checkinputpassword = () => {
+  const pass = password.value;
+  const passcheck = passwordcheck.value;
+  if (pass.length === 0) {
+    password.value = null;
+    passwordcheck.value = null;
+    Swal.fire("โปรดใส่รหัสผ่าน");
+  }
+  if (pass.length < 8) {
+    password.value = null;
+    passwordcheck.value = null;
+    Swal.fire("รหัสผ่านต้องมีความยาวมากกว่า 8 ตัวอักษร");
+  }
+  if (passcheck !== pass) {
+    password.value = null;
+    passwordcheck.value = null;
+    Swal.fire("รหัสผ่านไม่ตรงกัน");
+  }
+};
+
+const checkinputidcard = () => {
+  const idc = idcard.value;
+  const isNumeric = /^\d+$/.test(idc);
+  if (idc) {
+    if (idc.length === 0) {
+      idcard.value = null;
+      Swal.fire("โปรดใส่เลขบัตรประชาชน");
+    }
+    if (idc.length < 13) {
+      idcard.value = null;
+      Swal.fire("เลขบัตรประชาชนต้องมี 13 หลัก");
+    } else if (!isNumeric) {
+      idcard.value = null;
+      Swal.fire("เลขบัตรประชาชนต้องเป็นตัวเลขเท่านั้น");
+    }
+
+  }
+
+};
+
+
+
+
+
 // นับจำนวน user
 const totalUsers = computed(() => result.value.length);
 
@@ -188,7 +250,7 @@ const resetSearch = () => {
                 <thead class=" text-gray-400 uppercase bg-gray-50 ">
                   <tr>
                     <th scope="col" class="px-6 py-4 text-sm">รายชื่อ</th>
-                    <th scope="col" class="px-6 py-4 text-center text-sm">สถานะ</th>
+                    <th scope="col" class="px-6 py-4 text-center text-sm">สถานะการรับบริการ</th>
                     <th scope="col" class="px-6 py-4 text-center text-sm"> ตรวจล่าสุด </th>
                     <th scope="col" class="px-6 py-4 text-center text-sm">(mg/dl)</th>
                     <th scope="col" class="px-6 py-4 text-center text-sm">พูดคุย</th>
@@ -199,7 +261,7 @@ const resetSearch = () => {
                   <tr class="bg-white border-b" v-for="sugarRecord in filteredResult" :key="sugarRecord.id">
                     <td class="px-6 py-4 text-black font-medium">
                       <!-- <router-link :to="'/informationUser/' + sugarRecord.id"> -->
-                        {{ sugarRecord.user.fname }} {{ sugarRecord.user.lname }}
+                      {{ sugarRecord.user.fname }} {{ sugarRecord.user.lname }}
                       <!-- </router-link> -->
                     </td>
                     <td class="px-6 py-4 flex items-center justify-center">
@@ -214,7 +276,13 @@ const resetSearch = () => {
               'text-red-600': sugarRecord.sugarValue > 125,
               'text-green-500': sugarRecord.sugarValue >= 70 && sugarRecord.sugarValue <= 125,
               'text-yellow-400': sugarRecord.sugarValue < 70
-            }"> {{ sugarRecord.sugarValue }}</td>
+            }"> {{ sugarRecord.sugarValue }}
+                    </td>
+                    <td class="px-6 py-4 flex items-center justify-center">
+                      <router-link :to="{ name: 'chat' }">
+                        <img src="/chat.png" class="w-6 h-6 " />
+                      </router-link>
+                    </td>
                   </tr>
                 </tbody>
               </table>
@@ -292,70 +360,55 @@ const resetSearch = () => {
                           </div>
                           <!-- --------------------------------------------------------------------------- -->
 
-                          <div>
-                            <label class="block mb-2 text-sm font-medium text-gray-900">ยาที่แพ้ &nbsp;
-                              <span style="font-size: 10px; color: rgb(177, 109, 241)">
-                                ( ตัวอักษรต้องไม่เกิน 100 ตัวอักษร )
-                              </span>
-                            </label>
-                            <input type="text"
-                              class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:placeholder-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                              placeholder="xxxxxxxxxx" v-model.trim="allergic_drug" maxlength="100" />
-                            <p v-if="allergic_drug.length" class="input-count">{{ allergic_drug.length }}/100</p>
-                            <p v-show="allergic_drug.length < 1"> * Please input your name <span></span></p>
-                            <p v-show="allergic_drug.length > 100">* Characters must not exceed 100</p>
-                          </div>
-                          <!-- --------------------------------------------------------------------------- -->
-
-
-
-                          <div>
-                            <label class="block mb-2 text-sm font-medium text-gray-900">ยาประจำตัวที่ใช้ &nbsp;
-                              <span style="font-size: 10px; color: rgb(177, 109, 241)">
-                                ( ตัวอักษรต้องไม่เกิน 100 ตัวอักษร )
-                              </span>
-                            </label>
-                            <input type="text"
-                              class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:placeholder-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                              placeholder="xxxxxxxxxx" v-model.trim="my_drug" maxlength="100" />
-                            <p v-if="my_drug.length" class="input-count">{{ my_drug.length }}/100 </p>
-                            <p v-show="my_drug.length < 1"> * Please input your name <span></span> </p>
-                            <p v-show="my_drug.length > 100">* Characters must not exceed 100</p>
-                          </div>
-                          <!-- --------------------------------------------------------------------------- -->
-
-
-
+                          <!-- บัตรประชาชน -->
                           <div>
                             <label class="block mb-2 text-sm font-medium text-gray-900">เลขบัตรประจำตัวประชาชน</label>
-                            <input type="text" v-model.trim="idcard" placeholder="xxxxxxxx" maxlength="13"
+                            <input type="text" inputmode="numeric" v-model.trim="idcard" placeholder="xxxxxxxxxxxxx"
+                              maxlength="13" @blur="checkinputidcard"
                               class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:placeholder-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500" />
-                            <p v-if="idcard.length" class="input-count"> {{ idcard.length }}/13</p>
-                            <p v-show="idcard.length < 1"> * Please input your id_card <span></span></p>
-                            <p v-show="idcard.length > 13"> * Characters must not exceed 13</p>
+                            <div v-if="idcard">
+                              <p class="input-count"> {{ idcard.length }}/13</p>
+                              <p v-show="idcard.length < 13"> * Please input your id_card <span></span></p>
+                              <p v-show="idcard.length > 13"> * Characters must not exceed 13</p>
+                            </div>
                           </div>
-                          <!-- --------------------------------------------------------------------------- -->
-
-
-
+                          <!-- รหัส -->
                           <div>
                             <label class="block mb-2 text-sm font-medium text-gray-900">รหัสผ่าน</label>
                             <input placeholder="xxxxxxxx"
                               class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:placeholder-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                              type="password" name="password" v-model.trim="password" maxlength="14" minlength="8" />
-                            <p v-if="password" class="input-count" id="count"> {{ password.length }}/14 </p>
-                            <p v-show="password.length < 8" id="checkname"> * Password must not be less than 8
-                              characters</p>
-                            <p v-show="password.length > 14" id="checkname">* Password must not be more than 14
-                              characters</p>
+                              type="password" name="password" v-model.trim="password" maxlength="14" minlength="8"
+                              ref="passwordInput" />
+                            <div v-if="password">
+                              <p class="input-count" id="count"> {{ password.length }}/14 </p>
+                              <p v-show="password.length < 8" id="checkname"> * Password must not be less than 8
+                                characters</p>
+                              <p v-show="password.length > 14" id="checkname">* Password must not be more than 14
+                                characters</p>
+                            </div>
                           </div>
+                          <div v-show="password">
+                            <label class="block mb-2 text-sm font-medium text-gray-900">ยืนยันรหัสผ่าน</label>
+                            <input placeholder="xxxxxxxx"
+                              class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:placeholder-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                              type="password" name="passwordcheck" v-model="passwordcheck" maxlength="14" minlength="8"
+                              @keyup="checkmatch" @blur="checkinputpassword" ref="passwordCheckInput" />
+                            <div v-if="passwordcheck">
+                              <p class="input-count"> {{ passwordcheck.length }}/14 </p>
+                              <p v-show="passwordcheck.length < 8" class="checkname">* Password must be at least 8
+                                characters long</p>
+                              <p v-show="passwordcheck.length > 14" class="checkname">* Password must not exceed 14
+                                characters</p>
+                            </div>
 
+                          </div>
 
 
                           <button
                             class="block w-full bg-blue-900 hover:bg-blue-800 text-white font-bold py-2 px-4 mb-4 border rounded"
-                            @click.prevent="adduser">
-                            สร้างบัญชี
+                            @click.prevent="registerpatient"
+                            :disabled="!fname || !lname || !idcard || !password || !passwordcheck || idcard.length !== 13"
+                            :class="{ 'bg-blue-900': !idcard || !password }"> สร้างบัญชี
                           </button>
                         </form>
                       </div>
