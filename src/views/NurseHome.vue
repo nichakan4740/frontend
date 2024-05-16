@@ -195,6 +195,33 @@ const filteredResult = computed(() => {
 const resetSearch = () => {
   searchInput.value = '';
 };
+
+const patientHistory = ref([]);
+const isModalPatientOpen = ref(false);
+const titleModalPatient = ref('');
+const openModalPatient = async (patientId,fname,lname) => {
+  patientHistory.value = [];
+  titleModalPatient.value = '';
+  const response = await fetch(`${import.meta.env.VITE_BASE_URL}api/mysugar/${patientId}`);
+  if (response.ok) {
+    const data = await response.json();
+    if (data.length != 0) {
+      titleModalPatient.value = `${fname} ${lname}`
+      patientHistory.value = data
+      isModalPatientOpen.value = true
+    } else {
+      Swal.fire("ไม่พบข้อมูล");
+    }
+  } else if (response.status === 404) {
+    // Handle case when no data is found
+    result.value = [];
+  } else {
+    throw new Error('Failed to fetch data');
+  }
+};
+const closeModalPatient = () => {
+  isModalPatientOpen.value = false;
+};
 </script>
 <template>
   <LayoutNurse class="bg-gradient-to-b from-blue-100">
@@ -261,15 +288,22 @@ const resetSearch = () => {
                   <tr class="bg-white border-b" v-for="sugarRecord in filteredResult" :key="sugarRecord.id">
                     <td class="px-6 py-4 text-black font-medium">
                       <!-- <router-link :to="'/informationUser/' + sugarRecord.id"> -->
-                      {{ sugarRecord.user.fname }} {{ sugarRecord.user.lname }}
+                      <button @click="openModalPatient(sugarRecord.user.id,sugarRecord.user.fname,sugarRecord.user.lname)">{{ sugarRecord.user.fname }} {{
+              sugarRecord.user.lname }}</button>
                       <!-- </router-link> -->
                     </td>
                     <td class="px-6 py-4 flex items-center justify-center">
                       <img src="/correct.png" class="w-6 h-6 " />
                     </td>
                     <td class="px-6 py-4 text-center text-blue-800">
-                      {{ moment(sugarRecord.updated_at).format("DD MMMM YYYY") }}
-                      {{ moment(sugarRecord.updated_at).format("HH:mm") }}
+                      <p v-if="sugarRecord.updated_at != undefined">
+                        {{ sugarRecord.updated_at ? moment(sugarRecord.updated_at).format("DD MMMM YYYY") : '-' }}
+                      {{ sugarRecord.updated_at ? moment(sugarRecord.updated_at).format("HH:mm") : '-' }}
+                      </p>
+                      <p v-else>
+                        {{ sugarRecord.created_at ? moment(sugarRecord.created_at).format("DD MMMM YYYY") : '-' }}
+                      {{ sugarRecord.created_at ? moment(sugarRecord.created_at).format("HH:mm") : '-' }}
+                      </p>
                     </td>
                     <td class="px-6 py-4 text-center font-semibold"
                       :style="{ 'max-width': sugarRecord.sugarValue + '%' }" :class="{
@@ -433,6 +467,79 @@ const resetSearch = () => {
         </div>
       </div>
       <!-- ------------------------------------------------------------------------------------ -->
+
+
+      <div v-if="isModalPatientOpen" class="fixed z-10 inset-0 overflow-y-auto">
+        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+          <!-- ส่วนทับเงื่อนไข -->
+          <div class="fixed inset-0 transition-opacity" aria-hidden="true">
+            <div class="absolute inset-0 bg-gray-500 opacity-75">test</div>
+          </div>
+          <!-- เฉพาะส่วนแสดงตามเงื่อนไข -->
+          <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+
+          <!-- ส่วนหลักของโมดัล -->
+          <div v-if="isModalPatientOpen"
+            class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+            <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+
+              <!-- เนื้อหาของโมดัล --------------------------------------------------------------- -->
+              <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+
+                <div class="flex flex-col items-center justify-center px-6 py-8 mx-auto lg:py-0">
+                  <div class="w-full rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 bg-white">
+                    <div class="p-6 space-y-4 md:space-y-6 sm:p-8">
+                      <h1
+                          class="text-xl font-bold text-center leading-tight tracking-tight text-gray-900 md:text-2xl">
+                          ชื่อคนไข้ {{ titleModalPatient }}
+                        </h1>
+
+                      <table class="w-full text-base text-left rtl:text-right text-gray-500 ">
+                        <thead class=" text-gray-400 uppercase bg-gray-50 ">
+                          <tr>
+                            <th scope="col" class="px-6 py-4 text-sm">วันที่</th>
+                            <th scope="col" class="px-6 py-4 text-center text-sm">ค่าน้ำตาล</th>
+                            <th scope="col" class="px-6 py-4 text-center text-sm"> อาการผิดปกติ </th>
+                            <th scope="col" class="px-6 py-4 text-center text-sm">อื่นๆ</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr v-for="patientResult in patientHistory" :key="patientResult.id">
+                            <td>
+                              {{ patientResult.created_at ? moment(patientResult.created_at).format('DD MMMM YYYY') : '-' }}
+                            </td>
+                            <td>
+                              {{ patientResult.sugarValue ? patientResult.sugarValue : '-' }}
+                            </td>
+                            <td>
+                              {{ patientResult.symptom ? patientResult.symptom : '-' }}
+                            </td>
+                            <td>
+                              {{ patientResult.note ? patientResult.note : '-' }}
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- ---------------------------------------------------------------------------------------------------- -->
+
+              <!-- ปุ่มปิด Modal -->
+              <div class="sm:flex sm:items-start">
+                <button @click="closeModalPatient" type="button"
+                  class="inline-flex justify-center w-full rounded-md border border-transparent px-4 py-2 bg-red-600 text-base font-medium text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:text-sm">
+                  ปิด
+                </button>
+              </div>
+              <!-- ------------------------------------------------------------------------------------------------------------------------------- -->
+
+            </div>
+          </div>
+        </div>
+      </div>
 
     </div>
 

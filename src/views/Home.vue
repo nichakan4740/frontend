@@ -220,7 +220,7 @@ const backloginpatient = () => appRouter.push({ name: "homerole" });
 
       <div
         class="box-content p-3  ml-5 mr-5 mt-10 bg-gradient-to-b from-blue-900 to-blue-800  shadow-lg shadow-slate-500/50  rounded-lg">
-        <h2 class="font-semibold text-xl text-center text-slate-200 ">หน้าหลัก</h2>
+        <h2 class="font-semibold text-xl text-center text-slate-200 ">บันทึกค่าน้ำตาล</h2>
       </div>
 
       <div class="grid grid-cols-2 gap-2  mt-5  ">
