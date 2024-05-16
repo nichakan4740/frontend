@@ -58,8 +58,8 @@ const MysugarLoad = async () => {
       originalData.value = data;
       // เรียงข้อมูลตามวันที่ล่าสุดไปยังเก่าสุด
       originalData.value.sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at));
-      // แสดงผลทีละ 15 อัน
-      result.value = originalData.value.slice(0, 15);
+      // แสดงผลทีละ 10 อัน
+      result.value = originalData.value.slice(0, 10);
 
       result.value = filterBySelectedDate(data);
     } else if (response.status === 404) {
@@ -431,6 +431,10 @@ const MyDrugLoad = async () => {
 onMounted(MyDrugLoad);
 
 
+const getCurrentDate = () => {
+   return moment().format('YYYY-MM-DD');
+};
+
 </script>
 
 <template>
@@ -492,11 +496,11 @@ onMounted(MyDrugLoad);
               <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div class="mx-5">
                   <label for="startDate" class="text-lg text-gray-800">เลือกวันที่เริ่มต้น: </label>
-                  <input type="date" id="startDate" v-model="startDate" class="mt-2 px-4 py-2 border rounded-md w-full">
+                  <input type="date" id="startDate" v-model="startDate" :max="getCurrentDate()" class="mt-2 px-4 py-2 border rounded-md w-full">
                 </div>
                 <div class="mx-5">
                   <label for="endDate" class="text-lg text-gray-800">เลือกวันที่สิ้นสุด: </label>
-                  <input type="date" id="endDate" v-model="endDate" class="mt-2 px-4 py-2 border rounded-md w-full">
+                  <input type="date" id="endDate" v-model="endDate" :max="getCurrentDate()" class="mt-2 px-4 py-2 border rounded-md w-full">
                 </div>
               </div>
 

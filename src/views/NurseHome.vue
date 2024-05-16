@@ -1,6 +1,6 @@
 <script setup>
 import { useRouter } from "vue-router";
-import { ref, onBeforeMount, computed, onMounted, onUnmounted } from "vue";
+import { ref, onBeforeMount, computed, onMounted, watch, onUnmounted } from "vue";
 import LayoutNurse from '../layouts/LayoutNurse.vue';
 import moment from "moment";
 import Swal from "sweetalert2";
@@ -8,6 +8,8 @@ import Swal from "sweetalert2";
 
 // Function to format current time
 const currentTime = computed(() => moment().format('YYYY-MM-DD HH:mm:ss'));
+const startDate = ref('');
+const endDate = ref('');
 
 // Function to logout nurse
 const router = useRouter();
@@ -101,7 +103,7 @@ const registerpatient = async () => {
     console.log("error,cannot add");
     Swal.fire({
       icon: "error",
-      title: "ขอโทษ !!!",
+      title: "เกิดข้อผิดพลาด !!!",
       text: "ไม่สามารถสร้างบัญชีได้ โปรดตรวจสอบความถูกต้อง!",
     });
   }
@@ -196,19 +198,55 @@ const resetSearch = () => {
   searchInput.value = '';
 };
 
+
+// modal user
+
 const patientHistory = ref([]);
+const originalPatientHistory = ref([]);
+/* ------ filter------------------------------------------------------------------------------------------ */
+const filterBySelectedDate = (data, startDate, endDate) => {
+  if (startDate && endDate) {
+    const filteredData = data.filter(record => {
+      const recordDate = moment(record.updated_at).format('YYYY-MM-DD');
+      return moment(recordDate).isBetween(startDate, endDate, 'days', '[]');
+    });
+    return filteredData;
+  } else {
+    return data;
+  }
+};
+watch(
+  [startDate, endDate],
+  ([newStartDate, newEndDate], [oldStartDate, oldEndDate]) => {
+    if (newStartDate !== oldStartDate || newEndDate !== oldEndDate) {
+      if (newStartDate && newEndDate) {
+        patientHistory.value = filterBySelectedDate(
+          originalPatientHistory.value,
+          newStartDate,
+          newEndDate
+        );
+      } else {
+        patientHistory.value = originalPatientHistory.value;
+      }
+    }
+  },
+  { deep: true }
+);
+
 const isModalPatientOpen = ref(false);
 const titleModalPatient = ref('');
-const openModalPatient = async (patientId,fname,lname) => {
+const openModalPatient = async (patientId, fname, lname) => {
   patientHistory.value = [];
   titleModalPatient.value = '';
   const response = await fetch(`${import.meta.env.VITE_BASE_URL}api/mysugar/${patientId}`);
   if (response.ok) {
     const data = await response.json();
+
     if (data.length != 0) {
       titleModalPatient.value = `${fname} ${lname}`
-      patientHistory.value = data
-      isModalPatientOpen.value = true
+      patientHistory.value = data;
+      originalPatientHistory.value = data.slice(); // ตั้งค่าค่าเริ่มต้นของ originalPatientHistory เป็นข้อมูล patientHistory
+      isModalPatientOpen.value = true;
     } else {
       Swal.fire("ไม่พบข้อมูล");
     }
@@ -219,9 +257,19 @@ const openModalPatient = async (patientId,fname,lname) => {
     throw new Error('Failed to fetch data');
   }
 };
-const closeModalPatient = () => {
+
+
+// และในฟังก์ชัน closePatientModal หลังจากปิดโมดัล ให้กู้คืนข้อมูล patientHistory เป็นข้อมูลเริ่มต้น
+const closePatientModal = () => {
   isModalPatientOpen.value = false;
+  // Reset patientHistory to original data
+  patientHistory.value = originalPatientHistory.value;
 };
+
+const getCurrentDate = () => {
+   return moment().format('YYYY-MM-DD');
+};
+
 </script>
 <template>
   <LayoutNurse class="bg-gradient-to-b from-blue-100">
@@ -288,7 +336,9 @@ const closeModalPatient = () => {
                   <tr class="bg-white border-b" v-for="sugarRecord in filteredResult" :key="sugarRecord.id">
                     <td class="px-6 py-4 text-black font-medium">
                       <!-- <router-link :to="'/informationUser/' + sugarRecord.id"> -->
-                      <button @click="openModalPatient(sugarRecord.user.id,sugarRecord.user.fname,sugarRecord.user.lname)">{{ sugarRecord.user.fname }} {{
+                      <button
+                        @click="openModalPatient(sugarRecord.user.id, sugarRecord.user.fname, sugarRecord.user.lname)">{{
+              sugarRecord.user.fname }} {{
               sugarRecord.user.lname }}</button>
                       <!-- </router-link> -->
                     </td>
@@ -298,11 +348,11 @@ const closeModalPatient = () => {
                     <td class="px-6 py-4 text-center text-blue-800">
                       <p v-if="sugarRecord.updated_at != undefined">
                         {{ sugarRecord.updated_at ? moment(sugarRecord.updated_at).format("DD MMMM YYYY") : '-' }}
-                      {{ sugarRecord.updated_at ? moment(sugarRecord.updated_at).format("HH:mm") : '-' }}
+                        {{ sugarRecord.updated_at ? moment(sugarRecord.updated_at).format("HH:mm") : '-' }}
                       </p>
                       <p v-else>
                         {{ sugarRecord.created_at ? moment(sugarRecord.created_at).format("DD MMMM YYYY") : '-' }}
-                      {{ sugarRecord.created_at ? moment(sugarRecord.created_at).format("HH:mm") : '-' }}
+                        {{ sugarRecord.created_at ? moment(sugarRecord.created_at).format("HH:mm") : '-' }}
                       </p>
                     </td>
                     <td class="px-6 py-4 text-center font-semibold"
@@ -325,7 +375,7 @@ const closeModalPatient = () => {
         </div>
 
         <br>
-        <!-- เมื่อคลิกที่ปุ่มนี้โมดัลจะปรากฎ-------------------------------------------------------------------------------------- -->
+        <!-- เมื่อคลิกที่ปุ่มนี้โมดัล add user จะปรากฎ-------------------------------------------------------------------------------------- -->
         <button @click="openModal"
           class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-4 pl-4 pr-6 rounded-lg flex items-center ml-8">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
@@ -473,28 +523,47 @@ const closeModalPatient = () => {
         <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
           <!-- ส่วนทับเงื่อนไข -->
           <div class="fixed inset-0 transition-opacity" aria-hidden="true">
-            <div class="absolute inset-0 bg-gray-500 opacity-75">test</div>
+            <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
           </div>
           <!-- เฉพาะส่วนแสดงตามเงื่อนไข -->
           <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
 
           <!-- ส่วนหลักของโมดัล -->
           <div v-if="isModalPatientOpen"
-            class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+            class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full">
             <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
 
               <!-- เนื้อหาของโมดัล --------------------------------------------------------------- -->
               <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                <div class="items-center justify-center px-1 py-8 lg:py-0">
+                  <div class="w-full rounded-lg shadow dark:border  bg-white">
+                    <!-- ปุ่มปิด -->
+                    <button @click="closePatientModal" type="button" class="float-right">
+                      <img src="/circle.png" class="w-10 h-10 " />
+                    </button>
+                    <!-- --------------- -->
+                    <div class="p-1 space-y-4 md:space-y-6 sm:p-4">
+                      <p class="text-md font-bold text-center leading-tight tracking-tight text-gray-900 md:text-2xl">
+                        <span class="text-gray-700 text-md font-thin">ชื่อคนไข้ :</span>
+                        {{ titleModalPatient }}
+                      </p>
 
-                <div class="flex flex-col items-center justify-center px-6 py-8 mx-auto lg:py-0">
-                  <div class="w-full rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 bg-white">
-                    <div class="p-6 space-y-4 md:space-y-6 sm:p-8">
-                      <h1
-                          class="text-xl font-bold text-center leading-tight tracking-tight text-gray-900 md:text-2xl">
-                          ชื่อคนไข้ {{ titleModalPatient }}
-                        </h1>
+                      <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <div class="mx-5">
+                          <label for="startDate" class="text-lg text-gray-800">เลือกวันที่เริ่มต้น: </label>
+                          <input type="date" id="startDate" v-model="startDate"
+                          :max="getCurrentDate()"
+                            class="mt-2 px-4 py-2 border rounded-md w-full">
+                        </div>
+                        <div class="mx-5">
+                          <label for="endDate" class="text-lg text-gray-800">เลือกวันที่สิ้นสุด: </label>
+                          <input type="date" id="endDate" v-model="endDate"
+                          :max="getCurrentDate()"
+                            class="mt-2 px-4 py-2 border rounded-md w-full">
+                        </div>
+                      </div>
 
-                      <table class="w-full text-base text-left rtl:text-right text-gray-500 ">
+                      <table class="w-full text-base text-left rtl:text-right text-gray-500 font-semibold">
                         <thead class=" text-gray-400 uppercase bg-gray-50 ">
                           <tr>
                             <th scope="col" class="px-6 py-4 text-sm">วันที่</th>
@@ -505,16 +574,22 @@ const closeModalPatient = () => {
                         </thead>
                         <tbody>
                           <tr v-for="patientResult in patientHistory" :key="patientResult.id">
-                            <td>
-                              {{ patientResult.created_at ? moment(patientResult.created_at).format('DD MMMM YYYY') : '-' }}
+                            <td class="px-6 py-4 text-md">
+                              {{ patientResult.created_at ? moment(patientResult.created_at).format('DD MMMM YYYY') :
+              '-' }}
                             </td>
-                            <td>
+                            <td class="px-6 py-4 text-center text-md"
+                              :style="{ 'max-width': patientResult.sugarValue + '%' }" :class="{
+              'text-red-600': patientResult.sugarValue > 125,
+              'text-green-500': patientResult.sugarValue >= 70 && patientResult.sugarValue <= 125,
+              'text-yellow-400': patientResult.sugarValue < 70
+            }">
                               {{ patientResult.sugarValue ? patientResult.sugarValue : '-' }}
                             </td>
-                            <td>
+                            <td class="px-6 py-4 text-center text-md">
                               {{ patientResult.symptom ? patientResult.symptom : '-' }}
                             </td>
-                            <td>
+                            <td class="px-6 py-4 text-center text-md">
                               {{ patientResult.note ? patientResult.note : '-' }}
                             </td>
                           </tr>
@@ -524,17 +599,8 @@ const closeModalPatient = () => {
                   </div>
                 </div>
               </div>
-
               <!-- ---------------------------------------------------------------------------------------------------- -->
 
-              <!-- ปุ่มปิด Modal -->
-              <div class="sm:flex sm:items-start">
-                <button @click="closeModalPatient" type="button"
-                  class="inline-flex justify-center w-full rounded-md border border-transparent px-4 py-2 bg-red-600 text-base font-medium text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:text-sm">
-                  ปิด
-                </button>
-              </div>
-              <!-- ------------------------------------------------------------------------------------------------------------------------------- -->
 
             </div>
           </div>
