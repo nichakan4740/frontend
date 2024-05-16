@@ -70,7 +70,7 @@ pusherScript.onload = () => {
                             fill="#A8B4CD"
                         />
                     </svg>
-                   <router-link  :to="{ name: 'home' }" class="text-slate-300">หน้าหลัก</router-link>
+                   <router-link  :to="{ name: 'dashboard' }" class="text-slate-300">หน้าหลัก</router-link>
                 </a>
                 <!-- ------------------------------------------------------------------------------- -->
                 <a
@@ -88,7 +88,7 @@ pusherScript.onload = () => {
                             fill="#A8B4CD"
                         />
                     </svg>
-                    <router-link  :to="{ name: 'dashboard' }" class="text-slate-300">สถิติระดับค่าน้ำตาล</router-link>
+                    <router-link  :to="{ name: 'addsugar' }" class="text-slate-300">บันทึกค่าน้ำตาล</router-link>
                    
                 </a>
                 <!-- ------------------------------------------------------------------------------- -->

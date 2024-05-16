@@ -70,17 +70,17 @@ const textColor = 'darkred'; // สีแดงเข้ม
       </div>
 
       <div class="flex justify-center">
-        <router-link to="/home">
+        <router-link to="/dashboard">
           <button
             class="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded mr-5">
             กลับหน้าหลัก
           </button>
         </router-link>
 
-        <router-link to="/dashboard">
+        <router-link to="/addsugar">
           <button
             class="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded">
-            ดูประวัติการบันทึก
+            บันทึกค่าน้ำตาลเพิ่ม
           </button>
         </router-link>
       </div>

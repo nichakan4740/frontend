@@ -74,7 +74,7 @@ const loginpatient = async () => {
 
 
 const appRouter = useRouter();
-const close = () => appRouter.push({ name: "home" });
+const close = () => appRouter.push({ name: "dashboard" });
 
 </script>
 

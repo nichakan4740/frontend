@@ -358,28 +358,23 @@ const previousPage = () => {
 
               <!-- ---------------------------------------------------------- -->
               <!-- Input for selecting date -->
-              <div class="mt-5 mx-5">
-                <label for="startDate" class="text-lg text-gray-800">เลือกวันที่เริ่มต้น: </label>
-                <input type="date" id="startDate" v-model="startDate" class="mt-2 px-4 py-2 border rounded-md">
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div class="mx-5">
+                  <label for="startDate" class="text-lg text-gray-800">เลือกวันที่เริ่มต้น: </label>
+                  <input type="date" id="startDate" v-model="startDate" class="mt-2 px-4 py-2 border rounded-md w-full">
+                </div>
+                <div class="mx-5">
+                  <label for="endDate" class="text-lg text-gray-800">เลือกวันที่สิ้นสุด: </label>
+                  <input type="date" id="endDate" v-model="endDate" class="mt-2 px-4 py-2 border rounded-md w-full">
+                </div>
               </div>
-              <div class="mt-5 mx-5">
-                <label for="endDate" class="text-lg text-gray-800">เลือกวันที่สิ้นสุด: </label>
-                <input type="date" id="endDate" v-model="endDate" class="mt-2 px-4 py-2 border rounded-md">
-              </div>
 
 
-              <!-- <div class="mt-5 mx-5">
-                  <label for="endDate" class="text-lg text-gray-800">เลือกวันที่ต้องการแบบรายวัน: </label>
-                  <input type="date" id="selectedDate" v-model="selectedDate" @change="filterDataByDate"
-                  class="mt-2 px-4 py-2 border rounded-md">
-                </div> -->
-
-              <!-- ---------------------------------------------------------- -->
             </div>
           </div>
           <div>
           </div>
-          <div class="flex justify-end">
+          <div class="flex justify-end pt-10">
             <button class="bg-blue-500 hover:bg-blue-700 text-white font-hairline py-2 px-4 max-w-20 rounded"
               @click="handleDateSelection">
               ยกเลิก
@@ -477,14 +472,14 @@ const previousPage = () => {
                       <tr class="border-b dark:border-neutral-500" v-for="(sugarRecord, index) in paginatedResults"
                         :key="sugarRecord.id">
                         <td class="whitespace-nowrap px-6 py-4"> {{ moment(sugarRecord.updated_at).format("DD MMM YYYY"
-                ) }}
+                  ) }}
                           <!--แสดงข้อความตามเงื่อนไขของค่าน้ำตาล / แสดงข้อความตามเงื่อนไขของค่าน้ำตาล -->
                           <br>
                           <span :class="{
-                  'text-yellow-500': sugarRecord.sugarValue < 70,
-                  'text-green-500': sugarRecord.sugarValue >= 70 && sugarRecord.sugarValue <= 125,
-                  'text-red-500': sugarRecord.sugarValue > 125
-                }">
+                    'text-yellow-500': sugarRecord.sugarValue < 70,
+                    'text-green-500': sugarRecord.sugarValue >= 70 && sugarRecord.sugarValue <= 125,
+                    'text-red-500': sugarRecord.sugarValue > 125
+                  }">
                             <span v-if="sugarRecord.sugarValue < 70"><router-link
                                 to="/low">น้ำตาลต่ำ</router-link></span>
 
@@ -499,10 +494,10 @@ const previousPage = () => {
                           <div class="w-full rounded-full h-2.5 mb-4 dark:bg-gray-300 ">
                             <div class="bg-gray-600 h-2.5 rounded-full "
                               :style="{ 'max-width': sugarRecord.sugarValue + '%' }" :class="{
-                  'bg-red-500': sugarRecord.sugarValue > 125,
-                  'bg-green-500': sugarRecord.sugarValue >= 70 && sugarRecord.sugarValue <= 125,
-                  'bg-yellow-500': sugarRecord.sugarValue < 70
-                }"></div>
+                    'bg-red-500': sugarRecord.sugarValue > 125,
+                    'bg-green-500': sugarRecord.sugarValue >= 70 && sugarRecord.sugarValue <= 125,
+                    'bg-yellow-500': sugarRecord.sugarValue < 70
+                  }"></div>
                           </div>
 
 

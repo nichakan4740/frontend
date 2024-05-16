@@ -93,8 +93,8 @@ const routes = [
   },
 
   {
-    path: '/home',
-    name: 'home',
+    path: '/addsugar',
+    name: 'addsugar',
     component: Home,
   },
   {
