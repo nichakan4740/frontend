@@ -110,7 +110,7 @@ const close = () => appRouter.push({ name: "nursehome" });
               <label
                 for="password"
                 class="block mb-2 text-sm font-medium text-gray-900"
-                >Password</label
+                >รหัสผ่าน</label
               >
               <input
                 type="password"
@@ -138,7 +138,7 @@ const close = () => appRouter.push({ name: "nursehome" });
             <div class="text-center">
               <router-link :to="{ name: 'registerNurse' }">
                 <p class="text-sm font-medium text-gray-500">
-                  คุณไม่ม่บัญชีใช่หรือไม่?
+                  คุณไม่มีบัญชีใช่หรือไม่?
                   <a
                     class="font-bold text-primary-600 hover:underline text-indigo-800"
                     >โปรดลงทะเบียน</a
