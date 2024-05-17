@@ -194,7 +194,7 @@ const logoutpatient = () => {
   // ลบ JWT จาก localStorage หรือตำแหน่งที่คุณเก็บ token
   localStorage.removeItem('idcard');
   localStorage.removeItem('accesstoken');
-  localStorage.removeItem('name');
+  localStorage.removeItem('fname');
   localStorage.removeItem('iduser');
   backloginpatient()
 };
