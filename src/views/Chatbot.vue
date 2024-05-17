@@ -6,7 +6,6 @@ import moment from "moment";
 import Swal from "sweetalert2";
 import Pusher from "pusher-js";
 
-/* Helper Function */
 const formatTime = (time) => moment(time).format("YYYY-MM-DD");
 
 /* Constants and References */
@@ -15,6 +14,27 @@ const conversations = ref([]);
 const message = ref("");
 const messageFromAdmin = ref([]);
 
+
+/* --------------------------------------------------------------------------- */
+/* get ข้อมูล จาก db */
+const messages = ref([]);
+
+const fetchUserMessages = async () => {
+  try {
+    const response = await fetch(`${import.meta.env.VITE_BASE_URL}api/user/${userId}/messages`);
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+    const data = await response.json();
+    messages.value = data;
+  } catch (error) {
+    console.error('Error fetching user messages:', error);
+  }
+};
+onMounted(() => {
+  fetchUserMessages();
+});
+/* -------------------------------------------------- */
 /* Send Message to All Admins */
 const sendMessageAll = async () => {
   if (message.value.trim() === "") {
@@ -25,7 +45,6 @@ const sendMessageAll = async () => {
     });
     return;
   }
-
   try {
     const response = await fetch(
       `${import.meta.env.VITE_BASE_URL}api/sendmessage/all`,
@@ -48,8 +67,12 @@ const sendMessageAll = async () => {
 
     const responseData = await response.json();
     console.log("Message sent successfully:", responseData);
-    conversations.value.push(responseData);
-    localStorage.setItem("conversations", JSON.stringify(conversations.value));
+    
+    // เพิ่มข้อความที่ส่งไปใน messages array
+    messages.value.push(responseData);
+    
+    // บันทึกข้อมูลลงใน Local Storage (ตามความเหมาะสม)
+    localStorage.setItem("messages", JSON.stringify(messages.value));
   } catch (error) {
     console.error("Error sending message:", error);
     Swal.fire({
@@ -59,28 +82,18 @@ const sendMessageAll = async () => {
     });
   }
 };
-
 /* --------------------------------------------------------------------------------------------- */
 
-/* Fetch Conversations and Messages from LocalStorage */
-onMounted(() => {
-  const storedConversations = localStorage.getItem("conversations");
-  if (storedConversations)
-    conversations.value = JSON.parse(storedConversations);
 
-  const storedMessages = localStorage.getItem("messagefromAdmin");
-  if (storedMessages) messageFromAdmin.value = JSON.parse(storedMessages);
-});
+
+
 
 /* Pusher for Real-Time Messaging */
 const pusher = new Pusher("c38b6cfa9a4f7e26bf76", {
   cluster: "ap1",
   encrypted: true,
 });
-
-
 const channelmessagefromAdmin = "Touserid" + userId;
-
 const channel = pusher.subscribe(channelmessagefromAdmin);
 channel.bind("message", (data) => {
   console.log(data); // Check the structure of data
@@ -99,7 +112,6 @@ channel.bind("message", (data) => {
 });
 
 /* --------------------------------------------------------------------------------------------------- */
-/* ------------------------------------------------------------------------------------------------- */
 
 const messagetoadmin = ref("");
 const responseMessages = ref([]);
@@ -188,6 +200,8 @@ onMounted(() => {
 const firstCharacter = computed(() => {
   return name.value.charAt(0);
 });
+/* ----------------------------------- */
+
 </script>
 <template>
   <Layout class="bg-gradient-to-b from-blue-100">
@@ -215,9 +229,8 @@ const firstCharacter = computed(() => {
       </div>
 
       <div v-if="activeTab === 1">
-        <div
-          class="lg:flex lg:h-screen antialiased text-gray-800 box-content bg-white shadow-lg shadow-gray-300/50 mt-10 mb-10 pt-5 pb-5 pl-5 pr-10 rounded-lg"
-        >
+        <div class="lg:flex lg:h-screen antialiased text-gray-800 box-content bg-white shadow-lg shadow-gray-300/50 mt-10 mb-10 pt-5 pb-5 pl-5 pr-10 rounded-lg">
+
           <div class="flex h-screen antialiased text-gray-800">
             <!-- Left Sidebar -->
             <div class="flex flex-row h-full w-full overflow-x-hidden">
@@ -268,6 +281,10 @@ const firstCharacter = computed(() => {
                 </div>
               </div>
 
+
+
+
+
               <!-- Main Chat Area -->
               <div class="flex flex-col flex-auto h-full p-6">
                 <!-- Chat Content -->
@@ -278,14 +295,11 @@ const firstCharacter = computed(() => {
                   <div class="flex flex-col h-full overflow-x-auto mb-4">
                     <!-- Example Chat Messages -->
                     <div
-                      v-for="(conversation, index) in filteredConversations"
-                      :key="index"
-                      class="flex justify-end mb-2"
-                    >
+                      v-for="message in messages" :key="message.id"
+                      class="flex justify-end mb-2">
                       <div class="bg-blue-500 text-white py-2 px-4 rounded-xl max-w-xs text-right" >
-                        <p> {{ conversation.message }}</p>
-                        <p> {{ firstCharacter }}</p>
-                    
+                        <p>  {{ message.message }}</p>
+                        {{ formatTime(message.created_at) }}
                       </div>
                     </div>
 

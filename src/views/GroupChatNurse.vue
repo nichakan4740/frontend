@@ -6,7 +6,7 @@ import Pusher from "pusher-js";
 import Swal from "sweetalert2";
 
 const formatTime = (time) => {
-  return moment(time).format("YYYY-MM-DD HH:mm:ss");
+  return moment(time).format("YYYY-MM-DD");
 };
 
 const pusher = new Pusher("c38b6cfa9a4f7e26bf76", {
@@ -15,88 +15,8 @@ const pusher = new Pusher("c38b6cfa9a4f7e26bf76", {
 });
 
 const adminId = localStorage.getItem("idadmin");
-const state = reactive({
-  message: [],
-  filteredMessages: [],
-  latestMessagesByUserId: {}, // Object to store the latest message of each user
-  selectedUserMessages: null, // Store messages of the selected user for modal
-  selectedUserId: null, // Store the selected userId
-  newMessage: "", // Store the new message input
-  messagefromUser: ref([]) // Store messages from users
-});
 
-
-onMounted(() => {
-  const channel = pusher.subscribe('messageUser');
-  channel.bind("message", (data) => {
-    const newMessage = {
-      message: data.message,
-      timestamp: formatTime(data.timestamp),
-      admin_id: data.admin_id,
-      user_id: data.user_id,
-      user_name: data.user_name,
-    };
-
-    state.message.push(newMessage);
-    if (parseInt(data.admin_id) === parseInt(adminId)) {
-      state.filteredMessages.push(newMessage);
-
-      // Update the latest message for each user_id
-      state.latestMessagesByUserId[data.user_id] = newMessage;
-
-      // Save to local storage
-      localStorage.setItem("filteredMessages", JSON.stringify(state.filteredMessages));
-    }
-    window.scrollTo(0, document.body.scrollHeight);
-  });
-
-  // Load filtered messages from local storage
-  const filteredMessagesFromStorage = localStorage.getItem("filteredMessages");
-  if (filteredMessagesFromStorage) {
-    state.filteredMessages = JSON.parse(filteredMessagesFromStorage);
-
-    // Initialize the latestMessagesByUserId from filtered messages
-    state.filteredMessages.forEach((msg) => {
-      state.latestMessagesByUserId[msg.user_id] = msg;
-    });
-  }
-});
-/* --------------------------------------------------------------------------------------------------- */
-// Function to open the modal and show messages of the selected user
-/* const openModal = (userId) => {
-  // Find all messages from the selected user
-  const userMessages = state.filteredMessages.filter(msg => msg.user_id === userId);
-  if (userMessages.length > 0) {
-    state.selectedUserMessages = userMessages;
-    state.selectedUserId = userId;
-  } else {
-    Swal.fire({
-      icon: 'info',
-      title: 'ไม่พบข้อมูล',
-      text: 'ไม่พบข้อมูลสำหรับผู้ใช้นี้',
-    });
-  }
-}; */
-const openModal = (userId) => {
-  // Find all messages from the selected user
-  const userMessages = state.filteredMessages.filter(msg => msg.user_id === userId);
-  const userMessagesFromStorage = messagefromUser.value.filter(msg => msg.user_id === userId); // Filter messages from user stored in messagefromUser
-  if (userMessages.length > 0) {
-    // Concatenate userMessages and userMessagesFromStorage to include all messages
-    const allUserMessages = [...userMessages, ...userMessagesFromStorage];
-    state.selectedUserMessages = allUserMessages;
-    state.selectedUserId = userId;
-  } else {
-    Swal.fire({
-      icon: 'info',
-      title: 'ไม่พบข้อมูล',
-      text: 'ไม่พบข้อมูลสำหรับผู้ใช้นี้',
-    });
-  }
-};
-
-/* ---------------------------------------------------------------------------------------------------- */
-// Function to send a message to the selected user
+/* // Function to send a message to the selected user
 const sendMessageToUser = async () => {
   const message = state.newMessage;
   const userId = state.selectedUserId;
@@ -160,7 +80,7 @@ const sendMessageToUser = async () => {
       text: 'ไม่สามารถส่งข้อความได้',
     });
   }
-};
+}; */
 /* แสดงข้อความตอบกลับจาก user---------------------------------------------------------------------------------------------- */
 onMounted(() => {
  
@@ -189,19 +109,87 @@ messagefromUser.value.push({
 
 
 
+const state = reactive({
+});
+/* get ค่าจาก database  และเพิ่มค่าล่าสุดของ pusher ลงใน Array ของ data ---------------------------------------- */
+const isModalOpen = ref(false);
+const selectedUserMessages = ref([]);
+const messages = ref({});
+const allMessages = ref({});
+const selectedUserId = ref(null); // Define selectedUserId
+const name = ref("Nurse Name"); // Define name
 
+// Fetch messages from the database
+const fetchMessages = async () => {
+  try {
+    const response = await fetch(`${import.meta.env.VITE_BASE_URL}api/admin/${adminId}/messages`);
+    if (!response.ok) {
+      throw new Error('Failed to fetch messages');
+    }
+    const data = await response.json();
+
+    // Group messages by user_id
+    data.forEach(message => {
+      if (!allMessages.value[message.user_id]) {
+        allMessages.value[message.user_id] = [];
+      }
+      allMessages.value[message.user_id].push(message);
+
+      // Keep only the latest message in the messages ref
+      messages.value[message.user_id] = [message];
+    });
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+/* เปิด model  */
+const openModal = (userId) => {
+  const userMessages = allMessages.value[userId];
+  console.log('Open modal for user:', userId);
+  console.log('message', userMessages);
+  selectedUserMessages.value = userMessages; // Update the selectedUserMessages
+  isModalOpen.value = true;
+  
+};
+const closeModal = () => {
+  isModalOpen.value = false;
+};
+
+const adminIdInt = parseInt(adminId, 10); // แปลงเป็นตัวเลข
+onMounted(() => {
+  fetchMessages(); // Fetch messages when the component is mounted
+
+  const channel = pusher.subscribe('messageUser');
+  channel.bind("message", (data) => {
+    // Log the data received from Pusher
+    console.log('Data received from Pusher:', data);
+
+    // Check if the message is from the admin
+    if (data.admin_id === adminIdInt) {
+        console.log('Message is from admin:', data);
+      const newMessage = {
+        message: data.message,
+        timestamp: formatTime(data.timestamp),
+        admin_id: data.admin_id,
+        user_id: data.user_id,
+        user_name: data.user_name,
+      };
+
+      // Update allMessages only if it's a new user or message
+      if (!allMessages.value[data.user_id]) {
+        allMessages.value[data.user_id] = [];
+      }
+      allMessages.value[data.user_id].push(newMessage);
+
+      // Update messages with the latest message from the admin for the user
+      messages.value[data.user_id] = [newMessage];
+    }
+  });
+});
 
 /* ---------------------------------------------------------------------------------------------- */
 
-// ดึงข้อมูล name จาก Local Storage
-const name = ref("");
-onMounted(() => {
-  // ดึงข้อมูล name จาก Local Storage เมื่อ component ถูก mount
-  name.value = localStorage.getItem("name") || "";
-});
-const firstCharacter = computed(() => {
-  return name.value.charAt(0);
-});
 
 
 </script>
@@ -216,6 +204,7 @@ const firstCharacter = computed(() => {
           คุยกับผู้ป่วย
         </h2>
       </div>
+
 <!-- ---------------------------------- -->
  <div class="lg:flex lg:h-screen antialiased text-gray-800 box-content bg-white shadow-lg shadow-gray-300/50 mt-10  mb-10  ml-10  mr-10  rounded-lg">
       <!-- component -->
@@ -243,100 +232,104 @@ const firstCharacter = computed(() => {
                 <span class="font-bold">ข้อความจากผู้ป่วย</span>
               </div>
 
-              <!-- ข้อความด้านซ้ายที่เข้ามา  -->
-              <div class="flex flex-col space-y-1 mt-4 -mx-2 h-80 overflow-y-auto mr-2">
-                <button
-                 v-for="(msg, userId) in state.latestMessagesByUserId" :key="userId"
-                  @click="openModal(userId)"
-                  class="flex flex-row items-center hover:bg-gray-100 rounded-xl p-3"
-                >
-                  <div class="flex items-center">
-                    <div
-                      class="h-10 w-10 bg-indigo-200 rounded-full overflow-hidden flex items-center justify-center"
-                    >
-                      <img
-                        src="https://cdn.icon-icons.com/icons2/2266/PNG/512/patient_icon_140481.png"
-                        alt="Coronavirus Patient Icon"
-                        class="h-8 w-8 object-cover"
-                      />
-                    </div>
-                    <div class="ml-2 flex flex-col items-start pl-2">
-                      <p class="text-sm font-semibold text-gray-900">
-                        {{ msg.user_name }} 
-                      </p>
-                      <p class="text-xs text-gray-500">
-                        {{ msg.timestamp }}
-                      </p>
-                      <p class="text-sm font-normal text-gray-900">
-                        {{msg.message  }}
-                      </p>
-                    </div>
-                  </div>
-                </button>
+<!-- ----------------------------------------------------------------------------------- -->
+<!-- ข้อความด้านซ้ายที่เข้ามา  -->
+<div class="flex flex-col space-y-1 mt-4 -mx-2 h-80 overflow-y-auto mr-2">
+  <button
+    @click="openModal(userId)"
+    v-for="(userMessages, userId) in messages"
+    :key="userId"
+    :class="[
+      'flex flex-row items-center hover:bg-gray-100 rounded-xl p-3',
+      { 'bg-blue-200': selectedUserId === userId } // Add highlight class here
+    ]"
+  >
+    <div class="h-10 w-10 bg-indigo-200 rounded-full overflow-hidden flex items-center justify-center">
+      <img
+        src="https://cdn.icon-icons.com/icons2/2266/PNG/512/patient_icon_140481.png"
+        alt="User Icon"
+        class="h-8 w-8 object-cover"
+      />
+    </div>
+    <div class="ml-2 flex flex-col items-start pl-2">
+      <p class="text-sm font-semibold text-gray-900">
+        {{ userMessages[0].user_name }}
+      </p>
+      <p class="text-xs text-gray-500">
+        {{ userMessages[0].timestamp }}
+      </p>
+      <p class="text-sm font-normal text-gray-900">
+        {{ userMessages[0].message }}
+      </p>
+    </div>
+  </button>
+</div>
+<!-- --------------------------------------- -->
+</div>
+</div>
+<!-- ข้อความด้านขวา -------------------------------------------- -->
+<div  v-if="isModalOpen" class="flex flex-col flex-auto h-full p-6">
+  <div class="flex flex-col flex-auto flex-shrink-0 rounded-2xl bg-gray-100 h-full p-4">
+    <div class="flex flex-col h-full overflow-x-auto mb-4">
+      <div class="flex flex-col h-full">
+        <div class="grid grid-cols-12 gap-y-2">
+          <div v-for="message in selectedUserMessages"  :key="message.timestamp" 
+            :class="{
+              'col-start-1 col-end-8': message.admin_id !== adminId,
+              'col-start-6 col-end-13': message.admin_id === adminId,
+            }"
+            class="rounded-lg p-2 flex items-start"
+          >
+            <div class="h-10 w-10 bg-indigo-200 rounded-full overflow-hidden flex items-center justify-center mr-2">
+              <img
+                src="https://cdn.icon-icons.com/icons2/2266/PNG/512/patient_icon_140481.png"
+                alt="User Icon"
+                class="h-8 w-8 object-cover"
+              />
+            </div>
+            <div :class="{
+              'flex items-center': message.admin_id !== adminId,
+              'flex items-center justify-end': message.admin_id === adminId,
+            }" class="w-full">
+              <div
+                :class="{
+                  'bg-white text-gray-700': message.admin_id !== adminId,
+                  'bg-blue-500 text-white': message.admin_id === adminId,
+                }"
+                class="relative max-w-xl px-4 py-2 shadow rounded-xl w-full"
+              >
+                <div class="text-sm font-semibold mb-1" :class="{
+                  'text-left': message.admin_id !== adminId,
+                  'text-right': message.admin_id === adminId,
+                }">
+                  {{ message.user_name }}
+                </div>
+                <div>{{ message.message }}</div>
               </div>
             </div>
           </div>
+        </div>
 
-<!-- ------------------------------------------------------------------------------------------------ -->
-   <!-- ข้อความด้านขวา -->
-          <div v-if="state.selectedUserMessages" class="flex flex-col flex-auto h-full p-6">
-            <div
-              class="flex flex-col flex-auto flex-shrink-0 rounded-2xl bg-gray-100 h-full p-4"
-            >
-              <div class="flex flex-col h-full overflow-x-auto mb-4">
-                <div class="flex flex-col h-full">
-                  <div class="grid grid-cols-12 gap-y-2">
-                    <div 
-                      v-for="(msg, index) in state.selectedUserMessages" 
-                      :key="index" 
-                      :class="{
-                        'col-start-1 col-end-8 p-3 rounded-lg': msg.admin_id !== adminId,
-                        'col-start-6 col-end-13 p-3 rounded-lg justify-end flex': msg.admin_id === adminId
-                      }"
-                    >
-                      <div 
-                        :class="{
-                          'flex flex-row items-center': msg.admin_id !== adminId,
-                          'flex flex-row-reverse items-center': msg.admin_id === adminId
-                        }"
-                      >
-                        <div 
-                          :class="{
-                            'flex items-center justify-center h-10 w-10 rounded-full bg-indigo-500 flex-shrink-0': msg.admin_id !== adminId,
-                            'flex items-center justify-center h-10 w-10 rounded-full bg-green-500 flex-shrink-0': msg.admin_id === adminId
-                          }"
-                        >
-                           {{ msg.admin_id !== adminId ? msg.user_name.charAt(0) : firstCharacter }}
-                        </div>
-                        <div class="relative ml-3 text-sm bg-white py-2 px-4 shadow rounded-xl">
-                          <div>{{ msg.message }}</div>
-                          <p class="text-xs text-gray-600">
-                            {{ msg.timestamp }}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+      
 
+
+                  
 <!-- ------------------------------------------------------------------------------------------------------ -->
-<!-- ------------------------- -->
 </div>
-
 </div>
-<!-- ข้อความด้านซ้ายที่เข้ามาจาก   -->
-<div class="flex flex-col space-y-1 mt-4 -mx-2 h-80 overflow-y-auto mr-2">
-  <div v-for="(msg, index) in messagefromUser" :key="index" class="flex flex-row items-start justify-start p-3">
-  <!-- กรองข้อความเฉพาะของผู้ใช้ที่ถูกเลือก -->
- <!--  <template v-if="msg.user_id === state.selectedUserId"> -->
+<!-- ข้อความด้านซ้ายที่เข้ามาจาก User  -->
+<!-- <div class="flex flex-col space-y-1 mt-4 -mx-2 h-80 overflow-y-auto mr-2">
+  <div  class="flex flex-row items-start justify-start p-3">
+   <template v-if="msg.user_id === state.selectedUserId"> 
     <div class="flex flex-col items-start pl-2">
-      <p class="text-sm font-semibold text-gray-900">{{ msg.user_name }}</p>
-      <p class="text-xs text-gray-500">{{ msg.timestamp }}</p>
-      <p class="text-sm font-normal text-gray-900">{{ msg.message }}</p>
+      <p class="text-sm font-semibold text-gray-900"></p>
+      <p class="text-xs text-gray-500"></p>
+      <p class="text-sm font-normal text-gray-900"></p>
     </div>
-<!--   </template> -->
-</div>
 
 </div>
+
+</div> -->
 
 
 <!-- --------------------------------------------------------------------------------------------------------------------------------------------------- -->

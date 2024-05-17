@@ -1,228 +1,256 @@
 <script setup>
-import { ref, onMounted, computed, watch, reactive } from "vue";
+import { ref, onMounted, computed, reactive } from "vue";
 import LayoutNurse from "../layouts/LayoutNurse.vue";
 import moment from "moment";
 import Pusher from "pusher-js";
 import Swal from "sweetalert2";
 
-/* --------------------------------------------------------------------------------- */
-/* เวลา */
 const formatTime = (time) => {
   return moment(time).format("YYYY-MM-DD");
 };
-
-const adminId = localStorage.getItem("idadmin");
-const messages = ref([]);
 
 const pusher = new Pusher("c38b6cfa9a4f7e26bf76", {
   cluster: "ap1",
   encrypted: true,
 });
 
-const channels = pusher.subscribe('messageUser');
+const adminId = localStorage.getItem("idadmin");
+/* const state = reactive({
+  message: [],
+  filteredMessages: [],
+  latestMessagesByUserId: {}, // Object to store the latest message of each user
+  selectedUserMessages: null, // Store messages of the selected user for modal
+  selectedUserId: null, // Store the selected userId
+  newMessage: "", // Store the new message input
+  messagefromUser: ref([]) // Store messages from users
+}); */
 
-channels.bind("message", (data) => {
-  messages.value.push({
-    message: data.message,
-    createdAt: formatTime(data.createdAt), 
-    admin_id: data.admin_id,
-    user_id: data.user_id,
-    user_name: data.user_name,
-  });
-  localStorage.setItem("messagesAllUser", JSON.stringify(messages.value));
-});
-
-if (localStorage.getItem("messagesAllUser")) {
-  messages.value = JSON.parse(localStorage.getItem("messagesAllUser"));
-}
-
-
-
-const filteredMessages = computed(() => {
-  const adminMessages = messages.value.filter(
-    (message) => message.admin_id === parseInt(adminId)
-  );
-
-  // สร้างออบเจ็กต์เพื่อเก็บข้อความล่าสุดของแต่ละ user_id
-  const latestMessagesByUser = {};
-  adminMessages.forEach((message) => {
-    // ถ้ายังไม่มีข้อความล่าสุดสำหรับ user_id นี้ หรือข้อความใหม่มากกว่าข้อความที่มีอยู่
-    if (
-      !latestMessagesByUser.hasOwnProperty(message.user_id) ||
-      new Date(message.createdAt) >
-        new Date(latestMessagesByUser[message.user_id].createdAt)
-    ) {
-      latestMessagesByUser[message.user_id] = message;
-    }
-  });
-  // แปลงออบเจ็กต์เป็น array ของข้อความล่าสุดของแต่ละ user_id
-  const latestMessages = Object.values(latestMessagesByUser);
-
-  // เรียงลำดับข้อความตามเวลา createdAt ในลำดับจากมากไปน้อย
-  return latestMessages.sort(
-    (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-  );
-});
+/* 
 onMounted(() => {
+  const channel = pusher.subscribe('messageUser');
+  channel.bind("message", (data) => {
+    const newMessage = {
+      message: data.message,
+      timestamp: formatTime(data.timestamp),
+      admin_id: data.admin_id,
+      user_id: data.user_id,
+      user_name: data.user_name,
+    };
 
-}); 
+    state.message.push(newMessage);
+    if (parseInt(data.admin_id) === parseInt(adminId)) {
+      state.filteredMessages.push(newMessage);
 
-/* ------------------------------------------------------------------------------------------------------------------------------------------------------------------- */
-/* แสดงข้อความทั้งหมดเมื่อคลิกเข้าไป */
-const filteredMessagesAll = ref([]);
-const showModal = ref(false);
-const lastMessage = ref(JSON.parse(localStorage.getItem("NewMessageAll")));
+      // Update the latest message for each user_id
+      state.latestMessagesByUserId[data.user_id] = newMessage;
 
-const openModal = (message) => {
-  const userId = message.user_id; // เปลี่ยนจาก localStorage เป็น message.user_id
-  storeClickedMessage(message, userId); // เรียกใช้ฟังก์ชันเพื่อบันทึกข้อความใหม่และ userId
-  lastMessage.value = message; // อัพเดตค่า lastMessage ใหม่
-  showModal.value = true; // แสดง Modal
-  clickedUserId.value = userId; // กำหนดค่า clickedUserId เมื่อมีการคลิก
-  
-
-  // อัปเดต filteredMessagesAll ใหม่เพื่อแสดงข้อความทั้งหมดที่เกี่ยวข้องกับผู้ใช้งาน
-  filteredMessagesAll.value = messages.value.filter((msg) => {
-    return (
-      msg.admin_id === parseInt(adminId) && msg.user_id === message.user_id
-    );
+      // Save to local storage
+      localStorage.setItem("filteredMessages", JSON.stringify(state.filteredMessages));
+    }
+    window.scrollTo(0, document.body.scrollHeight);
   });
-};
 
-const storeClickedMessage = (message, userId) => {
-  // บันทึกข้อความล่าสุดไว้ใน localStorage
-  localStorage.setItem("NewMessageAll", JSON.stringify(message));
-  localStorage.setItem("userId", JSON.stringify(parseInt(message.user_id)));
-};
-/* -------------------------------------------------------------------------------------------------------------------------- */
+  // Load filtered messages from local storage
+  const filteredMessagesFromStorage = localStorage.getItem("filteredMessages");
+  if (filteredMessagesFromStorage) {
+    state.filteredMessages = JSON.parse(filteredMessagesFromStorage);
 
-
-
-
-/* ส่งข้อความตอบกลับ */
-const clickedUserId = ref(null);
-const messageToUser = ref("");
-
-const sendMessageToUser = (message) => {
-  const userId = localStorage.getItem("userId");
-  fetch(`${import.meta.env.VITE_BASE_URL}api/sendmessage/ToUser/${userId}`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-    },
-    body: JSON.stringify({
-      message: message,
-      admin_id: adminId,
-    }),
-  })
-    .then((response) => response.json())
-    .catch((error) => {
-      console.error("Error:", error);
-      Swal.fire({
-        icon: "error",
-        title: "Oops...",
-        text: "Failed to send message",
-      });
+    // Initialize the latestMessagesByUserId from filtered messages
+    state.filteredMessages.forEach((msg) => {
+      state.latestMessagesByUserId[msg.user_id] = msg;
     });
-};
-const handleSendMessage = () => {
-  if (messageToUser.value.trim() !== "") {
-    sendMessageToUser(messageToUser.value);
+  }
+}); */
+/* --------------------------------------------------------------------------------------------------- */
+
+/* const openModal = (userId) => {
+  // Find all messages from the selected user
+  const userMessages = state.filteredMessages.filter(msg => msg.user_id === userId);
+  const userMessagesFromStorage = messagefromUser.value.filter(msg => msg.user_id === userId); // Filter messages from user stored in messagefromUser
+  if (userMessages.length > 0) {
+    // Concatenate userMessages and userMessagesFromStorage to include all messages
+    const allUserMessages = [...userMessages, ...userMessagesFromStorage];
+    state.selectedUserMessages = allUserMessages;
+    state.selectedUserId = userId;
   } else {
     Swal.fire({
-      icon: "error",
-      title: "Oops...",
-      text: "Message must not be empty",
+      icon: 'info',
+      title: 'ไม่พบข้อมูล',
+      text: 'ไม่พบข้อมูลสำหรับผู้ใช้นี้',
+    });
+  }
+}; */
+
+/* ---------------------------------------------------------------------------------------------------- */
+// Function to send a message to the selected user
+const sendMessageToUser = async () => {
+  const message = state.newMessage;
+  const userId = state.selectedUserId;
+
+  if (message.trim() === "") {
+    return;
+  }
+
+  const payload = {
+    message: message,
+    admin_id: adminId,
+  };
+
+  try {
+    const response = await fetch(`${import.meta.env.VITE_BASE_URL}api/sendmessage/ToUser/${userId}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (response.ok) {
+      // Update the state with the new message
+      const newMessage = {
+        message: message,
+        timestamp: formatTime(new Date()), // Use current time for timestamp
+        admin_id: adminId,
+        user_id: userId,
+        user_name: state.selectedUserMessages[0]?.user_name || "Unknown", // Assuming user_name is the same for the selected user's messages
+      };
+
+      state.selectedUserMessages.push(newMessage);
+      state.filteredMessages.push(newMessage);
+      state.latestMessagesByUserId[userId] = newMessage;
+
+      // Save to local storage
+      localStorage.setItem("filteredMessages", JSON.stringify(state.filteredMessages));
+
+      // Clear the input field
+      state.newMessage = "";
+
+      // Optionally, show success message
+      Swal.fire({
+        icon: 'success',
+        title: 'ส่งข้อความสำเร็จ',
+      });
+    } else {
+      // Handle error
+      Swal.fire({
+        icon: 'error',
+        title: 'เกิดข้อผิดพลาด',
+        text: 'ไม่สามารถส่งข้อความได้',
+      });
+    }
+  } catch (error) {
+    console.error("Error sending message:", error);
+    Swal.fire({
+      icon: 'error',
+      title: 'เกิดข้อผิดพลาด',
+      text: 'ไม่สามารถส่งข้อความได้',
     });
   }
 };
-
-
-
-
-
-const messagesendToUser = ref([]);
-const userIds = localStorage.getItem("userId");
-/* const channelNamesendToUser = "Touserid" + userIds; */
- const channelNamesendToUser ='Conversation';
-
-const pushersendToUser = new Pusher("c38b6cfa9a4f7e26bf76", {
-  cluster: "ap1",
-  encrypted: true,
-});
-
-const channelsendToUser = pushersendToUser.subscribe(channelNamesendToUser);
-
-channelsendToUser.bind("message", (data) => {
- // console.log(data); // ตรวจสอบโครงสร้างข้อมูล 
-  // เพิ่มข้อมูลเข้าไปใน messagesendToUser.value
-  messagesendToUser.value.push({
-    message: data.message,
-    admin_id: data.admin_id,
-    user_id: data.user_id,
-  });
-
-  // บันทึก messagesendToUser ใน localStorage เฉพาะเมื่อมีข้อความใหม่ถูกส่งมา
-  localStorage.setItem(
-    "messagesendToUser",
-    JSON.stringify(messagesendToUser.value)
-  );
-});
-
+/* แสดงข้อความตอบกลับจาก user---------------------------------------------------------------------------------------------- */
 onMounted(() => {
-  // อ่านข้อมูล messagesendToUser จาก localStorage
-  if (localStorage.getItem("messagesendToUser")) {
-    messagesendToUser.value = JSON.parse(
-      localStorage.getItem("messagesendToUser")
-    );
-  }
-  console.log(localStorage.getItem("messagesendToUser"))
-}); 
-
-const filteredMessagesToSend = computed(() => {
-  return  messagesendToUser.value.filter((msg) => {
-    return msg.user_id ===  clickedUserId.value; // กรองเฉพาะข้อความที่มี user_id เท่ากับค่าที่ถูกคลิก
-  });
+ 
 });
- 
 
-
-/* ------------------------------------------------------------------------------------------------------------------------------------ */
-/* แสดงข้อความที่ตอบกลับมาจาก user */
- 
+const channelmessagefromUser = "Toadminid" + adminId;
 const messagefromUser = ref([]);
-const adminIds = localStorage.getItem("idadmin");
-/* const channelNamemessagefromUser = "Toadminid" + adminIds; */
-const channelNamemessagefromUser = 'Conversation';
-
-const pusherfromUser = new Pusher("c38b6cfa9a4f7e26bf76", {
-  cluster: "ap1",
-  encrypted: true,
-});
-
-const channel = pusherfromUser.subscribe(channelNamemessagefromUser);
-channel.bind("message", (data) => {
+const channel = pusher.subscribe(channelmessagefromUser);
+channel.bind('message', (data) => {
   console.log(data); // Check the structure of data
-  messagefromUser.value.push({
-    message: data.message,
-    admin_id: data.admin_id,
-    user_id: data.user_id,
-  });
-
-  localStorage.setItem("messagefromUser", JSON.stringify(messagefromUser.value));
+messagefromUser.value.push({
+  message: data.message,
+  timestamp: formatTime(data.timestamp),
+  admin_id: data.admin_id,
+  user_id: data.user_id,
+  user_name: data.user_name,
 });
 
-onMounted(() => {
-  
-  if (localStorage.getItem("messagefromUser")) {
-    messagefromUser.value = JSON.parse(
-     localStorage.getItem("messagefromUser"));
-  }
+ localStorage.setItem("messagefromUser", JSON.stringify(messagefromUser.value));
+
+});
+ onMounted(() => {
+  const storedMessages = JSON.parse(localStorage.getItem("messagefromUser")) || [];
+  messagefromUser.value = storedMessages;
 }); 
 
 
-/* ---------------------------------------------------------------------------------------------------------- */
+
+/* get ค่าจาก database  และเพิ่มค่าล่าสุดของ pusher ลงใน Array ของ data ---------------------------------------- */
+const state = reactive({
+});
+
+
+const isModalOpen = ref(false);
+const selectedUserMessages = ref([]);
+const messages = ref({});
+const allMessages = ref({});
+
+
+
+// Fetch messages from the database
+const fetchMessages = async () => {
+  try {
+    const response = await fetch(`${import.meta.env.VITE_BASE_URL}api/admin/${adminId}/messages`);
+    if (!response.ok) {
+      throw new Error('Failed to fetch messages');
+    }
+    const data = await response.json();
+
+    // Group messages by user_id
+    data.forEach(message => {
+      if (!allMessages.value[message.user_id]) {
+        allMessages.value[message.user_id] = [];
+      }
+      allMessages.value[message.user_id].push(message);
+
+      // Keep only the latest message in the messages ref
+      messages.value[message.user_id] = [message];
+    });
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+const openModal = (userId) => {
+  const userMessages = allMessages.value[userId];
+  console.log('Open modal for user:', userId);
+  console.log('message', userMessages);
+  selectedUserMessages.value = userMessages; // Update the selectedUserMessages
+  isModalOpen.value = true;
+};
+
+const closeModal = () => {
+  isModalOpen.value = false;
+};
+onMounted(() => {
+  fetchMessages(); // Fetch messages when the component is mounted
+
+  const channel = pusher.subscribe('messageUser');
+  channel.bind("message", (data) => {
+    const newMessage = {
+      message: data.message,
+      timestamp: formatTime(data.timestamp),
+      admin_id: data.admin_id,
+      user_id: data.user_id,
+      user_name: data.user_name,
+    };
+
+    if (!allMessages.value[data.user_id]) {
+      allMessages.value[data.user_id] = [];
+    }
+    allMessages.value[data.user_id].push(newMessage);
+
+    messages.value[data.user_id] = [newMessage];
+  });
+});
+
+/* -------------------------------------------------------------- */
+
+
+
+
+
+/* ---------------------------------------------------------------------------------------------- */
 
 // ดึงข้อมูล name จาก Local Storage
 const name = ref("");
@@ -233,23 +261,74 @@ onMounted(() => {
 const firstCharacter = computed(() => {
   return name.value.charAt(0);
 });
+
+
 </script>
 
 <template>
   <LayoutNurse class="bg-gradient-to-b from-blue-100">
     <!-- Content -->
     <div class="container mx-auto">
-      <div
-        class="box-content-small p-3 ml-5 mr-5 mt-10 bg-gradient-to-b from-blue-900 to-blue-800 shadow-lg shadow-slate-500/50 rounded-lg"
-      >
+     
+     <div class="box-content-small p-3 ml-5 mr-5 mt-10 bg-gradient-to-b from-blue-900 to-blue-800 shadow-lg shadow-slate-500/50 rounded-lg">
         <h2 class="font-semibold text-xl text-center text-slate-200">
           คุยกับผู้ป่วย
         </h2>
       </div>
 
+
+
+
+
+
+<div class="space-y-4">
+    <button @click="openModal(userId)" v-for="(userMessages, userId) in messages" :key="userId" class="border border-gray-300 rounded p-4" >
+      <h3 class="text-lg font-semibold mb-2">User: {{ userMessages[0].user_name }}</h3>
+      <div v-for="message in userMessages" :key="message.timestamp" class="mb-2">
+        <p class="bg-gray-100 p-2 rounded">{{ message.message }}</p>
+        <span class="text-sm text-gray-500">{{ message.timestamp }}</span>
+      </div>
+    </button>
+  </div>
+ 
+
+  <div>
+    <button @click="openModal(userId)" class="bg-blue-500 text-white px-4 py-2 rounded">Open Modal</button>
+
+    <!-- Modal -->
+    <div v-if="isModalOpen" class="fixed inset-0 bg-gray-600 bg-opacity-75 flex items-center justify-center">
+      <div class="bg-white rounded-lg shadow-lg w-11/12 md:w-1/2 lg:w-1/3 p-4">
+        <div class="flex justify-between items-center">
+          <h2 class="text-xl font-bold">User Messages</h2>
+          <button @click="closeModal" class="text-gray-600 hover:text-gray-900">&times;</button>
+        </div>
+        <ul class="mt-4">
+          <li v-for="message in selectedUserMessages" :key="message.timestamp" class="border-b border-gray-200 py-2">
+            <p class="text-sm text-gray-700">{{ message.timestamp }} - {{ message.message }}</p>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- ---------------------------------- -->
+ <div class="lg:flex lg:h-screen antialiased text-gray-800 box-content bg-white shadow-lg shadow-gray-300/50 mt-10  mb-10  ml-10  mr-10  rounded-lg">
       <!-- component -->
-      <div class="flex h-screen antialiased text-gray-800 container mt-6">
-        <div class="flex flex-row h-full w-full overflow-x-hidden ml-6">
+      <div class="flex h-screen antialiased text-gray-800 container">
+        <div class="flex flex-row h-full w-full overflow-x-hidden ">
           <div
             class="flex flex-col py-8 pl-6 pr-2 w-64 bg-white flex-shrink-0 rounded-xl"
           >
@@ -272,14 +351,11 @@ const firstCharacter = computed(() => {
                 <span class="font-bold">ข้อความจากผู้ป่วย</span>
               </div>
 
-              <!-- ------------------------------------------------------------------------------------------------------------------------------------- -->
-
               <!-- ข้อความด้านซ้ายที่เข้ามา  -->
               <div class="flex flex-col space-y-1 mt-4 -mx-2 h-80 overflow-y-auto mr-2">
                 <button
-                  v-for="(message, index) in filteredMessages"
-                  :key="'user_' + index"
-                  @click="openModal(message)"
+                 v-for="(msg, userId) in state.latestMessagesByUserId" :key="userId"
+                @click="openModal(userId)"
                   class="flex flex-row items-center hover:bg-gray-100 rounded-xl p-3"
                 >
                   <div class="flex items-center">
@@ -287,20 +363,20 @@ const firstCharacter = computed(() => {
                       class="h-10 w-10 bg-indigo-200 rounded-full overflow-hidden flex items-center justify-center"
                     >
                       <img
-                        src="https://cdn.icon-icons.com/icons2/2265/PNG/512/patient_coronavirus_icon_140453.png"
+                        src="https://cdn.icon-icons.com/icons2/2266/PNG/512/patient_icon_140481.png"
                         alt="Coronavirus Patient Icon"
                         class="h-8 w-8 object-cover"
                       />
                     </div>
                     <div class="ml-2 flex flex-col items-start pl-2">
                       <p class="text-sm font-semibold text-gray-900">
-                        {{ message.user_name }}
+                        {{ msg.user_name }} 
                       </p>
                       <p class="text-xs text-gray-500">
-                        {{ message.createdAt }}
+                        {{ msg.timestamp }}
                       </p>
                       <p class="text-sm font-normal text-gray-900">
-                        {{ message.message }}
+                        {{msg.message  }}
                       </p>
                     </div>
                   </div>
@@ -308,93 +384,84 @@ const firstCharacter = computed(() => {
               </div>
             </div>
           </div>
-          <!-- ---------------------------------------------------------------------------------------------------- -->
-          <!-- ข้อความด้านขวา -->
-          <div
-            class="flex flex-col flex-auto h-full p-6"
-            v-if="showModal"
-            @closeModal="showModal = false"
-          >
+
+<!-- ------------------------------------------------------------------------------------------------ -->
+   <!-- ข้อความด้านขวา -->
+          <div v-if="state.selectedUserMessages" class="flex flex-col flex-auto h-full p-6">
             <div
               class="flex flex-col flex-auto flex-shrink-0 rounded-2xl bg-gray-100 h-full p-4"
             >
               <div class="flex flex-col h-full overflow-x-auto mb-4">
                 <div class="flex flex-col h-full">
                   <div class="grid grid-cols-12 gap-y-2">
-                    <!-- ----------------------------------------------- ข้อความอันแรก -->
-                    <div
-                      class="col-start-1 col-end-8 p-3 rounded-lg" v-for="(message, index) in filteredMessagesAll" :key="index" >
-                      <div class="flex flex-row items-center">
-                        <div  class="flex items-center justify-center h-10 w-10 rounded-full bg-indigo-500 flex-shrink-0">
-                         {{ message.user_name }}
+                    <div 
+                      v-for="(msg, index) in state.selectedUserMessages" 
+                      :key="index" 
+                      :class="{
+                        'col-start-1 col-end-8 p-3 rounded-lg': msg.admin_id !== adminId,
+                        'col-start-6 col-end-13 p-3 rounded-lg justify-end flex': msg.admin_id === adminId
+                      }"
+                    >
+                      <div 
+                        :class="{
+                          'flex flex-row items-center': msg.admin_id !== adminId,
+                          'flex flex-row-reverse items-center': msg.admin_id === adminId
+                        }"
+                      >
+                        <div 
+                          :class="{
+                            'flex items-center justify-center h-10 w-10 rounded-full bg-indigo-500 flex-shrink-0': msg.admin_id !== adminId,
+                            'flex items-center justify-center h-10 w-10 rounded-full bg-green-500 flex-shrink-0': msg.admin_id === adminId
+                          }"
+                        >
+                           {{ msg.admin_id !== adminId ? msg.user_name.charAt(0) : firstCharacter }}
                         </div>
-
                         <div class="relative ml-3 text-sm bg-white py-2 px-4 shadow rounded-xl">
-                          <div>{{ message.message }}</div>
-                          <p class="text-sm text-gray-600">
-                          <!--   CreatedAt: {{ message.createdAt }} -->
+                          <div>{{ msg.message }}</div>
+                          <p class="text-xs text-gray-600">
+                            {{ msg.timestamp }}
                           </p>
-                         <!--  <p class="text-sm text-gray-600">admin_id: {{ message.admin_id }}</p> -->
                         </div>
                       </div>
                     </div>
-                    <div></div>
-
-                    <!-- ข้อความด้านขวา และข้อความที่ส่งกลับ -->
-                    <template v-for="(message, index) in filteredMessagesToSend" :key="index">
-                      <div class="col-start-6 col-end-13 p-3 rounded-lg">
-                        <div class="flex items-center justify-start flex-row-reverse" >
-                          <div class="flex items-center justify-center h-10 w-10 rounded-full bg-indigo-500 flex-shrink-0">
-                            {{ firstCharacter }}
-                          </div>
-                          <div  class="relative mr-3 text-sm bg-indigo-100 py-2 px-4 shadow rounded-xl">
-                            <div>{{ message.message }}</div>
-                            <!-- <p class="text-sm text-gray-600"> CreatedAt: {{ message.createdAt }}</p> -->
-                            <!-- <p class="text-sm text-gray-600"> admin_id: {{ message.user_id }}</p> -->
-                          </div>
-                        </div>
-                      </div>
-                    </template>
-
-
-                    <template   v-for="(message, index) in messagefromUser" :key="index"> 
-
-                      <div class="col-start-1 col-end-8 p-3 rounded-lg">
-                        <div class="flex flex-row items-center">
-                          <div class="flex items-center justify-center h-10 w-10 rounded-full bg-indigo-500 flex-shrink-0">
-                            {{ message.user_name}}
-                          </div>
-                          <div class="relative ml-3 text-sm bg-white py-2 px-4 shadow rounded-xl" >
-                            <div>{{ message.message}}</div>
-                            <!-- <p class="text-sm text-gray-600"> CreatedAt: {{ message.createdAt }}</p> -->
-                            <!-- <p class="text-sm text-gray-600"> admin_id: {{ message.admin_id }}</p> -->
-                          </div>
-                        </div>
-                      </div>
-                    </template>
                   </div>
-                </div>
-              </div>
 
+<!-- ------------------------------------------------------------------------------------------------------ -->
+<!-- ------------------------- -->
+</div>
+
+</div>
+<!-- ข้อความด้านซ้ายที่เข้ามาจาก   -->
+<div class="flex flex-col space-y-1 mt-4 -mx-2 h-80 overflow-y-auto mr-2">
+  <div v-for="(msg, index) in messagefromUser" :key="index" class="flex flex-row items-start justify-start p-3">
+  <!-- กรองข้อความเฉพาะของผู้ใช้ที่ถูกเลือก -->
+ <!--  <template v-if="msg.user_id === state.selectedUserId"> -->
+    <div class="flex flex-col items-start pl-2">
+      <p class="text-sm font-semibold text-gray-900">{{ msg.user_name }}</p>
+      <p class="text-xs text-gray-500">{{ msg.timestamp }}</p>
+      <p class="text-sm font-normal text-gray-900">{{ msg.message }}</p>
+    </div>
+<!--   </template> -->
+</div>
+
+</div>
+
+
+<!-- --------------------------------------------------------------------------------------------------------------------------------------------------- -->
               <!-- ข้อความที่ส่ง -->
-              <div
-                class="flex flex-row items-center h-16 rounded-xl bg-white w-full px-4"
-              >
+              <div class="flex flex-row items-center h-16 rounded-xl bg-white w-full px-4">
                 <div class="flex-grow ml-4">
                   <div class="relative w-full">
                     <input
+                      v-model="state.newMessage"
                       type="text"
-                      v-model="messageToUser"
                       placeholder="ส่งข้อความที่นี้..."
                       class="flex w-full border rounded-xl focus:outline-none focus:border-indigo-300 pl-4 h-10"
                     />
                   </div>
                 </div>
                 <div class="ml-4">
-                  <button
-                    @click="handleSendMessage"
-                    class="flex items-center justify-center bg-indigo-500 hover:bg-indigo-600 rounded-xl text-white px-4 py-1 flex-shrink-0"
-                  >
+                  <button @click="sendMessageToUser" class="flex items-center justify-center bg-indigo-500 hover:bg-indigo-600 rounded-xl text-white px-4 py-1 flex-shrink-0">
                     <span>Send</span>
                     <span class="ml-2">
                       <svg
@@ -416,14 +483,14 @@ const firstCharacter = computed(() => {
                 </div>
               </div>
             </div>
-
-            
           </div>
+
         </div>
       </div>
     </div>
-    <!-- -------------------------------------------------------------------------------------------- -->
+</div>
   </LayoutNurse>
 </template>
 
-<style></style>
+<style>
+</style>
