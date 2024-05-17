@@ -6,8 +6,6 @@ import Header from '../layouts/Header.vue';
 
 const fname = ref("");
 const lname = ref("");
-// const allergic_drug = ref("");
-// const my_drug = ref("");
 const idcard = ref("");
 const password = ref("");
 const passwordcheck = ref("");
@@ -49,7 +47,7 @@ const registerpatient = async () => {
     console.log("error,cannot add");
     Swal.fire({
       icon: "error",
-      title: "ขอโทษ !!!",
+      title: "เกิดข้อผิดพลาด !!!",
       text: "ไม่สามารถสร้างบัญชีได้ โปรดตรวจสอบความถูกต้อง!",
     });
   }

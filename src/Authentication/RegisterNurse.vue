@@ -40,7 +40,7 @@ const registernurse = async () => {
     console.log("error,cannot add");
     Swal.fire({
       icon: "error",
-      title: "ขอโทษ !!!",
+      title: "เกิดข้อผิดพลาด !!!",
       text: "ไม่สามารถสร้างบัญชีได้ โปรดตรวจสอบความถูกต้อง!",
     });
   }
@@ -164,7 +164,7 @@ const close = () => appRouter.push({ name: "loginNurse" });
 
                     <div>
                       <label 
-                      class="block mb-2 text-sm font-medium text-gray-900">เลขใบประกอบวิชาชีพ
+                      class="block mb-2 text-sm font-medium text-gray-900">เลขใบประกอบวิชาชีพพยาบาล
                       &nbsp;
                       <span style="font-size: 10px; color: rgb(177, 109, 241)">
                       ( ตัวอักษรต้องไม่เกิน 10 ตัวอักษร )
@@ -182,10 +182,10 @@ const close = () => appRouter.push({ name: "loginNurse" });
                           {{ professional_id.length }}/10
                         </p>
                         <p v-show="professional_id.length < 1" >
-                          * Please input your professional_id  <span></span>
+                          * กรุณากรอกเลขใบประกอบวิชาชีพพยาบาล <span></span>
                         </p>
                         <p v-show="professional_id.length > 100" >
-                          * Characters must not exceed 10
+                          * เลขใบประกอบวิชาชีพพยาบาลต้องเป็นตัวเลข 10 หลัก
                         </p>
                       </div>
                      

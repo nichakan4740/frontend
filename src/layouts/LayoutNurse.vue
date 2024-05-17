@@ -45,7 +45,9 @@ const toggleMenu = () => {
       <!-- Hamburger Menu -->
       <div v-if="showMenu" class="menu">
         <!-- เพิ่มเนื้อหาของเมนูที่นี่ -->
-        <!-- <p>Profile</p> -->
+        <router-link :to="'/informationNurse/'">
+          <p>ข้อมูลส่วนบุคคล</p>
+        </router-link>
         <p @click="logout">ออกจากระบบ</p>
       </div>
 

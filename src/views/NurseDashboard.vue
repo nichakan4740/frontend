@@ -120,11 +120,11 @@ const resetSearch = () => {
                 <thead class=" text-gray-400 uppercase bg-gray-50 ">
                   <tr>
                     <th scope="col" class="px-6 py-4 text-sm">รายชื่อ</th>
-                    <th scope="col" class="px-6 py-4 text-center text-sm">สถานะ</th>
-                    <th scope="col" class="px-6 py-4 text-center text-sm"> ตรวจล่าสุด </th>
+                    <th scope="col" class="px-6 py-4 text-center text-sm">สถานะการรับบริการ</th>
+                    <th scope="col" class="px-6 py-4 text-center text-sm"> เวลาที่ตรวจ </th>
                     <th scope="col" class="px-6 py-4 text-center text-sm">(mg/dl)</th>
-                    <th scope="col" class="px-6 py-4 text-center text-sm">พูดคุย</th>
-                    <th scope="col" class="px-6 py-4 text-center text-sm"></th>
+                    <th scope="col" class="px-6 py-4 text-center text-sm">อาการผิดปกติ</th>
+                    <th scope="col" class="px-6 py-4 text-center text-sm">อื่นๆ</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -148,6 +148,10 @@ const resetSearch = () => {
               'text-green-500': sugarRecord.sugarValue >= 70 && sugarRecord.sugarValue <= 125,
               'text-yellow-400': sugarRecord.sugarValue < 70
             }">{{ sugarRecord.sugarValue }}</td>
+                      <td class="px-6 py- text-black font-medium text-center">
+                      {{ sugarRecord.symptom }}</td>
+                      <td class="px-6 py-4 text-black font-medium text-center">
+                      {{ sugarRecord.note }}</td>
                   </tr>
                 </tbody>
               </table>

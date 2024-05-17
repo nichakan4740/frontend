@@ -1,10 +1,9 @@
 <script setup>
 import { useRouter } from "vue-router";
-import { ref, onBeforeMount, computed, onMounted, watch } from "vue";
+import { ref, onBeforeMount, computed, onMounted, watch, onUnmounted } from "vue";
 import Layout from "../layouts/Layout.vue";
 import moment from "moment";
 import Swal from "sweetalert2";
-
 
 
 /* date-time */
@@ -59,8 +58,8 @@ const MysugarLoad = async () => {
       originalData.value = data;
       // เรียงข้อมูลตามวันที่ล่าสุดไปยังเก่าสุด
       originalData.value.sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at));
-      // แสดงผลทีละ 15 อัน
-      result.value = originalData.value.slice(0, 15);
+      // แสดงผลทีละ 10 อัน
+      result.value = originalData.value.slice(0, 10);
 
       result.value = filterBySelectedDate(data);
     } else if (response.status === 404) {
@@ -205,10 +204,10 @@ const updateData = async () => {
       }`;
     // Display confirmation dialog using Swal
     const confirmationResult = await Swal.fire({
-      title: "คุณแน่ใจหรือไหม",
+      title: "ยืนยันการแก้ไข",
       text: "คุณต้องการที่จะแก้ไขการบันทึกค่าน้ำตาล",
       icon: "warning",
-      confirmButtonText: "ใช่ ,แก้ไขมัน",
+      confirmButtonText: "ยืนยัน",
       cancelButtonText: "ยกเลิก",
       showCancelButton: true,
       showCloseButton: true
@@ -242,10 +241,10 @@ const remove = async (record) => {
 
     // Display confirmation dialog using Swal
     const confirmationResult = await Swal.fire({
-      title: "คุณแน่ใจหรือไหม",
+      title: "ยืนยันการแก้ไข",
       text: "คุณต้องการลบการบันทึกค่าน้ำตาล",
       icon: "warning",
-      confirmButtonText: "ใช่ ,ลบมัน",
+      confirmButtonText: "ยืนยัน",
       cancelButtonText: "ยกเลิก",
       showCancelButton: true,
       showCloseButton: true
@@ -336,10 +335,146 @@ const previousPage = () => {
 };
 
 
+// ----------------------------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------------------------
+// เรียกใช้ API เพื่อตรวจสอบว่ามีข้อมูลหรือไม่
+// แล้วแสดง pop-up หรือไม่โดยใช้เงื่อนไข
+const showPopup = ref(false);
+const closePopup = () => {
+  showPopup.value = false;
+};
+
+
+onMounted(async () => {
+ 
+  try {
+    
+    const userId = localStorage.getItem('iduser');
+    const response = await fetch(`${import.meta.env.VITE_BASE_URL}api/check-data/${userId}`);
+    const dataDrug = await response.json();
+    console.log('data drug',dataDrug.hasData);
+    if (dataDrug.hasData === false) {
+      showPopup.value = true;
+    } 
+  } catch (error) {
+    console.error('Error:', error);
+  }
+});
+
+const saveDrug = async (event) => { // รับ event เข้ามา
+  const res = await fetch(
+    `${import.meta.env.VITE_BASE_URL}api/savedrug`,
+    {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+      },
+      body: JSON.stringify({
+        data : mydrug.value
+      }),
+    }
+  );
+  if (res.ok) {
+    Swal.fire({
+        icon: "success",
+        title: "บันทึกสำเร็จ",
+      }).then(function(){
+      showPopup.value = false;
+    });
+    setTimeout(function () {
+      close();
+    }, 1500);
+  } else {
+    const responseData = await res.json(); // Parse response JSON
+      const errorMessage = responseData.message;
+      Swal.fire({
+        icon: "error",
+        title: errorMessage,
+      });
+  }
+
+
+    // showPopup.value = false;
+    // ทำสิ่งที่คุณต้องการหลังจากบันทึกข้อมูลลงในฐานข้อมูล
+};
+
+const mydrug = ref({
+  id: "",
+  allergic_drug: "",
+  my_drug: "",
+  user_id:localStorage.getItem('iduser'),
+});
+
+
+
+const MyDrugLoad = async () => {
+  try {
+    const userId = localStorage.getItem('iduser');
+    console.log(userId);
+    const response = await fetch(`${import.meta.env.VITE_BASE_URL}api/drug/${userId}`);
+    if (response.ok) {
+      const mydrug = await response.json();
+      const originalData = ref();
+      originalData.value = mydrug.value;
+      //result.value = originalData.value; 
+      // result.value = filterBySelectedDate(mydrug); 
+    } else if (response.status === 404) {
+      console.log('No data found');
+      //result.value = []; 
+    } else {
+      throw new Error('Failed to fetch data');
+    }
+  } catch (error) {
+    console.error('Error fetching data:', error);
+  }
+};
+onMounted(MyDrugLoad);
+
+
+const getCurrentDate = () => {
+   return moment().format('YYYY-MM-DD');
+};
 
 </script>
 
 <template>
+
+<div>
+    <!-- Pop up กรอกข้อมูลยา -->
+    <div v-if="showPopup" class="fixed inset-0 z-10 flex items-center justify-center">
+      <div class="fixed inset-0 bg-black opacity-50"></div>
+      <div class="bg-white p-8 rounded shadow-md z-20">
+        <h2 class="text-xl font-bold mb-4 text-center">ข้อมูลยาของฉัน</h2>
+        <div class="card-body">
+          <form @submit.prevent="saveDrug">
+            <div class="box-content pt-3 pb-3">
+              <p>ยาที่แพ้ <span style="font-size: 13px; color: rgb(177, 109, 241)">( ถ้าไม่มีพิมพ์ว่า ' ไม่มี ' หรือ ' - ' )</span></p>
+              <div class="box-content">
+                <input type="text" v-model="mydrug.allergic_drug" class="block w-full rounded-md border-0 py-10 pl-7 pr-20 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400" placeholder="กรุณากรอกชื่อยาที่แพ้">
+              </div>
+            </div>
+            <div class="box-content pt-3 pb-3">
+              <p>ยาที่ใช้ประจำ <span style="font-size: 13px; color: rgb(177, 109, 241)">( ถ้าไม่มีพิมพ์ว่า ' ไม่มี ' หรือ ' - ' )</span></p>
+              <input type="text" v-model="mydrug.my_drug" class="block w-full rounded-md border-0 py-10 pl-7 pr-20 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400" placeholder="กรุณากรอกยาที่ใช้ประจำ">
+            </div>
+            <p class="text-sm text-gray-500 mt-2">** เมื่อกด 'ข้าม' ฟอร์มนี้จะแสดงในครั้งถัดไปเมื่อมีการเข้ามาหน้านี้อีกครั้ง</p>
+            <div class="flex justify-center mt-3">
+              <button type="submit" class=" text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-6 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">
+                บันทึกข้อมูล
+              </button>
+              <button @click="closePopup" class="focus:outline-none text-white bg-gray-400 hover:bg-gray-500 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-12 py-2.5  me-2 mb-2 dark:focus:ring-yellow-900">
+                ข้าม
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <!-- ส่วนของ pop-up เพื่อกรอกข้อมูลใหม่ -->
+  </div>
+
+
+  <!-- -------------------------------------------------------------------------------------------- -->
   <Layout class="bg-gradient-to-b from-blue-100">
     <!-- content -->
 
@@ -358,28 +493,23 @@ const previousPage = () => {
 
               <!-- ---------------------------------------------------------- -->
               <!-- Input for selecting date -->
-              <div class="mt-5 mx-5">
-                <label for="startDate" class="text-lg text-gray-800">เลือกวันที่เริ่มต้น: </label>
-                <input type="date" id="startDate" v-model="startDate" class="mt-2 px-4 py-2 border rounded-md">
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div class="mx-5">
+                  <label for="startDate" class="text-lg text-gray-800">เลือกวันที่เริ่มต้น: </label>
+                  <input type="date" id="startDate" v-model="startDate" :max="getCurrentDate()" class="mt-2 px-4 py-2 border rounded-md w-full">
+                </div>
+                <div class="mx-5">
+                  <label for="endDate" class="text-lg text-gray-800">เลือกวันที่สิ้นสุด: </label>
+                  <input type="date" id="endDate" v-model="endDate" :max="getCurrentDate()" class="mt-2 px-4 py-2 border rounded-md w-full">
+                </div>
               </div>
-              <div class="mt-5 mx-5">
-                <label for="endDate" class="text-lg text-gray-800">เลือกวันที่สิ้นสุด: </label>
-                <input type="date" id="endDate" v-model="endDate" class="mt-2 px-4 py-2 border rounded-md">
-              </div>
 
 
-              <!-- <div class="mt-5 mx-5">
-                  <label for="endDate" class="text-lg text-gray-800">เลือกวันที่ต้องการแบบรายวัน: </label>
-                  <input type="date" id="selectedDate" v-model="selectedDate" @change="filterDataByDate"
-                  class="mt-2 px-4 py-2 border rounded-md">
-                </div> -->
-
-              <!-- ---------------------------------------------------------- -->
             </div>
           </div>
           <div>
           </div>
-          <div class="flex justify-end">
+          <div class="flex justify-end pt-10">
             <button class="bg-blue-500 hover:bg-blue-700 text-white font-hairline py-2 px-4 max-w-20 rounded"
               @click="handleDateSelection">
               ยกเลิก
@@ -477,14 +607,14 @@ const previousPage = () => {
                       <tr class="border-b dark:border-neutral-500" v-for="(sugarRecord, index) in paginatedResults"
                         :key="sugarRecord.id">
                         <td class="whitespace-nowrap px-6 py-4"> {{ moment(sugarRecord.updated_at).format("DD MMM YYYY"
-                ) }}
+                  ) }}
                           <!--แสดงข้อความตามเงื่อนไขของค่าน้ำตาล / แสดงข้อความตามเงื่อนไขของค่าน้ำตาล -->
                           <br>
                           <span :class="{
-                  'text-yellow-500': sugarRecord.sugarValue < 70,
-                  'text-green-500': sugarRecord.sugarValue >= 70 && sugarRecord.sugarValue <= 125,
-                  'text-red-500': sugarRecord.sugarValue > 125
-                }">
+                    'text-yellow-500': sugarRecord.sugarValue < 70,
+                    'text-green-500': sugarRecord.sugarValue >= 70 && sugarRecord.sugarValue <= 125,
+                    'text-red-500': sugarRecord.sugarValue > 125
+                  }">
                             <span v-if="sugarRecord.sugarValue < 70"><router-link
                                 to="/low">น้ำตาลต่ำ</router-link></span>
 
@@ -499,10 +629,10 @@ const previousPage = () => {
                           <div class="w-full rounded-full h-2.5 mb-4 dark:bg-gray-300 ">
                             <div class="bg-gray-600 h-2.5 rounded-full "
                               :style="{ 'max-width': sugarRecord.sugarValue + '%' }" :class="{
-                  'bg-red-500': sugarRecord.sugarValue > 125,
-                  'bg-green-500': sugarRecord.sugarValue >= 70 && sugarRecord.sugarValue <= 125,
-                  'bg-yellow-500': sugarRecord.sugarValue < 70
-                }"></div>
+                    'bg-red-500': sugarRecord.sugarValue > 125,
+                    'bg-green-500': sugarRecord.sugarValue >= 70 && sugarRecord.sugarValue <= 125,
+                    'bg-yellow-500': sugarRecord.sugarValue < 70
+                  }"></div>
                           </div>
 
 

@@ -28,7 +28,7 @@ const loginpatient = async () => {
       const response = await res.json();
       localStorage.setItem("idcard", response.user.idcard);
       localStorage.setItem("iduser", response.user.id);
-      localStorage.setItem("name", response.user.fname);
+      localStorage.setItem("fname", response.user.fname);
       localStorage.setItem("lname", response.user.lname);
       localStorage.setItem("dob", response.user.dob);
       localStorage.setItem("phone", response.user.phone);
@@ -50,14 +50,14 @@ const loginpatient = async () => {
     } else if (res.status === 404) {
       Swal.fire({
         icon: "error",
-        title: "ขอโทษ!!!",
+        title: "เกิดข้อผิดพลาด!!!",
         text: "เลขบัตรประจำตัวประชาชนไม่ถูกต้อง!",
       });
       console.log("The professional number is incorrect.");
     } else if (res.status === 401) {
       Swal.fire({
         icon: "error",
-        title: "ขอโทษ !!!",
+        title: "เกิดข้อผิดพลาด !!!",
         text: "รหัสผ่านไม่ถูกต้อง โปรดใส่ใหม่",
       });
       console.log("Password Not Matched");
@@ -74,7 +74,7 @@ const loginpatient = async () => {
 
 
 const appRouter = useRouter();
-const close = () => appRouter.push({ name: "home" });
+const close = () => appRouter.push({ name: "dashboard" });
 
 </script>
 
@@ -96,7 +96,7 @@ const close = () => appRouter.push({ name: "home" });
             </div>
 
             <div>
-              <label for="password" class="block mb-2 text-sm font-medium text-gray-900">Password</label>
+              <label for="password" class="block mb-2 text-sm font-medium text-gray-900">รหัสผ่าน</label>
               <input type="password" name="password" id="password" placeholder="xxxxxxxx"
                 class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:placeholder-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500"
                 maxlength="14" minlength="8" v-model.trim="password" required="" />
@@ -114,7 +114,7 @@ const close = () => appRouter.push({ name: "home" });
             <div class="text-center">
               <router-link :to="{ name: 'registerPatient' }">
                 <p class="text-sm font-medium text-gray-500">
-                  คุณไม่ม่บัญชีใช่หรือไม่?
+                  คุณไม่มีบัญชีใช่หรือไม่?
                   <a class="font-bold text-primary-600 hover:underline text-indigo-800">โปรดลงทะเบียน</a>
                 </p>
               </router-link>

@@ -10,6 +10,7 @@ import LowLevel from '../views/LowLevel.vue';
 import Knowledge from '../views/Knowledge.vue';
 import HealthUser  from '../views/HealthUser.vue';
 import InformationUser  from '../views/InformationUser.vue';
+import InformationNurse  from '../views/InformationNurse.vue';
 /* ------------------------------------------------------------------------------------- */
 
 /* หน้าพยาบาล */
@@ -93,8 +94,8 @@ const routes = [
   },
 
   {
-    path: '/home',
-    name: 'home',
+    path: '/addsugar',
+    name: 'addsugar',
     component: Home,
   },
   {
@@ -140,9 +141,9 @@ const routes = [
   },
 
   {
-    path: '/informationUser',
-    name: 'informationUser',
-    component: InformationUser,
+    path: '/informationNurse',
+    name: 'informationNurse',
+    component: InformationNurse,
   },
 
 
@@ -157,6 +158,12 @@ const routes = [
     path: '/nurse-dashboard',
     name: 'nursedashboard',
     component: NurseDashboard,
+  },
+
+  {
+    path: '/informationUser',
+    name: 'informationUser',
+    component: InformationUser,
   },
 
   {

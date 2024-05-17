@@ -13,14 +13,14 @@ const logoutpatient = () => {
   // ลบ JWT จาก localStorage หรือตำแหน่งที่คุณเก็บ token
   localStorage.removeItem('idcard');
   localStorage.removeItem('accesstoken');
-  localStorage.removeItem('name');
+  localStorage.removeItem('fname');
   localStorage.removeItem('iduser');
   backloginpatient()
 };
 const appRouter = useRouter();
 const backloginpatient = () => appRouter.push({ name: "homerole" });
 
-const name = localStorage.getItem("name");
+const fname = localStorage.getItem("fname");
 
 </script>
 
@@ -57,7 +57,7 @@ const name = localStorage.getItem("name");
         <!-- sidebar-->
         <Sidebar />
         <div class="hidden sm:flex sm:items-center sm:ml-6">
-            <div class>{{name}}</div>
+            <div class>{{fname}}</div>
 
             <!-- Settings Dropdown -->
             <div class="ml-3 relative"> </div>

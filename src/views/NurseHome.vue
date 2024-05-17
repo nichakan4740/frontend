@@ -1,6 +1,6 @@
 <script setup>
 import { useRouter } from "vue-router";
-import { ref, onBeforeMount, computed, onMounted, onUnmounted } from "vue";
+import { ref, onBeforeMount, computed, onMounted, watch, onUnmounted } from "vue";
 import LayoutNurse from '../layouts/LayoutNurse.vue';
 import moment from "moment";
 import Swal from "sweetalert2";
@@ -8,6 +8,8 @@ import Swal from "sweetalert2";
 
 // Function to format current time
 const currentTime = computed(() => moment().format('YYYY-MM-DD HH:mm:ss'));
+const startDate = ref('');
+const endDate = ref('');
 
 // Function to logout nurse
 const router = useRouter();
@@ -58,18 +60,20 @@ onMounted(MysugarLoad);
 const originalData = ref([]);
 const result = ref([]);
 /* ------------------------------------------------------------------------------------------------------------ */
-
-
-
-/* ------------------------------------------------------------------------------------------------------- */
-// พยาบาลเพิ่มข้อมูลผู้ป่วย
+// เพิ่มผู้ป่วย ----------------------------------------
 const fname = ref("");
 const lname = ref("");
-const allergic_drug = ref("");
-const my_drug = ref("");
 const idcard = ref("");
-const password = ref("telenursing");
-const adduser = async () => {
+const password = ref("");
+const passwordcheck = ref("");
+const dob = ref("");
+const phone = ref("");
+const address = ref("");
+
+const passwordInput = ref(null);
+const passwordCheckInput = ref(null);
+
+const registerpatient = async () => {
   const res = await fetch(
     `${import.meta.env.VITE_BASE_URL}api/patient/register`,
     {
@@ -80,10 +84,11 @@ const adduser = async () => {
       body: JSON.stringify({
         fname: fname.value,
         lname: lname.value,
-        allergic_drug: allergic_drug.value,
-        my_drug: my_drug.value,
         idcard: idcard.value,
         password: password.value,
+        dob: dob.value,
+        phone: phone.value,
+        address: address.value,
       }),
     }
   );
@@ -93,17 +98,76 @@ const adduser = async () => {
       close();
     }, 1500);
     console.log("You add user success");
-    // เพิ่มบัญชีผู้ใช้งานสำเร็จแล้ว ทำการดึงข้อมูลผู้ป่วยอีกครั้งโดยไม่ต้องรีโหลดหน้าเว็บ
-    patientProfile.value = await getPatient();
+
   } else {
     console.log("error,cannot add");
     Swal.fire({
       icon: "error",
-      title: "ขอโทษ !!!",
+      title: "เกิดข้อผิดพลาด !!!",
       text: "ไม่สามารถสร้างบัญชีได้ โปรดตรวจสอบความถูกต้อง!",
     });
   }
+  closeModal()
 };
+
+const checkmatch = () => {
+  const pass = password.value;
+  const passcheck = passwordcheck.value;
+  if (passwordInput.value && passwordCheckInput.value) {
+    if (pass === passcheck) {
+      passwordInput.value.style.backgroundColor = "#e9f7e3";
+      passwordCheckInput.value.style.backgroundColor = "#e9f7e3";
+    } else {
+      passwordInput.value.style.backgroundColor = "#fae2e0";
+      passwordCheckInput.value.style.backgroundColor = "#fae2e0";
+    }
+  }
+};
+
+const checkinputpassword = () => {
+  const pass = password.value;
+  const passcheck = passwordcheck.value;
+  if (pass.length === 0) {
+    password.value = null;
+    passwordcheck.value = null;
+    Swal.fire("โปรดใส่รหัสผ่าน");
+  }
+  if (pass.length < 8) {
+    password.value = null;
+    passwordcheck.value = null;
+    Swal.fire("รหัสผ่านต้องมีความยาวมากกว่า 8 ตัวอักษร");
+  }
+  if (passcheck !== pass) {
+    password.value = null;
+    passwordcheck.value = null;
+    Swal.fire("รหัสผ่านไม่ตรงกัน");
+  }
+};
+
+const checkinputidcard = () => {
+  const idc = idcard.value;
+  const isNumeric = /^\d+$/.test(idc);
+  if (idc) {
+    if (idc.length === 0) {
+      idcard.value = null;
+      Swal.fire("โปรดใส่เลขบัตรประชาชน");
+    }
+    if (idc.length < 13) {
+      idcard.value = null;
+      Swal.fire("เลขบัตรประชาชนต้องมี 13 หลัก");
+    } else if (!isNumeric) {
+      idcard.value = null;
+      Swal.fire("เลขบัตรประชาชนต้องเป็นตัวเลขเท่านั้น");
+    }
+
+  }
+
+};
+
+
+
+
+
 // นับจำนวน user
 const totalUsers = computed(() => result.value.length);
 
@@ -133,6 +197,79 @@ const filteredResult = computed(() => {
 const resetSearch = () => {
   searchInput.value = '';
 };
+
+
+// modal user
+
+const patientHistory = ref([]);
+const originalPatientHistory = ref([]);
+/* ------ filter------------------------------------------------------------------------------------------ */
+const filterBySelectedDate = (data, startDate, endDate) => {
+  if (startDate && endDate) {
+    const filteredData = data.filter(record => {
+      const recordDate = moment(record.updated_at).format('YYYY-MM-DD');
+      return moment(recordDate).isBetween(startDate, endDate, 'days', '[]');
+    });
+    return filteredData;
+  } else {
+    return data;
+  }
+};
+watch(
+  [startDate, endDate],
+  ([newStartDate, newEndDate], [oldStartDate, oldEndDate]) => {
+    if (newStartDate !== oldStartDate || newEndDate !== oldEndDate) {
+      if (newStartDate && newEndDate) {
+        patientHistory.value = filterBySelectedDate(
+          originalPatientHistory.value,
+          newStartDate,
+          newEndDate
+        );
+      } else {
+        patientHistory.value = originalPatientHistory.value;
+      }
+    }
+  },
+  { deep: true }
+);
+
+const isModalPatientOpen = ref(false);
+const titleModalPatient = ref('');
+const openModalPatient = async (patientId, fname, lname) => {
+  patientHistory.value = [];
+  titleModalPatient.value = '';
+  const response = await fetch(`${import.meta.env.VITE_BASE_URL}api/mysugar/${patientId}`);
+  if (response.ok) {
+    const data = await response.json();
+
+    if (data.length != 0) {
+      titleModalPatient.value = `${fname} ${lname}`
+      patientHistory.value = data;
+      originalPatientHistory.value = data.slice(); // ตั้งค่าค่าเริ่มต้นของ originalPatientHistory เป็นข้อมูล patientHistory
+      isModalPatientOpen.value = true;
+    } else {
+      Swal.fire("ไม่พบข้อมูล");
+    }
+  } else if (response.status === 404) {
+    // Handle case when no data is found
+    result.value = [];
+  } else {
+    throw new Error('Failed to fetch data');
+  }
+};
+
+
+// และในฟังก์ชัน closePatientModal หลังจากปิดโมดัล ให้กู้คืนข้อมูล patientHistory เป็นข้อมูลเริ่มต้น
+const closePatientModal = () => {
+  isModalPatientOpen.value = false;
+  // Reset patientHistory to original data
+  patientHistory.value = originalPatientHistory.value;
+};
+
+const getCurrentDate = () => {
+   return moment().format('YYYY-MM-DD');
+};
+
 </script>
 <template>
   <LayoutNurse class="bg-gradient-to-b from-blue-100">
@@ -188,7 +325,7 @@ const resetSearch = () => {
                 <thead class=" text-gray-400 uppercase bg-gray-50 ">
                   <tr>
                     <th scope="col" class="px-6 py-4 text-sm">รายชื่อ</th>
-                    <th scope="col" class="px-6 py-4 text-center text-sm">สถานะ</th>
+                    <th scope="col" class="px-6 py-4 text-center text-sm">สถานะการรับบริการ</th>
                     <th scope="col" class="px-6 py-4 text-center text-sm"> ตรวจล่าสุด </th>
                     <th scope="col" class="px-6 py-4 text-center text-sm">(mg/dl)</th>
                     <th scope="col" class="px-6 py-4 text-center text-sm">พูดคุย</th>
@@ -199,22 +336,37 @@ const resetSearch = () => {
                   <tr class="bg-white border-b" v-for="sugarRecord in filteredResult" :key="sugarRecord.id">
                     <td class="px-6 py-4 text-black font-medium">
                       <!-- <router-link :to="'/informationUser/' + sugarRecord.id"> -->
-                        {{ sugarRecord.user.fname }} {{ sugarRecord.user.lname }}
+                      <button
+                        @click="openModalPatient(sugarRecord.user.id, sugarRecord.user.fname, sugarRecord.user.lname)">{{
+              sugarRecord.user.fname }} {{
+              sugarRecord.user.lname }}</button>
                       <!-- </router-link> -->
                     </td>
                     <td class="px-6 py-4 flex items-center justify-center">
                       <img src="/correct.png" class="w-6 h-6 " />
                     </td>
                     <td class="px-6 py-4 text-center text-blue-800">
-                      {{ moment(sugarRecord.updated_at).format("DD MMMM YYYY") }}
-                      {{ moment(sugarRecord.updated_at).format("HH:mm") }}
+                      <p v-if="sugarRecord.updated_at != undefined">
+                        {{ sugarRecord.updated_at ? moment(sugarRecord.updated_at).format("DD MMMM YYYY") : '-' }}
+                        {{ sugarRecord.updated_at ? moment(sugarRecord.updated_at).format("HH:mm") : '-' }}
+                      </p>
+                      <p v-else>
+                        {{ sugarRecord.created_at ? moment(sugarRecord.created_at).format("DD MMMM YYYY") : '-' }}
+                        {{ sugarRecord.created_at ? moment(sugarRecord.created_at).format("HH:mm") : '-' }}
+                      </p>
                     </td>
                     <td class="px-6 py-4 text-center font-semibold"
                       :style="{ 'max-width': sugarRecord.sugarValue + '%' }" :class="{
               'text-red-600': sugarRecord.sugarValue > 125,
               'text-green-500': sugarRecord.sugarValue >= 70 && sugarRecord.sugarValue <= 125,
               'text-yellow-400': sugarRecord.sugarValue < 70
-            }"> {{ sugarRecord.sugarValue }}</td>
+            }"> {{ sugarRecord.sugarValue }}
+                    </td>
+                    <td class="px-6 py-4 flex items-center justify-center">
+                      <router-link :to="{ name: 'chat' }">
+                        <img src="/chat.png" class="w-6 h-6 " />
+                      </router-link>
+                    </td>
                   </tr>
                 </tbody>
               </table>
@@ -223,7 +375,7 @@ const resetSearch = () => {
         </div>
 
         <br>
-        <!-- เมื่อคลิกที่ปุ่มนี้โมดัลจะปรากฎ-------------------------------------------------------------------------------------- -->
+        <!-- เมื่อคลิกที่ปุ่มนี้โมดัล add user จะปรากฎ-------------------------------------------------------------------------------------- -->
         <button @click="openModal"
           class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-4 pl-4 pr-6 rounded-lg flex items-center ml-8">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
@@ -292,70 +444,55 @@ const resetSearch = () => {
                           </div>
                           <!-- --------------------------------------------------------------------------- -->
 
-                          <div>
-                            <label class="block mb-2 text-sm font-medium text-gray-900">ยาที่แพ้ &nbsp;
-                              <span style="font-size: 10px; color: rgb(177, 109, 241)">
-                                ( ตัวอักษรต้องไม่เกิน 100 ตัวอักษร )
-                              </span>
-                            </label>
-                            <input type="text"
-                              class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:placeholder-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                              placeholder="xxxxxxxxxx" v-model.trim="allergic_drug" maxlength="100" />
-                            <p v-if="allergic_drug.length" class="input-count">{{ allergic_drug.length }}/100</p>
-                            <p v-show="allergic_drug.length < 1"> * Please input your name <span></span></p>
-                            <p v-show="allergic_drug.length > 100">* Characters must not exceed 100</p>
-                          </div>
-                          <!-- --------------------------------------------------------------------------- -->
-
-
-
-                          <div>
-                            <label class="block mb-2 text-sm font-medium text-gray-900">ยาประจำตัวที่ใช้ &nbsp;
-                              <span style="font-size: 10px; color: rgb(177, 109, 241)">
-                                ( ตัวอักษรต้องไม่เกิน 100 ตัวอักษร )
-                              </span>
-                            </label>
-                            <input type="text"
-                              class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:placeholder-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                              placeholder="xxxxxxxxxx" v-model.trim="my_drug" maxlength="100" />
-                            <p v-if="my_drug.length" class="input-count">{{ my_drug.length }}/100 </p>
-                            <p v-show="my_drug.length < 1"> * Please input your name <span></span> </p>
-                            <p v-show="my_drug.length > 100">* Characters must not exceed 100</p>
-                          </div>
-                          <!-- --------------------------------------------------------------------------- -->
-
-
-
+                          <!-- บัตรประชาชน -->
                           <div>
                             <label class="block mb-2 text-sm font-medium text-gray-900">เลขบัตรประจำตัวประชาชน</label>
-                            <input type="text" v-model.trim="idcard" placeholder="xxxxxxxx" maxlength="13"
+                            <input type="text" inputmode="numeric" v-model.trim="idcard" placeholder="xxxxxxxxxxxxx"
+                              maxlength="13" @blur="checkinputidcard"
                               class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:placeholder-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500" />
-                            <p v-if="idcard.length" class="input-count"> {{ idcard.length }}/13</p>
-                            <p v-show="idcard.length < 1"> * Please input your id_card <span></span></p>
-                            <p v-show="idcard.length > 13"> * Characters must not exceed 13</p>
+                            <div v-if="idcard">
+                              <p class="input-count"> {{ idcard.length }}/13</p>
+                              <p v-show="idcard.length < 13"> * Please input your id_card <span></span></p>
+                              <p v-show="idcard.length > 13"> * Characters must not exceed 13</p>
+                            </div>
                           </div>
-                          <!-- --------------------------------------------------------------------------- -->
-
-
-
+                          <!-- รหัส -->
                           <div>
                             <label class="block mb-2 text-sm font-medium text-gray-900">รหัสผ่าน</label>
                             <input placeholder="xxxxxxxx"
                               class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:placeholder-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                              type="password" name="password" v-model.trim="password" maxlength="14" minlength="8" />
-                            <p v-if="password" class="input-count" id="count"> {{ password.length }}/14 </p>
-                            <p v-show="password.length < 8" id="checkname"> * Password must not be less than 8
-                              characters</p>
-                            <p v-show="password.length > 14" id="checkname">* Password must not be more than 14
-                              characters</p>
+                              type="password" name="password" v-model.trim="password" maxlength="14" minlength="8"
+                              ref="passwordInput" />
+                            <div v-if="password">
+                              <p class="input-count" id="count"> {{ password.length }}/14 </p>
+                              <p v-show="password.length < 8" id="checkname"> * Password must not be less than 8
+                                characters</p>
+                              <p v-show="password.length > 14" id="checkname">* Password must not be more than 14
+                                characters</p>
+                            </div>
                           </div>
+                          <div v-show="password">
+                            <label class="block mb-2 text-sm font-medium text-gray-900">ยืนยันรหัสผ่าน</label>
+                            <input placeholder="xxxxxxxx"
+                              class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:placeholder-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                              type="password" name="passwordcheck" v-model="passwordcheck" maxlength="14" minlength="8"
+                              @keyup="checkmatch" @blur="checkinputpassword" ref="passwordCheckInput" />
+                            <div v-if="passwordcheck">
+                              <p class="input-count"> {{ passwordcheck.length }}/14 </p>
+                              <p v-show="passwordcheck.length < 8" class="checkname">* Password must be at least 8
+                                characters long</p>
+                              <p v-show="passwordcheck.length > 14" class="checkname">* Password must not exceed 14
+                                characters</p>
+                            </div>
 
+                          </div>
 
 
                           <button
                             class="block w-full bg-blue-900 hover:bg-blue-800 text-white font-bold py-2 px-4 mb-4 border rounded"
-                            @click.prevent="adduser">
-                            สร้างบัญชี
+                            @click.prevent="registerpatient"
+                            :disabled="!fname || !lname || !idcard || !password || !passwordcheck || idcard.length !== 13"
+                            :class="{ 'bg-blue-900': !idcard || !password }"> สร้างบัญชี
                           </button>
                         </form>
                       </div>
@@ -380,6 +517,95 @@ const resetSearch = () => {
         </div>
       </div>
       <!-- ------------------------------------------------------------------------------------ -->
+
+
+      <div v-if="isModalPatientOpen" class="fixed z-10 inset-0 overflow-y-auto">
+        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+          <!-- ส่วนทับเงื่อนไข -->
+          <div class="fixed inset-0 transition-opacity" aria-hidden="true">
+            <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+          </div>
+          <!-- เฉพาะส่วนแสดงตามเงื่อนไข -->
+          <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+
+          <!-- ส่วนหลักของโมดัล -->
+          <div v-if="isModalPatientOpen"
+            class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full">
+            <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+
+              <!-- เนื้อหาของโมดัล --------------------------------------------------------------- -->
+              <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                <div class="items-center justify-center px-1 py-8 lg:py-0">
+                  <div class="w-full rounded-lg shadow dark:border  bg-white">
+                    <!-- ปุ่มปิด -->
+                    <button @click="closePatientModal" type="button" class="float-right">
+                      <img src="/circle.png" class="w-10 h-10 " />
+                    </button>
+                    <!-- --------------- -->
+                    <div class="p-1 space-y-4 md:space-y-6 sm:p-4">
+                      <p class="text-md font-bold text-center leading-tight tracking-tight text-gray-900 md:text-2xl">
+                        <span class="text-gray-700 text-md font-thin">ชื่อคนไข้ :</span>
+                        {{ titleModalPatient }}
+                      </p>
+
+                      <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <div class="mx-5">
+                          <label for="startDate" class="text-lg text-gray-800">เลือกวันที่เริ่มต้น: </label>
+                          <input type="date" id="startDate" v-model="startDate"
+                          :max="getCurrentDate()"
+                            class="mt-2 px-4 py-2 border rounded-md w-full">
+                        </div>
+                        <div class="mx-5">
+                          <label for="endDate" class="text-lg text-gray-800">เลือกวันที่สิ้นสุด: </label>
+                          <input type="date" id="endDate" v-model="endDate"
+                          :max="getCurrentDate()"
+                            class="mt-2 px-4 py-2 border rounded-md w-full">
+                        </div>
+                      </div>
+
+                      <table class="w-full text-base text-left rtl:text-right text-gray-500 font-semibold">
+                        <thead class=" text-gray-400 uppercase bg-gray-50 ">
+                          <tr>
+                            <th scope="col" class="px-6 py-4 text-sm">วันที่</th>
+                            <th scope="col" class="px-6 py-4 text-center text-sm">ค่าน้ำตาล</th>
+                            <th scope="col" class="px-6 py-4 text-center text-sm"> อาการผิดปกติ </th>
+                            <th scope="col" class="px-6 py-4 text-center text-sm">อื่นๆ</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr v-for="patientResult in patientHistory" :key="patientResult.id">
+                            <td class="px-6 py-4 text-md">
+                              {{ patientResult.created_at ? moment(patientResult.created_at).format('DD MMMM YYYY') :
+              '-' }}
+                            </td>
+                            <td class="px-6 py-4 text-center text-md"
+                              :style="{ 'max-width': patientResult.sugarValue + '%' }" :class="{
+              'text-red-600': patientResult.sugarValue > 125,
+              'text-green-500': patientResult.sugarValue >= 70 && patientResult.sugarValue <= 125,
+              'text-yellow-400': patientResult.sugarValue < 70
+            }">
+                              {{ patientResult.sugarValue ? patientResult.sugarValue : '-' }}
+                            </td>
+                            <td class="px-6 py-4 text-center text-md">
+                              {{ patientResult.symptom ? patientResult.symptom : '-' }}
+                            </td>
+                            <td class="px-6 py-4 text-center text-md">
+                              {{ patientResult.note ? patientResult.note : '-' }}
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- ---------------------------------------------------------------------------------------------------- -->
+
+
+            </div>
+          </div>
+        </div>
+      </div>
 
     </div>
 

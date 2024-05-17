@@ -31,7 +31,7 @@ const loginnurse = async () => {
       localStorage.setItem("professional_id", response.user.professional_id);
       localStorage.setItem("idadmin", response.user.id);
       localStorage.setItem("name", response.user.name);
-      localStorage.setItem("lname", response.user.lname);
+      // localStorage.setItem("lname", response.user.lname);
       localStorage.setItem("accesstoken", response.authorisation.token);
       console.log(localStorage);
 
@@ -49,14 +49,14 @@ const loginnurse = async () => {
     } else if (res.status === 404) {
       Swal.fire({
         icon: "error",
-        title: "ขอโทษ!!!",
+        title: "เกิดข้อผิดพลาด!!!",
         text: "เลขประกอบวิชาชีพไม่ถูกต้อง!",
       });
       console.log("The professional number is incorrect.");
     } else if (res.status === 401) {
       Swal.fire({
         icon: "error",
-        title: "ขอโทษ !!!",
+        title: "เกิดข้อผิดพลาด !!!",
         text: "รหัสผ่านไม่ถูกต้อง โปรดใส่ใหม่",
       });
       console.log("Password Not Matched");
@@ -110,7 +110,7 @@ const close = () => appRouter.push({ name: "nursehome" });
               <label
                 for="password"
                 class="block mb-2 text-sm font-medium text-gray-900"
-                >Password</label
+                >รหัสผ่าน</label
               >
               <input
                 type="password"
@@ -138,7 +138,7 @@ const close = () => appRouter.push({ name: "nursehome" });
             <div class="text-center">
               <router-link :to="{ name: 'registerNurse' }">
                 <p class="text-sm font-medium text-gray-500">
-                  คุณไม่ม่บัญชีใช่หรือไม่?
+                  คุณไม่มีบัญชีใช่หรือไม่?
                   <a
                     class="font-bold text-primary-600 hover:underline text-indigo-800"
                     >โปรดลงทะเบียน</a
