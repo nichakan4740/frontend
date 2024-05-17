@@ -28,7 +28,7 @@ const loginpatient = async () => {
       const response = await res.json();
       localStorage.setItem("idcard", response.user.idcard);
       localStorage.setItem("iduser", response.user.id);
-      localStorage.setItem("name", response.user.fname);
+      localStorage.setItem("fname", response.user.fname);
       localStorage.setItem("lname", response.user.lname);
       localStorage.setItem("dob", response.user.dob);
       localStorage.setItem("phone", response.user.phone);

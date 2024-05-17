@@ -10,8 +10,8 @@ const appRouter = useRouter();
 /* date-time */
 const selectedDate = ref('');
 
-const fullname = localStorage.getItem("name") + " " + localStorage.getItem("lname");
-const fname = localStorage.getItem("name");
+const fullname = localStorage.getItem("fname") + " " + localStorage.getItem("lname");
+const fname = localStorage.getItem("fname");
 const lname = localStorage.getItem("lname");
 const idcard = localStorage.getItem("idcard");
 const dob = localStorage.getItem("dob");
@@ -44,7 +44,7 @@ const MyInfo = async () => {
          fetch(`${import.meta.env.VITE_BASE_URL}api/patient/getProfile/${userId}`);
          if (response.ok) {
             const data = await response.json();
-            localStorage.setItem("name", data.fname);
+            localStorage.setItem("fname", data.fname);
             localStorage.setItem("lname", data.lname);
             localStorage.setItem("idcard", data.idcard);
             localStorage.setItem("dob", data.dob);
