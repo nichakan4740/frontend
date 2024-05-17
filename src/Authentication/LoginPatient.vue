@@ -50,14 +50,14 @@ const loginpatient = async () => {
     } else if (res.status === 404) {
       Swal.fire({
         icon: "error",
-        title: "ขอโทษ!!!",
+        title: "เกิดข้อผิดพลาด!!!",
         text: "เลขบัตรประจำตัวประชาชนไม่ถูกต้อง!",
       });
       console.log("The professional number is incorrect.");
     } else if (res.status === 401) {
       Swal.fire({
         icon: "error",
-        title: "ขอโทษ !!!",
+        title: "เกิดข้อผิดพลาด !!!",
         text: "รหัสผ่านไม่ถูกต้อง โปรดใส่ใหม่",
       });
       console.log("Password Not Matched");

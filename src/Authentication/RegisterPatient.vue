@@ -49,7 +49,7 @@ const registerpatient = async () => {
     console.log("error,cannot add");
     Swal.fire({
       icon: "error",
-      title: "ขอโทษ !!!",
+      title: "เกิดข้อผิดพลาด !!!",
       text: "ไม่สามารถสร้างบัญชีได้ โปรดตรวจสอบความถูกต้อง!",
     });
   }

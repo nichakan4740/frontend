@@ -31,7 +31,7 @@ const loginnurse = async () => {
       localStorage.setItem("professional_id", response.user.professional_id);
       localStorage.setItem("idadmin", response.user.id);
       localStorage.setItem("name", response.user.name);
-      localStorage.setItem("lname", response.user.lname);
+      // localStorage.setItem("lname", response.user.lname);
       localStorage.setItem("accesstoken", response.authorisation.token);
       console.log(localStorage);
 
@@ -49,14 +49,14 @@ const loginnurse = async () => {
     } else if (res.status === 404) {
       Swal.fire({
         icon: "error",
-        title: "ขอโทษ!!!",
+        title: "เกิดข้อผิดพลาด!!!",
         text: "เลขประกอบวิชาชีพไม่ถูกต้อง!",
       });
       console.log("The professional number is incorrect.");
     } else if (res.status === 401) {
       Swal.fire({
         icon: "error",
-        title: "ขอโทษ !!!",
+        title: "เกิดข้อผิดพลาด !!!",
         text: "รหัสผ่านไม่ถูกต้อง โปรดใส่ใหม่",
       });
       console.log("Password Not Matched");

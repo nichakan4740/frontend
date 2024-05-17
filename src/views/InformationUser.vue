@@ -79,10 +79,10 @@ const updateinfouser = async () => {
 
     // Display confirmation dialog using Swal
     const confirmationResult = await Swal.fire({
-      title: "คุณแน่ใจหรือไหม",
+      title: "ยืนยันการแก้ไข",
       text: "คุณต้องการที่จะแก้ไขข้อมูล",
       icon: "warning",
-      confirmButtonText: "ใช่ ,แก้ไขมัน",
+      confirmButtonText: "ยืนยัน",
       cancelButtonText: "ยกเลิก",
       showCancelButton: true,
       showCloseButton: true
@@ -109,69 +109,6 @@ const updateinfouser = async () => {
   window.location.reload(); // Reload the browser after successfully updating the information
   closeModal();
 }
-
-/* --------------------------------------------------------------------------------------------------- */
-/* --------------------------------------------------------------------------------------------------- */
-
-
-
-// const updateinfouser = async () => {
-//    console.log(myinfo.value.fname);
-
-//    try {
-
-//       const userId = localStorage.getItem('iduser');
-//       const response = await fetch(`${import.meta.env.VITE_BASE_URL}api/patient/getProfile/${userId}`, {
-//          method: 'PUT',
-//          headers: {
-//             'Content-Type': 'application/json',
-//          },
-//          body: JSON.stringify({
-//             fname: myinfo.value.fname,
-//             lname: myinfo.value.lname,
-//             idcard: myinfo.value.idcard,
-//             dob: myinfo.value.dob,
-//             phone: myinfo.value.phone,
-//             address: myinfo.value.address,
-//             user_id: userId,
-//          }),
-//       });
-//       if (response.ok) {
-//          MyInfo()
-//          const data = await response.json();
-//          console.log(data.InformationUser);
-//          localStorage.setItem("idcard", data.user.idcard);
-//          localStorage.setItem("name", data.user.fname);
-//          localStorage.setItem("lname", data.user.lname);
-//          localStorage.setItem("dob", data.user.dob);
-//          localStorage.setItem("phone", data.user.phone);
-//          localStorage.setItem("address", data.user.address);
-//          console.log('Information updated successfully:', data);
-//          Swal.fire({
-//             icon: 'success',
-//             title: 'บันทึกข้อมูลสำเร็จ',
-//             // text: 'Information updated successfully',
-//          });
-//       } else {
-//          const errorMessage = await response.text();
-//          console.error('Failed to update information:', errorMessage);
-//          Swal.fire({
-//             icon: 'error',
-//             title: 'Failed',
-//             text: errorMessage,
-//          });
-//       }
-//    } catch (error) {
-//       console.error('Error updating information:', error);
-//       Swal.fire({
-//          icon: 'error',
-//          title: 'Error',
-//          text: 'Failed to update information. Please try again later.',
-//       });
-//    } closeModal();
-//    // window.location.reload(); 
-// };
-
 
 
 // ให้ปุ่มเปลี่ยนสี
