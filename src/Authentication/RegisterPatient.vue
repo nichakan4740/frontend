@@ -12,6 +12,7 @@ const passwordcheck = ref("");
 const dob = ref("");
 const phone = ref("");
 const address = ref("");
+const status = ref("");
 
 const passwordInput = ref(null);
 const passwordCheckInput = ref(null);
@@ -34,6 +35,7 @@ const registerpatient = async () => {
         dob: dob.value,
         phone: phone.value,
         address: address.value,
+        status: status.value,
       }),
     }
   );

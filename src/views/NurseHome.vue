@@ -267,8 +267,24 @@ const closePatientModal = () => {
 };
 
 const getCurrentDate = () => {
-   return moment().format('YYYY-MM-DD');
+  return moment().format('YYYY-MM-DD');
 };
+const selectedUser = ref(null);
+const showMenu = ref(false);
+const toggleMenu = (selectedUserId) => {
+  // ตรวจสอบว่าเป็นการคลิกอีกครั้งหรือไม่
+  if (showMenu.value && selectedUserId === selectedUser.value) {
+    // ถ้าเป็นการคลิกซ้ำ ปิดเมนู
+    showMenu.value = false;
+    selectedUser.value = null;
+  } else {
+    // ถ้าเป็นการคลิกครั้งแรก หรือคลิก Id ที่แตกต่างกัน
+    // เปิดเมนูและกำหนด Id ที่เลือกไว้
+    showMenu.value = true;
+    selectedUser.value = selectedUserId;
+  }
+};
+
 
 </script>
 <template>
@@ -338,13 +354,23 @@ const getCurrentDate = () => {
                       <!-- <router-link :to="'/informationUser/' + sugarRecord.id"> -->
                       <button
                         @click="openModalPatient(sugarRecord.user.id, sugarRecord.user.fname, sugarRecord.user.lname)">{{
-              sugarRecord.user.fname }} {{
-              sugarRecord.user.lname }}</button>
+                        sugarRecord.user.fname }} {{
+                        sugarRecord.user.lname }}</button>
                       <!-- </router-link> -->
                     </td>
                     <td class="px-6 py-4 flex items-center justify-center">
-                      <img src="/correct.png" class="w-6 h-6 " />
+                      <button @click="toggleMenu(sugarRecord.user.id)">
+                        <img src="/correct.png" class="w-6 h-6" />
+                      </button>
                     </td>
+                    <!-- Hamburger Menu -->
+                    <div v-if="showMenu && selectedUser === sugarRecord.user.id" class="statusmenu">
+                      <!-- เพิ่มเนื้อหาของเมนูที่นี่ -->
+                      <img src="/correct.png" class="w-6 h-6" /><span>กำลังรับการบริการ</span>
+                      <img src="/cross.png" class="w-6 h-6" /><span>ยกเลิกการรับบริการ</span>
+                      
+                    </div>
+                      <!-- ----------------- -->
                     <td class="px-6 py-4 text-center text-blue-800">
                       <p v-if="sugarRecord.updated_at != undefined">
                         {{ sugarRecord.updated_at ? moment(sugarRecord.updated_at).format("DD MMMM YYYY") : '-' }}
@@ -551,14 +577,12 @@ const getCurrentDate = () => {
                       <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                         <div class="mx-5">
                           <label for="startDate" class="text-lg text-gray-800">เลือกวันที่เริ่มต้น: </label>
-                          <input type="date" id="startDate" v-model="startDate"
-                          :max="getCurrentDate()"
+                          <input type="date" id="startDate" v-model="startDate" :max="getCurrentDate()"
                             class="mt-2 px-4 py-2 border rounded-md w-full">
                         </div>
                         <div class="mx-5">
                           <label for="endDate" class="text-lg text-gray-800">เลือกวันที่สิ้นสุด: </label>
-                          <input type="date" id="endDate" v-model="endDate"
-                          :max="getCurrentDate()"
+                          <input type="date" id="endDate" v-model="endDate" :max="getCurrentDate()"
                             class="mt-2 px-4 py-2 border rounded-md w-full">
                         </div>
                       </div>
@@ -612,4 +636,16 @@ const getCurrentDate = () => {
   </LayoutNurse>
 </template>
 
-<style></style>
+<style>
+.statusmenu {
+  position: absolute;
+  /* top: 50px;
+  right: 90px; */
+  background-color: white;
+  border: 1px solid #ccc;
+  border-radius: 8%;
+  box-shadow: 8px;
+  padding: 10px;
+  z-index: 1000;
+}
+</style>
