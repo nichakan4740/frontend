@@ -239,7 +239,7 @@ const close = () => appRouter.push({ name: "loginNurse" });
                       >
                       <div v-if="passwordcheck">
                         <p class="input-count">{{ passwordcheck.length }}/14</p>
-                        <p v-show="passwordcheck.length < 8" class="checkname">*  รหัสผ่านต้องมีความยาวมากกว่า 8 ตัวอักษร </p>
+                        <p v-show="passwordcheck.length < 8" class="checkname">* รหัสผ่านต้องมีความยาวมากกว่า 8 ตัวอักษร </p>
                         <p v-show="passwordcheck.length > 14" class="checkname">*  รหัสผ่านต้องมีความยาวน้อยกว่า 14 ตัวอักษร</p>
                       </div>
                      </div>

@@ -46,10 +46,12 @@ const MysugarLoad = async () => {
       const data = await response.json();
       console.log(data)
       // Filter the data to keep only the latest sugar records for each user
-      const filteredData = filterLatestSugarRecords(data);
-      // Update the result ref with the filtered data
-      result.value = filteredData;
-      console.log(result.value)
+      if(data.message !== "ไม่มีข้อมูล"){
+        // Update the result ref with the filtered data
+        result.value = filterLatestSugarRecords(data);;
+        console.log(result.value)
+      }
+      
       // await AllUserLoad()
     } else if (response.status === 404) {
       console.log('No data found');
