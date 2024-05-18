@@ -606,8 +606,7 @@ const getCurrentDate = () => {
                       <!-- <tr class="border-b dark:border-neutral-500" v-for="sugarRecord in result" :key="sugarRecord.id"> -->
                       <tr class="border-b dark:border-neutral-500" v-for="(sugarRecord) in paginatedResults"
                         :key="sugarRecord.id">
-                        <div v-if="sugarRecord.sugarValue !== null ">
-                        <td class="whitespace-nowrap px-6 py-4"> {{ moment(sugarRecord.updated_at).format("DD MMM YYYY") }}
+                        <td v-if="sugarRecord.sugarValue !== null" class="whitespace-nowrap px-6 py-4"> {{ moment(sugarRecord.updated_at).format("DD MMM YYYY") }}
                           <!--แสดงข้อความตามเงื่อนไขของค่าน้ำตาล / แสดงข้อความตามเงื่อนไขของค่าน้ำตาล -->
                           <br>
                           <span :class="{
@@ -625,7 +624,7 @@ const getCurrentDate = () => {
                         </td>
 
 
-                        <td class="whitespace-nowrap px-6 py-4">{{ sugarRecord.sugarValue !== null ? sugarRecord.sugarValue : "-" }} mg/dl
+                        <td v-if="sugarRecord.sugarValue !== null" class="whitespace-nowrap px-6 py-4">{{ sugarRecord.sugarValue !== null ? sugarRecord.sugarValue : "-" }} mg/dl
                           <div class="w-full rounded-full h-2.5 mb-4 dark:bg-gray-300 ">
                             <div class="bg-gray-600 h-2.5 rounded-full "
                               :style="{ 'max-width': sugarRecord.sugarValue + '%' }" :class="{
@@ -637,15 +636,11 @@ const getCurrentDate = () => {
 
 
                         </td>
-                        <td class="whitespace-nowrap px-6 py-4">{{ sugarRecord.symptom }}</td>
-                        <td class="whitespace-nowrap px-6 py-4">{{ sugarRecord.note }}</td>
-
-
-
-
+                        <td v-if="sugarRecord.sugarValue !== null" class="whitespace-nowrap px-6 py-4">{{ sugarRecord.symptom }}</td>
+                        <td v-if="sugarRecord.sugarValue !== null" class="whitespace-nowrap px-6 py-4">{{ sugarRecord.note }}</td>
 
                         <!-- ปุ่มแก้ไข/ปุ่มลบ -->
-                        <td class="whitespace-nowrap px-6 py-4">
+                        <td v-if="sugarRecord.sugarValue !== null" class="whitespace-nowrap px-6 py-4">
                           <button type="button"
                             class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-3 py-2 me-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
                             @click="edit(sugarRecord)">
@@ -655,8 +650,6 @@ const getCurrentDate = () => {
                                 d="M21.731 2.269a2.625 2.625 0 0 0-3.712 0l-1.157 1.157 3.712 3.712 1.157-1.157a2.625 2.625 0 0 0 0-3.712ZM19.513 8.199l-3.712-3.712-12.15 12.15a5.25 5.25 0 0 0-1.32 2.214l-.8 2.685a.75.75 0 0 0 .933.933l2.685-.8a5.25 5.25 0 0 0 2.214-1.32L19.513 8.2Z" />
                             </svg>
                           </button>
-
-
 
                           <button type="button"
                             class="focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-3 py-2 me-2 ml-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900"
@@ -669,12 +662,11 @@ const getCurrentDate = () => {
                             </svg>
                           </button>
                         </td>
-                      </div>
                         <!-- ----------------------------------------------------------------- -->
                       </tr>
                     </tbody>
                   </table>
-                  <div  v-if="result.sugarValue == null" class="text-center text-gray-500 ">
+                  <div  v-if="result.length == 0 || result.length == 1 " class="text-center text-gray-500 ">
                     <br>
                     ไม่มีประวัติการบันทึกผลการวัดค่าน้ำตาล
                   </div>
