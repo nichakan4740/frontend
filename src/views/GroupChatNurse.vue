@@ -15,6 +15,8 @@ const pusher = new Pusher("c38b6cfa9a4f7e26bf76", {
 });
 const adminId = localStorage.getItem("idadmin");
 
+
+
 // ส่งข้อความตอบกลับหา user
 const sendMessageToUser = async (userId, chatRoomId) => { // เพิ่ม chatRoomId ใน parameter
   const message = state.newMessage;
@@ -40,6 +42,8 @@ const sendMessageToUser = async (userId, chatRoomId) => { // เพิ่ม cha
         icon: 'success',
         title: 'ส่งข้อความสำเร็จ',
       });
+      // เมื่อส่งข้อความสำเร็จ ให้เรียก fetchMessages เพื่ออัพเดตข้อความ
+      fetchMessages();
     } else {
       Swal.fire({
         icon: 'error',
@@ -57,21 +61,6 @@ const sendMessageToUser = async (userId, chatRoomId) => { // เพิ่ม cha
   }
 };
 
-/*  const getMessageSendToUser = async () => {
-  try {
-    const response = await fetch(`${import.meta.env.VITE_BASE_URL}api/admin/${adminId}/messages`);
-    if (!response.ok) {
-      throw new Error('Failed to fetch messages sent to users');
-    }
-    const data = await response.json();
-    receivedMessages.value = data; // Set receivedMessages with the data received from the API
-
-     console.log("receivedMessages:", receivedMessages.value);
-  } catch (error) {
-    console.error(error);
-  }
-};  */
-
 /* ------------------------------------------------------------------------------------------------- */
 
 // get ค่าจาก database และเพิ่มค่าล่าสุดของ pusher ลงใน Array ของ data
@@ -84,13 +73,17 @@ const name = ref("Nurse Name"); // Define name
 /* const receivedMessages = ref([]); // ดึงข้อความที่ส่งไปหา User */
 
 // ดึงข้อมูลที่เข้ามาครั้งแรกจาก user
- const fetchMessages = async () => {
+const fetchMessages = async () => {
   try {
     const response = await fetch(`${import.meta.env.VITE_BASE_URL}api/admin/${adminId}/messages`);
     if (!response.ok) {
       throw new Error('Failed to fetch messages');
     }
     const data = await response.json();
+
+    // Clear messages and allMessages before updating
+    messages.value = {};
+    allMessages.value = {};
 
     // Group messages by user_id
     data.forEach(message => {
@@ -105,7 +98,8 @@ const name = ref("Nurse Name"); // Define name
   } catch (error) {
     console.error(error);
   }
-}; 
+};
+
 
 /* --------------------------------------------------------------------------------------------------------- */
 // เปิด modal
@@ -160,7 +154,6 @@ onMounted(() => {
 
 // แสดงข้อความตอบกลับจาก user
 onMounted(() => {});
-
 const channelmessagefromUser = "Toadminid" + adminId;
 const messagefromUser = ref([]);
 const channel = pusher.subscribe(channelmessagefromUser);
