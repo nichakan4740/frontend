@@ -12,7 +12,7 @@ const passwordcheck = ref("");
 const dob = ref("");
 const phone = ref("");
 const address = ref("");
-const status = ref("");
+const status = ref(1);
 
 const passwordInput = ref(null);
 const passwordCheckInput = ref(null);

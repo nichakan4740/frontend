@@ -113,10 +113,10 @@ const updateDrug = async () => {
     const editdrug = `${import.meta.env.VITE_BASE_URL}api/drug/${userId}`;
     // Display confirmation dialog using Swal
     const confirmationResult = await Swal.fire({
-      title: "คุณแน่ใจหรือไหม",
+      title: "ยืนยันการแก้ไข",
       text: "คุณต้องการที่จะแก้ไขการบันทึกค่าน้ำตาล",
       icon: "warning",
-      confirmButtonText: "ใช่ ,แก้ไขมัน",
+      confirmButtonText: "ยืนยัน",
       cancelButtonText: "ยกเลิก",
       showCancelButton: true,
       showCloseButton: true
