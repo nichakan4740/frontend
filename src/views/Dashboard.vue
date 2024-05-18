@@ -81,9 +81,11 @@ onMounted(MysugarLoad);
 const findMaxMinSugarValue = () => {
   if (result.value.length > 0) {
     // หาค่าน้ำตาลที่มากที่สุด
-    maxSugarValue.value = Math.max(...result.value.map(record => record.sugarValue));
+    var filterResult = result.value.filter((item) => item.sugarValue !== null)
+    console.log(filterResult);
+    maxSugarValue.value = Math.max(...filterResult.map(record => record.sugarValue));
     // หาค่าน้ำตาลที่น้อยที่สุด
-    minSugarValue.value = Math.min(...result.value.map(record => record.sugarValue));
+    minSugarValue.value = Math.min(...filterResult.map(record => record.sugarValue));
   } else {
     // ถ้าไม่มีข้อมูลให้กำหนดค่าเป็น 0
     maxSugarValue.value = 0;
@@ -100,18 +102,19 @@ const filterBySelectedDate = (data, startDate, endDate) => {
       const recordDate = moment(record.updated_at).format('YYYY-MM-DD');
       return moment(recordDate).isBetween(startDate, endDate, 'days', '[]');
     });
+    const filterNull = filteredData.filter((item) => item.sugarValue !== null)
 
     // หาค่าน้ำตาลที่มากที่สุด
-    maxSugarValue.value = Math.max(...filteredData.map(record => record.sugarValue));
+    maxSugarValue.value = Math.max(...filterNull.map(record => record.sugarValue));
     // หาค่าน้ำตาลที่น้อยที่สุด
-    minSugarValue.value = Math.min(...filteredData.map(record => record.sugarValue));
+    minSugarValue.value = Math.min(...filterNull.map(record => record.sugarValue));
 
     // คำนวณค่าเฉลี่ยและคืนค่า
-    averageLowSugar.value = calculateAverageSugar('low', filteredData);
-    averageNormalSugar.value = calculateAverageSugar('normal', filteredData);
-    averageHighSugar.value = calculateAverageSugar('high', filteredData);
+    averageLowSugar.value = calculateAverageSugar('low', filterNull);
+    averageNormalSugar.value = calculateAverageSugar('normal', filterNull);
+    averageHighSugar.value = calculateAverageSugar('high', filterNull);
 
-    return filteredData;
+    return filterNull;
 
   } else {
     maxSugarValue.value = null;

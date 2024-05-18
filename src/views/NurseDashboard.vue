@@ -111,7 +111,7 @@ const resetSearch = () => {
         <div v-if="userData.length > 0"
         class="box-content p-8 bg-white shadow-lg shadow-gray-300/50 mt-4 ml-5 mr-5 mb-10 rounded-lg"
           >
-        <h2 class="text-left text-2xl font-bold mb-5">ข้อมูลรายบุคคลทั้งหมด</h2>
+        <p class="text-left text-2xl font-medium  mb-5">ข้อมูลรายบุคคล: <span class="text-blue-600 font-medium text-lg">{{ userData[0].user.fname}} {{ userData[0].user.lname}}</span></p>
 
         <div class="overflow-x-auto">
           <div class="inline-block min-w-full py-2 sm:px-6 lg:px-8">
