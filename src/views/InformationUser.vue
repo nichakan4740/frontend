@@ -30,7 +30,8 @@ const myinfo = ref({
    idcard: '',
    dob: '',
    phone: '',
-   address: ''
+   address: '',
+   status: ''
 
 });
 
@@ -164,6 +165,7 @@ const editinfo = () => {
    myinfo.value.dob = dob;
    myinfo.value.phone = phone;
    myinfo.value.address = address;
+   myinfo.value.status = status;
    openModal();
 };
 

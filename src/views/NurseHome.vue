@@ -472,21 +472,20 @@ const toggleMenu = (selectedUserId) => {
                     </div>
                     <!-- ----------------- -->
                     <td class="px-6 py-4 text-center text-blue-800">
-                      <p v-if="sugarRecord.updated_at != undefined">
-                        {{ sugarRecord.updated_at ? moment(sugarRecord.updated_at).format("DD MMMM YYYY") : '-' }}
-                        {{ sugarRecord.updated_at ? moment(sugarRecord.updated_at).format("HH:mm") : '-' }}
-                      </p>
-                      <p v-else>
-                        {{ sugarRecord.created_at ? moment(sugarRecord.created_at).format("DD MMMM YYYY") : '-' }}
-                        {{ sugarRecord.created_at ? moment(sugarRecord.created_at).format("HH:mm") : '-' }}
-                      </p>
+                      <p v-html="sugarRecord.sugarValue !== null 
+                          ? (sugarRecord.updated_at !== undefined 
+                              ? moment(sugarRecord.updated_at).format('DD MMMM YYYY') + '<br>' + moment(sugarRecord.updated_at).format('HH:mm')
+                              : (sugarRecord.created_at ? moment(sugarRecord.created_at).format('DD MMMM YYYY') + '<br>' + moment(sugarRecord.created_at).format('HH:mm') : '-'))
+                          : '-'"
+                      ></p>
                     </td>
-                    <td class="px-6 py-4 text-center font-semibold"
-                      :style="{ 'max-width': sugarRecord.sugarValue + '%' }" :class="{
-              'text-red-600': sugarRecord.sugarValue > 125,
-              'text-green-500': sugarRecord.sugarValue >= 70 && sugarRecord.sugarValue <= 125,
-              'text-yellow-400': sugarRecord.sugarValue < 70
-            }"> {{ sugarRecord.sugarValue }}
+                    <td class="px-6 py-4 text-center font-semibold text-gray-400"
+                      :style="{ 'max-width': sugarRecord.sugarValue + '%' }" 
+                      :class="{
+                        'text-red-600': sugarRecord.sugarValue > 125,
+                        'text-green-500': sugarRecord.sugarValue >= 70 && sugarRecord.sugarValue <= 125,
+                        'text-yellow-400': sugarRecord.sugarValue >= 0 && sugarRecord.sugarValue < 70
+                      }"> {{ sugarRecord.sugarValue !== null ? sugarRecord.sugarValue:"-" }}
                     </td>
                     <td class="px-6 py-4 flex items-center justify-center">
                       <router-link :to="{ name: 'chat' }">
@@ -551,8 +550,8 @@ const toggleMenu = (selectedUserId) => {
                               class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:placeholder-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500"
                               placeholder="xxxxxxxxxx" v-model.trim="fname" maxlength="100" />
                             <p v-if="fname.length" class="input-count"> {{ fname.length }}/100</p>
-                            <p v-show="fname.length < 1">* Please input your name <span></span></p>
-                            <p v-show="fname.length > 100">* Characters must not exceed 100</p>
+                            <p v-show="fname.length < 1">* โปรดใส่ชื่อจริง <span></span></p>
+                            <p v-show="fname.length > 100">* ตัวอักษรต้องไม่เกิน 100 ตัวอักษร</p>
                           </div>
                           <!-- --------------------------------------------------------------------------- -->
                           <div>
@@ -565,8 +564,8 @@ const toggleMenu = (selectedUserId) => {
                               class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:placeholder-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500"
                               placeholder="xxxxxxxxxx" v-model.trim="lname" maxlength="100" />
                             <p v-if="lname.length" class="input-count"> {{ lname.length }}/100 </p>
-                            <p v-show="lname.length < 1"> * Please input your name <span></span></p>
-                            <p v-show="lname.length > 100">* Characters must not exceed 100</p>
+                            <p v-show="lname.length < 1"> * โปรดใส่นามสกุล <span></span></p>
+                            <p v-show="lname.length > 100">* ตัวอักษรต้องไม่เกิน 100 ตัวอักษร</p>
                           </div>
                           <!-- --------------------------------------------------------------------------- -->
 
@@ -578,8 +577,8 @@ const toggleMenu = (selectedUserId) => {
                               class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:placeholder-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500" />
                             <div v-if="idcard">
                               <p class="input-count"> {{ idcard.length }}/13</p>
-                              <p v-show="idcard.length < 13"> * Please input your id_card <span></span></p>
-                              <p v-show="idcard.length > 13"> * Characters must not exceed 13</p>
+                              <p v-show="idcard.length < 13"> * โปรดใส่เลขบัตรประชาชน 13 หลัก <span></span></p>
+                              <p v-show="idcard.length > 13"> * ตัวเลขต้องเท่ากับ 13</p>
                             </div>
                           </div>
                           <!-- รหัส -->
@@ -591,10 +590,9 @@ const toggleMenu = (selectedUserId) => {
                               ref="passwordInput" />
                             <div v-if="password">
                               <p class="input-count" id="count"> {{ password.length }}/14 </p>
-                              <p v-show="password.length < 8" id="checkname"> * Password must not be less than 8
-                                characters</p>
-                              <p v-show="password.length > 14" id="checkname">* Password must not be more than 14
-                                characters</p>
+                              <p v-show="password.length < 8" id="checkname"> * รหัสผ่านต้องมีความยาวมากกว่า 8 ตัวอักษร</p>
+                              <p v-show="password.length > 14" id="checkname">* รหัสผ่านต้องมีความยาวน้อยกว่า 14
+                                ตัวอักษร</p>
                             </div>
                           </div>
                           <div v-show="password">
@@ -605,10 +603,10 @@ const toggleMenu = (selectedUserId) => {
                               @keyup="checkmatch" @blur="checkinputpassword" ref="passwordCheckInput" />
                             <div v-if="passwordcheck">
                               <p class="input-count"> {{ passwordcheck.length }}/14 </p>
-                              <p v-show="passwordcheck.length < 8" class="checkname">* Password must be at least 8
-                                characters long</p>
-                              <p v-show="passwordcheck.length > 14" class="checkname">* Password must not exceed 14
-                                characters</p>
+                              <p v-show="passwordcheck.length < 8" class="checkname">* รหัสผ่านต้องมีความยาวมากกว่า 8
+                                ตัวอักษร</p>
+                              <p v-show="passwordcheck.length > 14" class="checkname">* รหัสผ่านต้องมีความยาวน้อยกว่า 14
+                                ตัวอักษร</p>
                             </div>
 
                           </div>
@@ -699,14 +697,20 @@ const toggleMenu = (selectedUserId) => {
                         <tbody>
                           <tr v-for="patientResult in patientHistory" :key="patientResult.id">
                             <td class="px-6 py-4 text-md">
-                              {{ patientResult.created_at ? moment(patientResult.created_at).format('DD MMMM YYYY') :
-              '-' }}
+                     
+                        {{ patientResult.sugarValue !== null 
+                          ? (patientResult.updated_at !== undefined 
+                              ? moment(patientResult.updated_at).format("DD MMMM YYYY HH:mm") 
+                              : (patientResult.created_at ? moment(patientResult.created_at).format("DD MMMM YYYY HH:mm") : '-'))
+                          : '-'
+                        }}
                             </td>
                             <td class="px-6 py-4 text-center text-md"
                               :style="{ 'max-width': patientResult.sugarValue + '%' }" :class="{
               'text-red-600': patientResult.sugarValue > 125,
               'text-green-500': patientResult.sugarValue >= 70 && patientResult.sugarValue <= 125,
-              'text-yellow-400': patientResult.sugarValue < 70
+              'text-yellow-400': patientResult.sugarValue < 70,
+              'text-gray-400': patientResult.sugarValue = null
             }">
                               {{ patientResult.sugarValue ? patientResult.sugarValue : '-' }}
                             </td>
