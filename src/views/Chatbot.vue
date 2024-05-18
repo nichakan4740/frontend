@@ -88,7 +88,7 @@ const sendMessageAll = async () => {
 
 
 
-/* Pusher for Real-Time Messaging */
+/* ข้อความจาก Admin */
 const pusher = new Pusher("c38b6cfa9a4f7e26bf76", {
   cluster: "ap1",
   encrypted: true,
@@ -109,6 +109,9 @@ channel.bind("message", (data) => {
     "messagefromAdmin",
     JSON.stringify(messageFromAdmin.value)
   );
+   /* 
+    // Reload the page to ensure all messages are fetched
+    location.reload(); */
 });
 
 /* --------------------------------------------------------------------------------------------------- */
