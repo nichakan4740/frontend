@@ -17,6 +17,7 @@ const idcard = localStorage.getItem("idcard");
 const dob = localStorage.getItem("dob");
 const phone = localStorage.getItem("phone");
 const address = localStorage.getItem("address");
+const status = localStorage.getItem("status");
 
 
 // เรียกข้อมูล
@@ -40,8 +41,8 @@ const MyInfo = async () => {
    try {
       const userId = localStorage.getItem('iduser');
       if (userId) {
-         const response = await 
-         fetch(`${import.meta.env.VITE_BASE_URL}api/patient/getProfile/${userId}`);
+         const response = await
+            fetch(`${import.meta.env.VITE_BASE_URL}api/patient/getProfile/${userId}`);
          if (response.ok) {
             const data = await response.json();
             localStorage.setItem("fname", data.fname);
@@ -50,10 +51,12 @@ const MyInfo = async () => {
             localStorage.setItem("dob", data.dob);
             localStorage.setItem("phone", data.phone);
             localStorage.setItem("address", data.address);
+            localStorage.setItem("status", data.status);
             result.value = data;
-            console.log(result.value.dob);
-            console.log(result.value.phone);
-            console.log(result.value.address);
+            // console.log(result.value.dob);
+            // console.log(result.value.phone);
+            // console.log(result.value.address);
+            // console.log(result.value.status);
          } else if (response.status === 404) {
             // Handle case when no data is found
             console.log('No data found');
@@ -73,41 +76,41 @@ onMounted(MyInfo);
 /* --------------------------------------------------------------------------------------------------- */
 
 const updateinfouser = async () => {
-  try {
-   const userId = localStorage.getItem('iduser');
-   const editinfo = `${import.meta.env.VITE_BASE_URL}api/patient/updateProfile/${userId}`;
+   try {
+      const userId = localStorage.getItem('iduser');
+      const editinfo = `${import.meta.env.VITE_BASE_URL}api/patient/updateProfile/${userId}`;
 
-    // Display confirmation dialog using Swal
-    const confirmationResult = await Swal.fire({
-      title: "ยืนยันการแก้ไข",
-      text: "คุณต้องการที่จะแก้ไขข้อมูล",
-      icon: "warning",
-      confirmButtonText: "ยืนยัน",
-      cancelButtonText: "ยกเลิก",
-      showCancelButton: true,
-      showCloseButton: true
-    });
-
-    if (confirmationResult.isConfirmed) {
-      const response = await fetch(editinfo, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(myinfo.value),
+      // Display confirmation dialog using Swal
+      const confirmationResult = await Swal.fire({
+         title: "ยืนยันการแก้ไข",
+         text: "คุณต้องการที่จะแก้ไขข้อมูล",
+         icon: "warning",
+         confirmButtonText: "ยืนยัน",
+         cancelButtonText: "ยกเลิก",
+         showCancelButton: true,
+         showCloseButton: true
       });
 
-      if (response.ok) {
-        await MyInfo();
-      } else {
-        throw new Error("Failed to delete");
+      if (confirmationResult.isConfirmed) {
+         const response = await fetch(editinfo, {
+            method: "PUT",
+            headers: {
+               "Content-Type": "application/json",
+            },
+            body: JSON.stringify(myinfo.value),
+         });
+
+         if (response.ok) {
+            await MyInfo();
+         } else {
+            throw new Error("Failed to delete");
+         }
       }
-    }
-  } catch (error) {
-    console.error("Error deleting data:", error);
-  }
-  window.location.reload(); // Reload the browser after successfully updating the information
-  closeModal();
+   } catch (error) {
+      console.error("Error deleting data:", error);
+   }
+   window.location.reload(); // Reload the browser after successfully updating the information
+   closeModal();
 }
 
 
@@ -183,14 +186,26 @@ const editinfo = () => {
             <section
                class="bg-white dark:bg-gray-900 box-conten shadow-lg shadow-gray-300/50 mt-10 ml-5 mr-5 pt-6 pb-6 pl-6 pr-6  mb-10  rounded-lg ">
                <div class="flex justify-center min-h-screen">
-                  <div class="hidden bg-cover lg:block lg:w-2/5 mt-10">
-                     <img src="/user2.png" class="max-w-60 mx-auto">
+                  <div class="flex flex-col bg-cover lg:block lg:w-2/5 mt-10">
+                     <div>
+                        <img src="/user2.png" class="max-w-60 mx-auto">
+                     </div>
+                     <div class="max-w-60 mx-auto">
+                        <div class="flex justify-center mt-10">
+                           <p class="text-md text-center text-gray-600 dark:text-gray-200">สถานะการรับบริการ:</p>
+                           <img src="/correct.png" v-if="status == 1" class="w-6 h-6 ml-2" />
+                           <img src="/cross.png" v-else class="w-6 h-6 ml-2" />
+                        </div>
+                     </div>
+
+
                   </div>
 
                   <div class="flex items-center w-full max-w-3xl p-8 mx-auto lg:px-12 lg:w-3/5">
                      <div class="w-full">
                         <h1 class="text-2xl font-semibold tracking-wider text-gray-800 capitalize dark:text-white">
-                           <div class>{{ fullname }}</div>
+                           <div>{{ fullname }}
+                           </div>
                         </h1>
 
                         <!-- <p class="mt-4 text-gray-500 dark:text-gray-400">
@@ -263,7 +278,7 @@ const editinfo = () => {
 
                            <div>
                               <label class="block mb-2 text-sm text-gray-600 dark:text-gray-200">วันเกิด</label>
-                              <div v-if="dob != null" type="text" 
+                              <div v-if="dob != null" type="text"
                                  class="block w-full px-5 py-3 mt-2 text-gray-700 bg-white border border-gray-200 rounded-md dark:placeholder-gray-600 dark:bg-gray-900 dark:text-gray-300 dark:border-gray-700 focus:border-blue-400 dark:focus:border-blue-400 focus:ring-blue-400 focus:outline-none focus:ring focus:ring-opacity-40">
                                  {{ dob }}
                               </div>

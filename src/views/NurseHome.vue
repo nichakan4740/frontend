@@ -2,6 +2,7 @@
 import { useRouter } from "vue-router";
 import { ref, onBeforeMount, computed, onMounted, watch, onUnmounted } from "vue";
 import LayoutNurse from '../layouts/LayoutNurse.vue';
+import Spinner from "../Authentication/Spinner.vue";
 import moment from "moment";
 import Swal from "sweetalert2";
 
@@ -10,6 +11,7 @@ import Swal from "sweetalert2";
 const currentTime = computed(() => moment().format('YYYY-MM-DD HH:mm:ss'));
 const startDate = ref('');
 const endDate = ref('');
+const loading = ref(false);
 
 // Function to logout nurse
 const router = useRouter();
@@ -46,6 +48,7 @@ const MysugarLoad = async () => {
       const filteredData = filterLatestSugarRecords(data);
       // Update the result ref with the filtered data
       result.value = filteredData;
+      console.log(result.value)
     } else if (response.status === 404) {
       console.log('No data found');
       result.value = [];
@@ -69,6 +72,7 @@ const passwordcheck = ref("");
 const dob = ref("");
 const phone = ref("");
 const address = ref("");
+const status = ref(true);
 
 const passwordInput = ref(null);
 const passwordCheckInput = ref(null);
@@ -89,6 +93,8 @@ const registerpatient = async () => {
         dob: dob.value,
         phone: phone.value,
         address: address.value,
+        status: status.value,
+
       }),
     }
   );
@@ -269,21 +275,107 @@ const closePatientModal = () => {
 const getCurrentDate = () => {
   return moment().format('YYYY-MM-DD');
 };
+
+// -------------------------------
+// -------------------------------
+
+const myinfo = ref({
+  fname: '',
+  lname: '',
+  idcard: '',
+  dob: '',
+  phone: '',
+  address: '',
+  status: null
+
+});
+
+const MyInfo = async (patientId) => {
+  try {
+    if (patientId) {
+      const response = await fetch(`${import.meta.env.VITE_BASE_URL}api/patient/getProfile/${patientId}`);
+      if (response.ok) {
+        const data = await response.json();
+        // result.value = data;
+        myinfo.value.fname = data.fname
+        myinfo.value.lname = data.lname
+        myinfo.value.idcard = data.idcard
+        myinfo.value.dob = data.dob
+        myinfo.value.phone = data.phone
+        myinfo.value.address = data.address
+        myinfo.value.status = data.status
+        console.log(data);
+        console.log(myinfo.value);
+
+      } else if (response.status === 404) {
+        // Handle case when no data is found
+        console.log('No data found');
+        statusUser.value = [];
+      } else {
+        throw new Error('Failed to fetch data');
+      }
+    } else {
+      console.log('No user ID found in LocalStorage');
+    }
+  } catch (error) {
+    console.error('Error fetching data:', error);
+  }
+};
+
+onMounted(MyInfo);
+
+/* --------------------------------------------------------------------------------------------------- */
+
+
+
+const updatestatususer = async (patientId, status) => {
+  loading.value = true;
+  try {
+    await MyInfo(patientId)
+    myinfo.value.status = status;
+    if ( patientId === selectedUser.value) {
+      selectedUser.value = null;
+    } else {
+      selectedUser.value = patientId;
+    }
+    const editinfo = `${import.meta.env.VITE_BASE_URL}api/patient/updateProfile/${patientId}`;
+    console.log(myinfo.value)
+    const response = await fetch(editinfo, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(myinfo.value),
+    });
+
+    if (response.ok) {
+      await MyInfo(patientId);
+    } else {
+      throw new Error("Failed to delete");
+    }
+
+  } catch (error) {
+    console.error("Error deleting data:", error);
+  } finally {
+    loading.value = false; // Set loading to false regardless of success or failure
+  }
+  window.location.reload();
+}
+
+
 const selectedUser = ref(null);
 const showMenu = ref(false);
 const toggleMenu = (selectedUserId) => {
-  // ตรวจสอบว่าเป็นการคลิกอีกครั้งหรือไม่
   if (showMenu.value && selectedUserId === selectedUser.value) {
-    // ถ้าเป็นการคลิกซ้ำ ปิดเมนู
     showMenu.value = false;
     selectedUser.value = null;
   } else {
-    // ถ้าเป็นการคลิกครั้งแรก หรือคลิก Id ที่แตกต่างกัน
-    // เปิดเมนูและกำหนด Id ที่เลือกไว้
     showMenu.value = true;
     selectedUser.value = selectedUserId;
   }
 };
+
+
 
 
 </script>
@@ -354,23 +446,31 @@ const toggleMenu = (selectedUserId) => {
                       <!-- <router-link :to="'/informationUser/' + sugarRecord.id"> -->
                       <button
                         @click="openModalPatient(sugarRecord.user.id, sugarRecord.user.fname, sugarRecord.user.lname)">{{
-                        sugarRecord.user.fname }} {{
-                        sugarRecord.user.lname }}</button>
+              sugarRecord.user.fname }} {{
+              sugarRecord.user.lname }}</button>
                       <!-- </router-link> -->
                     </td>
                     <td class="px-6 py-4 flex items-center justify-center">
                       <button @click="toggleMenu(sugarRecord.user.id)">
-                        <img src="/correct.png" class="w-6 h-6" />
+                        <img src="/correct.png" v-if="sugarRecord.user.status == 1" class="w-6 h-6" />
+                        <img src="/cross.png" v-else class="w-6 h-6" />
                       </button>
                     </td>
                     <!-- Hamburger Menu -->
                     <div v-if="showMenu && selectedUser === sugarRecord.user.id" class="statusmenu">
                       <!-- เพิ่มเนื้อหาของเมนูที่นี่ -->
-                      <img src="/correct.png" class="w-6 h-6" /><span>กำลังรับการบริการ</span>
-                      <img src="/cross.png" class="w-6 h-6" /><span>ยกเลิกการรับบริการ</span>
-                      
+                      <button @click="updatestatususer(sugarRecord.user.id, 1)">
+                        <img src="/correct.png" class="w-6 h-6" />
+                        <p>กำลังรับการบริการ</p>
+                      </button>
+                      <hr class="pt-1 pb-1">
+                      <button @click="updatestatususer(sugarRecord.user.id, 0)">
+                        <img src="/cross.png" class="w-6 h-6" />
+                        <p>ยกเลิกการรับบริการ</p>
+                      </button>
+
                     </div>
-                      <!-- ----------------- -->
+                    <!-- ----------------- -->
                     <td class="px-6 py-4 text-center text-blue-800">
                       <p v-if="sugarRecord.updated_at != undefined">
                         {{ sugarRecord.updated_at ? moment(sugarRecord.updated_at).format("DD MMMM YYYY") : '-' }}
@@ -632,7 +732,7 @@ const toggleMenu = (selectedUserId) => {
       </div>
 
     </div>
-
+    <Spinner :loading="loading"></Spinner>
   </LayoutNurse>
 </template>
 
@@ -645,6 +745,7 @@ const toggleMenu = (selectedUserId) => {
   border: 1px solid #ccc;
   border-radius: 8%;
   box-shadow: 8px;
+  width: auto;
   padding: 10px;
   z-index: 1000;
 }
