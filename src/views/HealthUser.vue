@@ -5,7 +5,7 @@ import Layout from '../layouts/Layout.vue';
 import moment from "moment";
 import Swal from "sweetalert2";
 
-const name = localStorage.getItem("name") + " " + localStorage.getItem("lname");
+const name = localStorage.getItem("fname") + " " + localStorage.getItem("lname");
 const userId = localStorage.getItem('iduser');
 
 const originalData = ref([]); // Store original data
