@@ -18,7 +18,6 @@ const messageFromAdmin = ref([]);
 /* --------------------------------------------------------------------------- */
 /* get ข้อมูล จาก db */
 const messages = ref([]);
-
 const fetchUserMessages = async () => {
   try {
     const response = await fetch(`${import.meta.env.VITE_BASE_URL}api/user/${userId}/messages`);
@@ -27,6 +26,9 @@ const fetchUserMessages = async () => {
     }
     const data = await response.json();
     messages.value = data;
+    /* console.log(data); 
+    adminId = data[0].admin_id; // ดึงค่า admin_id จากข้อมูลที่ได้รับ
+    console.log(adminId); // ดูค่า adminId ที่ได้ */
   } catch (error) {
     console.error('Error fetching user messages:', error);
   }
@@ -34,6 +36,7 @@ const fetchUserMessages = async () => {
 onMounted(() => {
   fetchUserMessages();
 });
+
 /* -------------------------------------------------- */
 /* Send Message to All Admins */
 const sendMessageAll = async () => {
@@ -84,10 +87,6 @@ const sendMessageAll = async () => {
 };
 /* --------------------------------------------------------------------------------------------- */
 
-
-
-
-
 /* ข้อความจาก Admin */
 const pusher = new Pusher("c38b6cfa9a4f7e26bf76", {
   cluster: "ap1",
@@ -104,83 +103,66 @@ channel.bind("message", (data) => {
     user_id: data.user_id,
     admin_name: data.admin_name,
   });
-
-  localStorage.setItem(
-    "messagefromAdmin",
-    JSON.stringify(messageFromAdmin.value)
-  );
-   /* 
-    // Reload the page to ensure all messages are fetched
-    location.reload(); */
 });
 
-/* --------------------------------------------------------------------------------------------------- */
-
 const messagetoadmin = ref("");
-const responseMessages = ref([]);
+/* let adminId = null; // เพิ่มตัวแปร adminId ไว้ที่นี่เพื่อใช้เก็บค่า adminId ที่ได้รับ */
+const sendMessageToAdmin = async (chatRoomId) => {
 
-// Function to send message to admin
-const sendMessagetoadmin = async () => {
   try {
-    // Your logic to get adminId
+     // Your logic to get adminId
     const adminId =
       messageFromAdmin.value.length > 0
         ? messageFromAdmin.value[messageFromAdmin.value.length - 1].admin_id
         : null;
     console.log("Parsed Admin ID:", adminId);
 
-    // Fetch API to send message
     const response = await fetch(
       `${import.meta.env.VITE_BASE_URL}api/sendmessage/ToAdmin/${adminId}`,
       {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Accept: "application/json",
         },
         body: JSON.stringify({
-          user_id: userId,
           message: messagetoadmin.value,
+          user_id: userId,
+          chat_room_id: chatRoomId, // Include chat_room_id in the request body
         }),
       }
     );
 
-    // Handle response
     if (!response.ok) {
-      const errorMessage = await response.text();
-      throw new Error(errorMessage || "Failed to send message");
+      throw new Error((await response.text()) || "Failed to send message");
     }
 
-    // Push the sent message to responseMessages array
-    responseMessages.value.push({
-      user_id: userId,
-      message: messagetoadmin.value,
+    const responseData = await response.json();
+    console.log("Message sent successfully:", responseData);
+
+    message.value = "";
+
+    Swal.fire({
+      icon: "success",
+      title: "Success",
+      text: "Message sent successfully",
     });
-
-    // Save responseMessages array to localStorage
-    localStorage.setItem(
-      "responseMessages",
-      JSON.stringify(responseMessages.value)
-    );
-
-    // Clear message input
-    messagetoadmin.value = "";
   } catch (error) {
     console.error("Error sending message:", error);
-    responseMessage.value = "Failed to send message";
   }
 };
+/* --------------------------------------------------------------------------------------------------- */
 
-// Load responseMessages array from localStorage on component mount
-onMounted(() => {
-  const storedResponseMessages = localStorage.getItem("responseMessages");
-  if (storedResponseMessages) {
-    responseMessages.value = JSON.parse(storedResponseMessages);
-  }
-});
+// สร้าง reactive property เพื่อตรวจสอบว่า collapse ไหนเปิดอยู่
+const activeCollapse = ref(0);
 
+// function เพื่อเปิด/ปิด collapse
+const toggleCollapse = (index) => {
+  activeCollapse.value = (activeCollapse.value === index) ? 0 : index;
+};
 /* ---------------------------------------------------------------------------- */
 /* Computed Property for Filtering Conversations */
-const filteredConversations = computed(() => {
+/*  const filteredConversations = computed(() => {
   return conversations.value.filter(
     (conversation) => conversation.user_id === userId
   );
@@ -192,17 +174,10 @@ const filteredMessagesFromAdmin = computed(() => {
 
 const filteredResponseMessages = computed(() => {
   return responseMessages.value.filter((message) => message.user_id === userId);
-});
+});  */
+ const activeTab = ref(1);
 
-const activeTab = ref(1);
-const name = ref("");
-onMounted(() => {
-  // ดึงข้อมูล name จาก Local Storage เมื่อ component ถูก mount
-  name.value = localStorage.getItem("name") || "";
-});
-const firstCharacter = computed(() => {
-  return name.value.charAt(0);
-});
+const nameUser = localStorage.getItem("lname");
 /* ----------------------------------- */
 
 </script>
@@ -232,19 +207,14 @@ const firstCharacter = computed(() => {
       </div>
 
       <div v-if="activeTab === 1">
-        <div class="lg:flex lg:h-screen antialiased text-gray-800 box-content bg-white shadow-lg shadow-gray-300/50 mt-10 mb-10 pt-5 pb-5 pl-5 pr-10 rounded-lg">
-
-          <div class="flex h-screen antialiased text-gray-800">
+        <div class="lg:flex lg:h-screen text-gray-800 box-content bg-white shadow-lg shadow-gray-300/50 mt-10 mb-10 pt-5 pb-5 pl-5 pr-10 rounded-lg">
+          <div class="flex h-screen antialiased text-gray-800 container">
             <!-- Left Sidebar -->
             <div class="flex flex-row h-full w-full overflow-x-hidden">
-              <div
-                class="flex flex-col py-8 pl-6 pr-2 lg:w-64 bg-white flex-shrink-0"
-              >
+              <div class="flex flex-col py-8 pl-6 pr-2 lg:w-64 bg-white flex-shrink-0" >
                 <!-- Sidebar Content -->
                 <!-- User Profile -->
-                <div
-                  class="flex flex-col items-center bg-indigo-100 border border-gray-200 w-full py-6 px-4 rounded-lg"
-                >
+                <div class="flex flex-col items-center bg-indigo-100 border border-gray-200 w-full py-6 px-4 rounded-lg">
                   <!-- User Avatar -->
                   <div class="h-20 w-20 rounded-full border overflow-hidden">
                     <img
@@ -253,37 +223,43 @@ const firstCharacter = computed(() => {
                       class="h-full w-full"
                     />
                   </div>
-                  <!-- User Information -->
-                  <div class="text-sm font-semibold mt-2">{{ name }}</div>
+                  <div class="text-sm font-semibold mt-5">{{nameUser}}</div>
                 </div>
-
                 <!-- Active Conversations -->
                 <div class="flex flex-col mt-8">
-                  <!-- Active Conversations Header -->
-                  <div
-                    class="flex flex-row items-center justify-between text-xs"
-                  >
-                    <span class="font-bold">เปิดแชทใหม่ที่นี้ !!</span>
-                  </div>
+<!-- --------------------------------------------------------------------- -->
+                  <div id="accordion-collapse" data-accordion="collapse">
+                      <h2 id="accordion-collapse-heading-1">
+                        <button @click="toggleCollapse(1)" :aria-expanded="activeCollapse === 1 ? 'true' : 'false'"
+                        class="flex items-center justify-between w-full p-5 font-medium text-gray-500 border border-b border-gray-200 rounded-t-xl w-56">
+                          <span>เปิดแชทใหม่ที่นี้</span>
+                          <svg :class="{ 'rotate-180': activeCollapse === 1 }" class="w-3 h-3 shrink-0" aria-hidden="true"
+                              fill="none" viewBox="0 0 10 6">
+                              <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5 5 1 1 5"/>
+                          </svg>
+                      </button>
+                      </h2>
 
-                  <!-- Active Conversations List -->
-                  <div
-                    class="flex flex-col space-y-1 mt-4 -mx-2 h-48 overflow-y-auto"
-                  >
-                    <!-- Input and Send Message -->
-                    <div>
-                      <textarea
-                        v-model="message"
-                        placeholder="กรุณากรอกข้อความ"
-                      ></textarea>
-                      <br />
-                      <button @click="sendMessageAll">ส่งข้อความ</button>
+                      <div v-show="activeCollapse === 1" id="accordion-collapse-body-1"
+                          class="p-5 border-t-0 border rounded-b-lg border-gray-200 w-56">
+                        
+                        <!-- Input and Send Message -->
+                        <div class="mt-4">
+                          <textarea v-model="message" placeholder="กรุณากรอกข้อความเพื่อเปิดแชท"
+                                    class="w-full px-3 py-2 placeholder-gray-300 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-200"
+                                    rows="4"></textarea>
+                          <div class="mt-2">
+                          <button @click="sendMessageAll"
+                                    class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:bg-blue-600">
+                              ส่งข้อความ
+                            </button>
+                          </div>
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                  <!-- ---------------------------------------------------------------------------- -->
-                </div>
+       <!-- -------------------------------------------------------------------------------------------------------------------- -->
               </div>
-
+              </div>
 
 
 
@@ -305,38 +281,9 @@ const firstCharacter = computed(() => {
                         {{ formatTime(message.created_at) }}
                       </div>
                     </div>
-
-                    <!-- ----ข้อความตอบกลับจาก admin ---------------------------------------------------------------------------------------- -->
-
-                    <!-- แสดงข้อความจาก admin -->
-                    <div
-                      v-for="(message, index) in filteredMessagesFromAdmin"
-                      :key="index"
-                      class="flex justify-start mb-2"
-                    >
-                      <div  class="bg-gray-200 text-gray-800 py-2 px-4 rounded-xl max-w-xs" >
-                        <p>{{ message.message }}</p>
-                        <p>{{ message.timestamp }}</p>
-                        <p>{{ message.admin_name }}</p>
-                      </div>
-                    </div>
-                    <!-- ---------------------------------------------------------- -->
-
-                    <!-- ตอบกลับหา admin -->
-                    <div
-                      v-for="(
-                        responseMessage, index
-                      ) in filteredResponseMessages"
-                      :key="index"
-                      class="flex justify-end mb-2"
-                    >
-                      <div  class="bg-blue-500 text-white py-2 px-4 rounded-xl max-w-xs text-right" >
-                       <p>{{ responseMessage.message }}</p> 
-                        <p>{{ firstCharacter }}</p>
-                      </div>
-                    </div>
+                    <!-- ---------------------------------------------------------- -->       
                   </div>
-<!-- --------------------------------------------------------------------------- -->
+                  <!-- --------------------------------------------------------------------------- -->
                   <!-- Message Input -->
                   <div
                     class="flex flex-row items-center h-16 rounded-xl bg-white w-full px-4"
@@ -354,10 +301,10 @@ const firstCharacter = computed(() => {
                     <!-- Send Message Button -->
                     <div class="ml-4">
                       <button
-                        @click="sendMessagetoadmin"
+                        @click="sendMessageToAdmin(chatRoomId)"
                         class="flex items-center justify-center bg-indigo-500 hover:bg-indigo-600 rounded-xl text-white px-4 py-1 flex-shrink-0"
                       >
-                        <span>Send</span>
+                        <span>ส่งข้อความ</span>
                         <span class="ml-2">
                           <svg
                             class="w-4 h-4 transform rotate-45 -mt-px"
@@ -410,6 +357,7 @@ const firstCharacter = computed(() => {
   </Layout>
 </template>
 <style>
+
 #bodybox {
   margin: auto;
   max-width: 600px;

@@ -16,7 +16,7 @@ const pusher = new Pusher("c38b6cfa9a4f7e26bf76", {
 const adminId = localStorage.getItem("idadmin");
 
 // ส่งข้อความตอบกลับหา user
-/* const sendMessageToUser = async (userId) => {
+const sendMessageToUser = async (userId, chatRoomId) => { // เพิ่ม chatRoomId ใน parameter
   const message = state.newMessage;
   if (message.trim() === "") {
     return;
@@ -24,6 +24,7 @@ const adminId = localStorage.getItem("idadmin");
   const payload = {
     message: message,
     admin_id: adminId,
+    chat_room_id: chatRoomId, // เพิ่ม chat_room_id เข้าไปใน payload
   };
   try {
     const response = await fetch(`${import.meta.env.VITE_BASE_URL}api/sendmessage/ToUser/${userId}`, {
@@ -35,13 +36,6 @@ const adminId = localStorage.getItem("idadmin");
     });
 
     if (response.ok) {
-      // Push the sent message to receivedMessages
-      receivedMessages.value.push({
-        message: message,
-        user_id: userId,
-        admin_id: adminId,
-      });
-
       Swal.fire({
         icon: 'success',
         title: 'ส่งข้อความสำเร็จ',
@@ -61,8 +55,8 @@ const adminId = localStorage.getItem("idadmin");
       text: 'ไม่สามารถส่งข้อความได้',
     });
   }
-}; */
- 
+};
+
 /*  const getMessageSendToUser = async () => {
   try {
     const response = await fetch(`${import.meta.env.VITE_BASE_URL}api/admin/${adminId}/messages`);
@@ -256,40 +250,17 @@ const state = reactive({});
                   <div class="flex flex-col h-full">
                  
                       <div v-for="message in selectedUserMessages" :key="message.timestamp" class="rounded-lg p-2 flex items-start">
-                        <div class="h-10 w-10 bg-indigo-200 rounded-full overflow-hidden flex items-center justify-center mr-2">
-                          <img
-                            src="https://cdn.icon-icons.com/icons2/2266/PNG/512/patient_icon_140481.png"
-                            alt="User Icon"
-                            class="h-8 w-8 object-cover"/>
-                        </div>
                         <div class="w-full">
                           <div class="relative max-w-xl px-4 py-2 shadow rounded-xl w-full">
                             <div class="text-sm font-semibold mb-1">
-                              {{ message.user_name }}
+                             <!--  {{ message.user_name }} -->
                             </div>
                             <div>{{ message.message }}</div>
+                             <div> {{ formatTime(timestamp) }}</div>
                           </div>
                         </div>
                       </div>
-               
 <!-- ------------------------------------------------------------------------------------------------------------------ -->
-                   <!--     <div v-for="(message, index) in receivedMessages" :key="index" class="rounded-lg p-2 flex items-start" >
-                        <div class="h-10 w-10 bg-indigo-200 rounded-full overflow-hidden flex items-center justify-center mr-2">
-                          <img
-                            src="https://cdn.icon-icons.com/icons2/2266/PNG/512/patient_icon_140481.png"
-                            alt="User Icon"
-                            class="h-8 w-8 object-cover"
-                          />
-                        </div>
-                        <div class="w-full">
-                          <div class="relative max-w-xl px-4 py-2 shadow rounded-xl w-full">
-                            <div class="text-sm font-semibold mb-1" >
-                              {{ message.admin_name }}
-                            </div>
-                            <div>{{ message.message }}</div>
-                          </div>
-                        </div>
-                      </div>  -->
 <!-- ------------------------------------------------------------------------------------------------------------------ -->
                   </div>
                 </div>
