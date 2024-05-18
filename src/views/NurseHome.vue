@@ -44,11 +44,13 @@ const MysugarLoad = async () => {
     const response = await fetch(`${import.meta.env.VITE_BASE_URL}api/mysugar`);
     if (response.ok) {
       const data = await response.json();
+      console.log(data)
       // Filter the data to keep only the latest sugar records for each user
       const filteredData = filterLatestSugarRecords(data);
       // Update the result ref with the filtered data
       result.value = filteredData;
       console.log(result.value)
+      // await AllUserLoad()
     } else if (response.status === 404) {
       console.log('No data found');
       result.value = [];
@@ -251,6 +253,7 @@ const openModalPatient = async (patientId, fname, lname) => {
     if (data.length != 0) {
       titleModalPatient.value = `${fname} ${lname}`
       patientHistory.value = data;
+      console.log(patientHistory.value)
       originalPatientHistory.value = data.slice(); // ตั้งค่าค่าเริ่มต้นของ originalPatientHistory เป็นข้อมูล patientHistory
       isModalPatientOpen.value = true;
     } else {
@@ -472,13 +475,14 @@ const toggleMenu = (selectedUserId) => {
                     </div>
                     <!-- ----------------- -->
                     <td class="px-6 py-4 text-center text-blue-800">
-                      <p v-html="sugarRecord.sugarValue !== null 
-                          ? (sugarRecord.updated_at !== undefined 
-                              ? moment(sugarRecord.updated_at).format('DD MMMM YYYY') + '<br>' + moment(sugarRecord.updated_at).format('HH:mm')
-                              : (sugarRecord.created_at ? moment(sugarRecord.created_at).format('DD MMMM YYYY') + '<br>' + moment(sugarRecord.created_at).format('HH:mm') : '-'))
-                          : '-'"
-                      ></p>
-                    </td>
+      <p v-html="sugarRecord.sugarValue !== null 
+          ? (sugarRecord.updated_at !== undefined 
+              ? moment(sugarRecord.updated_at).format('DD MMMM YYYY') + '<br>' + moment(sugarRecord.updated_at).format('HH:mm')
+              : (sugarRecord.created_at ? moment(sugarRecord.created_at).format('DD MMMM YYYY') + '<br>' + moment(sugarRecord.created_at).format('HH:mm') : '-'))
+          : '-'"
+      ></p>
+    </td>
+
                     <td class="px-6 py-4 text-center font-semibold text-gray-400"
                       :style="{ 'max-width': sugarRecord.sugarValue + '%' }" 
                       :class="{
@@ -709,8 +713,7 @@ const toggleMenu = (selectedUserId) => {
                               :style="{ 'max-width': patientResult.sugarValue + '%' }" :class="{
               'text-red-600': patientResult.sugarValue > 125,
               'text-green-500': patientResult.sugarValue >= 70 && patientResult.sugarValue <= 125,
-              'text-yellow-400': patientResult.sugarValue < 70,
-              'text-gray-400': patientResult.sugarValue = null
+              'text-yellow-400': patientResult.sugarValue < 70
             }">
                               {{ patientResult.sugarValue ? patientResult.sugarValue : '-' }}
                             </td>

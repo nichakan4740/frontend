@@ -302,7 +302,7 @@ const averageHighSugar = computed(() => calculateAverageSugar('high', result.val
 
 
 /* นับจำนวน---------------------------------------------------------------------------------------------------- */
-const countLowSugar = computed(() => result.value.filter(record => record.sugarValue < 70).length);
+const countLowSugar = computed(() => result.value.filter(record => record.sugarValue !== null && record.sugarValue < 70).length);
 const countNormalSugar = computed(() => result.value.filter(record => record.sugarValue >= 70 && record.sugarValue <= 125).length);
 const countHighSugar = computed(() => result.value.filter(record => record.sugarValue > 125).length);
 
@@ -604,17 +604,17 @@ const getCurrentDate = () => {
                     </thead>
                     <tbody>
                       <!-- <tr class="border-b dark:border-neutral-500" v-for="sugarRecord in result" :key="sugarRecord.id"> -->
-                      <tr class="border-b dark:border-neutral-500" v-for="(sugarRecord, index) in paginatedResults"
+                      <tr class="border-b dark:border-neutral-500" v-for="(sugarRecord) in paginatedResults"
                         :key="sugarRecord.id">
-                        <td class="whitespace-nowrap px-6 py-4"> {{ moment(sugarRecord.updated_at).format("DD MMM YYYY"
-                  ) }}
+                        <div v-if="sugarRecord.sugarValue !== null ">
+                        <td class="whitespace-nowrap px-6 py-4"> {{ moment(sugarRecord.updated_at).format("DD MMM YYYY") }}
                           <!--แสดงข้อความตามเงื่อนไขของค่าน้ำตาล / แสดงข้อความตามเงื่อนไขของค่าน้ำตาล -->
                           <br>
                           <span :class="{
-                    'text-yellow-500': sugarRecord.sugarValue < 70,
-                    'text-green-500': sugarRecord.sugarValue >= 70 && sugarRecord.sugarValue <= 125,
-                    'text-red-500': sugarRecord.sugarValue > 125
-                  }">
+                            'text-yellow-500': sugarRecord.sugarValue < 70,
+                            'text-green-500': sugarRecord.sugarValue >= 70 && sugarRecord.sugarValue <= 125,
+                            'text-red-500': sugarRecord.sugarValue > 125
+                          }">
                             <span v-if="sugarRecord.sugarValue < 70"><router-link
                                 to="/low">น้ำตาลต่ำ</router-link></span>
 
@@ -625,14 +625,14 @@ const getCurrentDate = () => {
                         </td>
 
 
-                        <td class="whitespace-nowrap px-6 py-4">{{ sugarRecord.sugarValue }} mg/dl
+                        <td class="whitespace-nowrap px-6 py-4">{{ sugarRecord.sugarValue !== null ? sugarRecord.sugarValue : "-" }} mg/dl
                           <div class="w-full rounded-full h-2.5 mb-4 dark:bg-gray-300 ">
                             <div class="bg-gray-600 h-2.5 rounded-full "
                               :style="{ 'max-width': sugarRecord.sugarValue + '%' }" :class="{
-                    'bg-red-500': sugarRecord.sugarValue > 125,
-                    'bg-green-500': sugarRecord.sugarValue >= 70 && sugarRecord.sugarValue <= 125,
-                    'bg-yellow-500': sugarRecord.sugarValue < 70
-                  }"></div>
+                              'bg-red-500': sugarRecord.sugarValue > 125,
+                              'bg-green-500': sugarRecord.sugarValue >= 70 && sugarRecord.sugarValue <= 125,
+                              'bg-yellow-500': sugarRecord.sugarValue < 70
+                            }"></div>
                           </div>
 
 
@@ -669,15 +669,12 @@ const getCurrentDate = () => {
                             </svg>
                           </button>
                         </td>
+                      </div>
                         <!-- ----------------------------------------------------------------- -->
                       </tr>
                     </tbody>
                   </table>
-
-                  <!-- ไม่มีข้อมูล -->
-                  <div class="flex flex-col" v-if="result.length > 0">
-                  </div>
-                  <div v-else class="text-center text-gray-500 ">
+                  <div  v-if="result.sugarValue == null" class="text-center text-gray-500 ">
                     <br>
                     ไม่มีประวัติการบันทึกผลการวัดค่าน้ำตาล
                   </div>

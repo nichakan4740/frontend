@@ -139,15 +139,18 @@ const resetSearch = () => {
                       <img src="/correct.png" class="w-6 h-6 " />
                     </td>
                     <td class="px-6 py-4 text-center text-blue-800">
-                      {{ moment(sugarRecord.updated_at).format("DD MMM YYYY") }}
-                      {{ moment(sugarRecord.updated_at).format("HH:mm") }}
+                      <p v-html="sugarRecord.sugarValue !== null 
+                      ? moment(sugarRecord.updated_at).format('DD MMMM YYYY') + '<br>' + moment(sugarRecord.updated_at).format('HH:mm')
+                      :  '-'"
+                      ></p>
+            
                     </td>
                     <td class="px-6 py-4 text-center font-semibold" 
                     :style="{ 'max-width': sugarRecord.sugarValue + '%' }" :class="{
               'text-red-600': sugarRecord.sugarValue > 125,
               'text-green-500': sugarRecord.sugarValue >= 70 && sugarRecord.sugarValue <= 125,
               'text-yellow-400': sugarRecord.sugarValue < 70
-            }">{{ sugarRecord.sugarValue }}</td>
+            }">{{ sugarRecord.sugarValue !== null ? sugarRecord.sugarValue : "-" }}</td>
                       <td class="px-6 py- text-black font-medium text-center">
                       {{ sugarRecord.symptom }}</td>
                       <td class="px-6 py-4 text-black font-medium text-center">
