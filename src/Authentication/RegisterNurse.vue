@@ -150,10 +150,10 @@ const close = () => appRouter.push({ name: "loginNurse" });
                           {{ name.length }}/100
                         </p>
                         <p v-if="name.length < 1">
-                          * Please input your name <span></span>
+                          * กรุณากรอกชื่อ-นามสกุล <span></span>
                         </p>
                         <p v-if="name.length > 100" >
-                          * Characters must not exceed 100
+                          * ตัวอักษรต้องไม่เกิน 100
                         </p>
                       </div>
                       
@@ -211,10 +211,10 @@ const close = () => appRouter.push({ name: "loginNurse" });
                           {{ password.length }}/14
                         </p>
                         <p v-show="password.length < 8" id="checkname">
-                          * Password must not be less than 8 characters
+                          * รหัสผ่านต้องมีความยาวมากกว่า 8 ตัวอักษร
                         </p>
                         <p v-show="password.length > 14" id="checkname">
-                          * Password must not be more than 14 characters
+                          * รหัสผ่านต้องมีความยาวน้อยกว่า 14 ตัวอักษร
                         </p>
 
                       </div>
@@ -239,8 +239,8 @@ const close = () => appRouter.push({ name: "loginNurse" });
                       >
                       <div v-if="passwordcheck">
                         <p class="input-count">{{ passwordcheck.length }}/14</p>
-                        <p v-show="passwordcheck.length < 8" class="checkname">* Password must be at least 8 characters long</p>
-                        <p v-show="passwordcheck.length > 14" class="checkname">* Password must not exceed 14 characters</p>
+                        <p v-show="passwordcheck.length < 8" class="checkname">* รหัสผ่านต้องมีความยาวมากกว่า 8 ตัวอักษร </p>
+                        <p v-show="passwordcheck.length > 14" class="checkname">*  รหัสผ่านต้องมีความยาวน้อยกว่า 14 ตัวอักษร</p>
                       </div>
                      </div>
 

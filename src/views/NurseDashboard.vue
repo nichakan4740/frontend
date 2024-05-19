@@ -111,7 +111,7 @@ const resetSearch = () => {
         <div v-if="userData.length > 0"
         class="box-content p-8 bg-white shadow-lg shadow-gray-300/50 mt-4 ml-5 mr-5 mb-10 rounded-lg"
           >
-        <h2 class="text-left text-2xl font-bold mb-5">ข้อมูลรายบุคคลทั้งหมด</h2>
+        <p class="text-left text-2xl font-medium  mb-5">ข้อมูลรายบุคคล: <span class="text-blue-600 font-medium text-lg">{{ userData[0].user.fname}} {{ userData[0].user.lname}}</span></p>
 
         <div class="overflow-x-auto">
           <div class="inline-block min-w-full py-2 sm:px-6 lg:px-8">
@@ -139,15 +139,18 @@ const resetSearch = () => {
                       <img src="/correct.png" class="w-6 h-6 " />
                     </td>
                     <td class="px-6 py-4 text-center text-blue-800">
-                      {{ moment(sugarRecord.updated_at).format("DD MMM YYYY") }}
-                      {{ moment(sugarRecord.updated_at).format("HH:mm") }}
+                      <p v-html="sugarRecord.sugarValue !== null 
+                      ? moment(sugarRecord.updated_at).format('DD MMMM YYYY') + '<br>' + moment(sugarRecord.updated_at).format('HH:mm')
+                      :  '-'"
+                      ></p>
+            
                     </td>
                     <td class="px-6 py-4 text-center font-semibold" 
                     :style="{ 'max-width': sugarRecord.sugarValue + '%' }" :class="{
               'text-red-600': sugarRecord.sugarValue > 125,
               'text-green-500': sugarRecord.sugarValue >= 70 && sugarRecord.sugarValue <= 125,
               'text-yellow-400': sugarRecord.sugarValue < 70
-            }">{{ sugarRecord.sugarValue }}</td>
+            }">{{ sugarRecord.sugarValue !== null ? sugarRecord.sugarValue : "-" }}</td>
                       <td class="px-6 py- text-black font-medium text-center">
                       {{ sugarRecord.symptom }}</td>
                       <td class="px-6 py-4 text-black font-medium text-center">

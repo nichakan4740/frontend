@@ -138,8 +138,8 @@ const close = () => appRouter.push({ name: "loginPatient" });
                 maxlength="100"
               />
               <p v-if="fname.length" class="input-count"> {{ fname.length }}/100</p>
-              <p v-show="fname.length < 1">* Please input your name <span></span></p>
-              <p v-show="fname.length > 100">* Characters must not exceed 100</p>
+              <p v-show="fname.length < 1">* โปรดใส่ชื่อจริง <span></span></p>
+              <p v-show="fname.length > 100">* ตัวอักษรต้องไม่เกิน 100</p>
             </div>
             <!-- นามสกุล -->
             <div>
@@ -156,8 +156,8 @@ const close = () => appRouter.push({ name: "loginPatient" });
                 maxlength="100"
               />
               <p v-if="lname.length" class="input-count"> {{ lname.length }}/100 </p>
-              <p v-show="lname.length < 1"> * Please input your last name <span></span></p>
-              <p v-show="lname.length > 100">* Characters must not exceed 100</p>
+              <p v-show="lname.length < 1"> * โปรดใส่นามสกุล <span></span></p>
+              <p v-show="lname.length > 100">* ตัวอักษรต้องไม่เกิน 100</p>
             </div>
             <!-- บัตรประชาชน -->
             <div>
@@ -173,8 +173,8 @@ const close = () => appRouter.push({ name: "loginPatient" });
               />
               <div  v-if="idcard">
                 <p class="input-count"> {{ idcard.length }}/13</p>
-                <p v-show="idcard.length < 13">  * Please input your id_card <span></span></p>
-                <p v-show="idcard.length > 13"> * Characters must not exceed 13</p>
+                <p v-show="idcard.length < 13">  * โปรดใส่เลขบัตรประชาชน <span></span></p>
+                <p v-show="idcard.length > 13"> * ตัวเลขต้องไม่เกิน 13</p>
               </div>
             </div>
             <!-- รหัส -->
@@ -192,8 +192,8 @@ const close = () => appRouter.push({ name: "loginPatient" });
               />
               <div v-if="password">
                 <p class="input-count" id="count"> {{ password.length }}/14 </p>
-                <p v-show="password.length < 8" id="checkname"> * Password must not be less than 8 characters</p>
-                <p v-show="password.length > 14" id="checkname">* Password must not be more than 14 characters</p>
+                <p v-show="password.length < 8" id="checkname"> * รหัสผ่านต้องมีความยาวมากกว่า 8 ตัว</p>
+                <p v-show="password.length > 14" id="checkname">* รหัสผ่านต้องมีความยาวน้อยกว่า 14 ตัว</p>
               </div>
             </div>
             <div v-show="password">
@@ -212,8 +212,8 @@ const close = () => appRouter.push({ name: "loginPatient" });
               />
               <div v-if="passwordcheck">
                 <p class="input-count"> {{ passwordcheck.length }}/14 </p>
-                <p v-show="passwordcheck.length < 8" class="checkname">* Password must be at least 8 characters long</p>
-                <p v-show="passwordcheck.length > 14" class="checkname">* Password must not exceed 14 characters</p>
+                <p v-show="passwordcheck.length < 8" class="checkname">* รหัสผ่านต้องมีความยาวมากกว่า 8 ตัว</p>
+                <p v-show="passwordcheck.length > 14" class="checkname">* รหัสผ่านต้องมีความยาวน้อยกว่า 14 ตัว</p>
               </div>
            
             </div>
