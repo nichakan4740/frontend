@@ -6,6 +6,58 @@ import moment from "moment";
 import Swal from "sweetalert2";
 import Pusher from "pusher-js";
 
+
+const deleteChatRooms = async () => {
+  if (!userId) {
+    console.error('ไม่พบ User ID ใน localStorage');
+    return;
+  }
+
+  // Confirm Deletion
+  const result = await Swal.fire({
+    title: 'คุณต้องการเปิดแชทใหม่ใช่หรือไม่',
+    text: 'ถ้าคุณเปิดแชทใหม่แชทก่อนหน้านี้ของคุณจะถูกลบและไม่สามารถกู้คืนแชทเหล่านี้ได้!',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#3085d6',
+    cancelButtonColor: '#d33',
+    confirmButtonText: 'ใช่ฉันต้องการเปิดแชทใหม่',
+    cancelButtonText: 'ยกเลิก'
+  });
+
+   if (!result.isConfirmed) {
+    return false; // Return false if deletion is not confirmed
+      return true; // Return true if deletion is confirmed
+  }
+
+  try {
+    const response = await fetch(`${import.meta.env.VITE_BASE_URL}api/chat-rooms/user/${userId}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error('เกิดข้อผิดพลาดในการลบห้องแชท:', errorData);
+      await Swal.fire('เกิดข้อผิดพลาด!', 'เกิดข้อผิดพลาดในการลบห้องแชท.', 'error');
+      return;
+    }
+
+    const data = await response.json();
+    console.log('ลบแชทเรียบร้อยแล้ว:', data);
+    await Swal.fire('เรียบร้อย!', 'แชทของคุณถูกลบแล้ว.', 'success');
+  } catch (error) {
+    console.error('เกิดข้อผิดพลาดในการลบห้องแชท:', error);
+    await Swal.fire('เกิดข้อผิดพลาด!', 'เกิดข้อผิดพลาดในการลบห้องแชท.', 'error');
+  }
+    // หลังจากลบสำเร็จ ให้ทำการ reload หน้าเว็บ
+    window.location.reload();
+};
+
+/* --------------------------------------------------------------- */
+
 const formatTime = (time) => moment(time).format("YYYY-MM-DD");
 
 /* Constants and References */
@@ -33,17 +85,19 @@ onMounted(() => {
   fetchUserMessages();
 });
 
+
+
 /* Send Message to All Admins */
 const sendMessageAll = async () => {
-  if (message.value.trim() === "") {
-    Swal.fire({
-      icon: "error",
-      title: "Oops...",
-      text: "ข้อความต้องไม่ว่างเปล่า",
-    });
-    return;
-  }
   try {
+      if (messages.value.length > 0) {
+      // ถ้ามีข้อความอยู่ในกล่องข้อความ
+      const confirmDeletion = await deleteChatRooms(); // Wait for deletion confirmation
+      if (!confirmDeletion) {
+        return; // If deletion is not confirmed, exit the function
+      }
+    }
+
     const response = await fetch(
       `${import.meta.env.VITE_BASE_URL}api/sendmessage/all`,
       {
@@ -56,31 +110,50 @@ const sendMessageAll = async () => {
           message: message.value,
           user_id: userId,
           admin_id: "all",
+          user_name: name.value,
+          reply_type: 'user',
         }),
       }
     );
 
-    if (!response.ok)
+    if (!response.ok) {
       throw new Error((await response.text()) || "Failed to send message");
+    }
 
     const responseData = await response.json();
     console.log("Message sent successfully:", responseData);
+
+    // เพิ่มข้อความที่ส่งไปใน messages array พร้อมกับ user_name และ reply_type
+    const newMessage = {
+      ...responseData,
+      user_name: name.value,
+      reply_type: 'user',
+    };
     
-    // เพิ่มข้อความที่ส่งไปใน messages array
-    messages.value.push(responseData);
+    messages.value.push(newMessage);
     
-    // บันทึกข้อมูลลงใน Local Storage (ตามความเหมาะสม)
-    localStorage.setItem("messages", JSON.stringify(messages.value));
+
+    // แสดงว่าเปิดแชทสำเร็จ
+    Swal.fire({
+      icon: "success",
+      title: "เปิดแชทสำเร็จ",
+    });
   } catch (error) {
     console.error("Error sending message:", error);
+    // ถ้ามีข้อผิดพลาดในการส่งข้อความ
     Swal.fire({
       icon: "error",
       title: "Oops...",
-      text: "Failed to send message",
+      text: "ไม่สามารถส่งข้อความได้",
     });
   }
 };
 
+
+
+
+
+/* ---------------------------------------------------------- */
 /* ข้อความจาก Admin */
 const pusher = new Pusher("c38b6cfa9a4f7e26bf76", {
   cluster: "ap1",
@@ -146,6 +219,7 @@ const sendMessageToAdmin = async (chatRoomId) => {
       user_name: name.value,
       reply_type: 'user',
     };
+
     messages.value.push(newMessage);
 
     messagetoadmin.value = "";
@@ -173,7 +247,7 @@ const toggleCollapse = (index) => {
 
 const activeTab = ref(1);
 
-const nameUser = localStorage.getItem("lname");
+const nameUser = localStorage.getItem("fname");
 
 </script>
 
@@ -242,9 +316,14 @@ const nameUser = localStorage.getItem("lname");
                           rows="4"></textarea>
                         <div class="mt-2">
                           <button @click="sendMessageAll"
-                            class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:bg-blue-600">
-                            ส่งข้อความ
+                            class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:bg-blue-600 mb-3">
+                            ส่งข้อความเพื่อเปิดแชท
                           </button>
+
+                         <!--  <button @click="deleteChatRooms" class="  items-center  px-4 py-2 bg-red-200 text-white rounded-md hover:bg-red-500 focus:outline-none focus:bg-red-600">
+                           ทำการลบแชททั้งหมด
+                          </button> -->
+
                         </div>
                       </div>
                     </div>
