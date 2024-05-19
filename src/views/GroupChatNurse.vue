@@ -13,37 +13,52 @@ const pusher = new Pusher("c38b6cfa9a4f7e26bf76", {
   cluster: "ap1",
   encrypted: true,
 });
+
 const adminId = localStorage.getItem("idadmin");
+const nameadmin = localStorage.getItem("name");
 
-
-
+const message = ref("");
 // ส่งข้อความตอบกลับหา user
-const sendMessageToUser = async (userId, chatRoomId) => { // เพิ่ม chatRoomId ใน parameter
-  const message = state.newMessage;
-  if (message.trim() === "") {
-    return;
-  }
-  const payload = {
-    message: message,
-    admin_id: adminId,
-    chat_room_id: chatRoomId, // เพิ่ม chat_room_id เข้าไปใน payload
-  };
+const sendMessageToUser = async (userId) => {
   try {
     const response = await fetch(`${import.meta.env.VITE_BASE_URL}api/sendmessage/ToUser/${userId}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(payload),
+      body: JSON.stringify({
+        message: message.value,
+        admin_id: adminId,
+        chat_room_id: selectedUserId.value,
+      }),
     });
 
     if (response.ok) {
+      const responseData = await response.json();
       Swal.fire({
         icon: 'success',
         title: 'ส่งข้อความสำเร็จ',
       });
-      // เมื่อส่งข้อความสำเร็จ ให้เรียก fetchMessages เพื่ออัพเดตข้อความ
-      fetchMessages();
+
+      // Add the new message directly to selectedUserMessages and allMessages
+      const newMessage = {
+        message: message.value,
+        timestamp: formatTime(responseData.timestamp), // Assuming the API returns the timestamp of the sent message
+        admin_id: adminId,
+        user_id: selectedUserId.value,
+        admin_name: name.value, 
+        reply_type: 'admin',
+      };
+
+      // Update allMessages
+      if (!allMessages.value[selectedUserId.value]) {
+        allMessages.value[selectedUserId.value] = [];
+      }
+
+      allMessages.value[selectedUserId.value].push(newMessage);
+
+      // Clear the input field after sending the message
+      message.value = ""; 
     } else {
       Swal.fire({
         icon: 'error',
@@ -61,7 +76,9 @@ const sendMessageToUser = async (userId, chatRoomId) => { // เพิ่ม cha
   }
 };
 
+
 /* ------------------------------------------------------------------------------------------------- */
+
 
 // get ค่าจาก database และเพิ่มค่าล่าสุดของ pusher ลงใน Array ของ data
 const isModalOpen = ref(false);
@@ -69,8 +86,7 @@ const selectedUserMessages = ref([]);
 const messages = ref({});
 const allMessages = ref({});
 const selectedUserId = ref(null); // Define selectedUserId
-const name = ref("Nurse Name"); // Define name
-/* const receivedMessages = ref([]); // ดึงข้อความที่ส่งไปหา User */
+const name = ref(nameadmin); // Define name
 
 // ดึงข้อมูลที่เข้ามาครั้งแรกจาก user
 const fetchMessages = async () => {
@@ -100,7 +116,6 @@ const fetchMessages = async () => {
   }
 };
 
-
 /* --------------------------------------------------------------------------------------------------------- */
 // เปิด modal
 const openModal = (userId) => {
@@ -110,7 +125,6 @@ const openModal = (userId) => {
   selectedUserMessages.value = userMessages; // Update the selectedUserMessages
   isModalOpen.value = true;
   selectedUserId.value = userId; // Set the selectedUserId
-  
 };
 
 const closeModal = () => {
@@ -121,7 +135,6 @@ const closeModal = () => {
 const adminIdInt = parseInt(adminId);  
 onMounted(() => {
   fetchMessages(); // Fetch messages when the component is mounted
-/*   getMessageSendToUser(); */ 
 
   const channel = pusher.subscribe('messageUser');
   channel.bind("message", (data) => {
@@ -153,22 +166,32 @@ onMounted(() => {
 
 
 // แสดงข้อความตอบกลับจาก user
-onMounted(() => {});
 const channelmessagefromUser = "Toadminid" + adminId;
 const messagefromUser = ref([]);
-const channel = pusher.subscribe(channelmessagefromUser);
-channel.bind('message', (data) => {
-  console.log(data); // Check the structure of data
-  messagefromUser.value.push({
+const userChannel = pusher.subscribe(channelmessagefromUser);
+userChannel.bind('message', (data) => {
+  console.log('Message from user received:', data); // Log received data
+  const newMessage = {
     message: data.message,
     timestamp: formatTime(data.timestamp),
     admin_id: data.admin_id,
     user_id: data.user_id,
     user_name: data.user_name,
-  });
-});
-const state = reactive({});
+  };
 
+  // Update allMessages and selectedUserMessages
+  if (!allMessages.value[data.user_id]) {
+    allMessages.value[data.user_id] = [];
+  }
+  allMessages.value[data.user_id].push(newMessage);
+  if (selectedUserId.value === data.user_id) {
+    selectedUserMessages.value.push(newMessage);
+  }
+});
+
+const state = reactive({
+  newMessage: "", // Add newMessage to the state
+});
 
 
 </script>
@@ -236,33 +259,80 @@ const state = reactive({});
                 </div>
               </div>
             </div>
-<!-- ------------------------------- -->
+
             <div v-if="isModalOpen" class="flex flex-col flex-auto h-full p-6">
               <div class="flex flex-col flex-auto flex-shrink-0 rounded-2xl bg-gray-100 h-full p-4">
                 <div class="flex flex-col h-full overflow-x-auto mb-4">
                   <div class="flex flex-col h-full">
-                 
-                      <div v-for="message in selectedUserMessages" :key="message.timestamp" class="rounded-lg p-2 flex items-start">
-                        <div class="w-full">
-                          <div class="relative max-w-xl px-4 py-2 shadow rounded-xl w-full">
-                            <div class="text-sm font-semibold mb-1">
-                             <!--  {{ message.user_name }} -->
+
+                      <!-- Chat Messages -->
+                          <div class="flex flex-col h-full overflow-x-auto mb-4">
+                              <div v-for="message in selectedUserMessages" :key="message.timestamp" > 
+                                <!-- Admin -->
+                                <div v-if="message.reply_type !== 'admin'" class="col-start-1 col-end-8 p-3 rounded-lg">
+                                  <div class="flex flex-row items-center">
+                                    <div  class="h-10 w-10 bg-indigo-200 rounded-full overflow-hidden flex items-center justify-center mr-3">
+                                      <img
+                                        src="https://cdn.icon-icons.com/icons2/2266/PNG/512/patient_icon_140481.png"
+                                        alt="User Icon"
+                                        class="h-8 w-8 object-cover"
+                                      />
+                                    </div>
+                                    <div  class="bg-gray-300 text-black py-2 px-4 rounded-xl max-w-xs">
+                                        <p class="text-sm font-semibold text-gray-900">
+                                          {{message.user_name}}
+                                        </p>
+
+                                        <p class="text-xs text-gray-500">
+                                        {{ formatTime(message.created_at) }}
+                                        </p>
+
+                                        
+                                        <p class="text-sm font-normal text-gray-900">
+                                          {{ message.message }}
+                                        </p>
+                                    
+                                      </div>
+                                  </div>
+                                </div>
+
+                                  <!-- user -->
+                                  <div v-else class="col-start-6 col-end-13 p-3 rounded-lg">
+                                  <div class="flex items-center justify-start flex-row-reverse">
+                                    <div  class="h-10 w-10 bg-indigo-200 rounded-full overflow-hidden flex items-center justify-center">
+                                    <img
+                                        src="https://cdn.icon-icons.com/icons2/582/PNG/512/asistante_icon-icons.com_55049.png"
+                                        class="h-full w-full"
+                                    />
+                                    </div>
+                                    <div  class="relative mr-3 text-sm bg-indigo-100 py-2 px-4 shadow rounded-xl">
+                                        <p  class="text-sm font-semibold text-gray-900">
+                                          {{message.admin_name}}
+                                        </p>
+
+                                        <p class="text-xs text-gray-500">
+                                        {{ formatTime(message.created_at) }}
+                                      </p>
+
+                                        <p class="text-sm font-normal text-gray-900">
+                                          {{ message.message }}
+                                        </p>
+                                    </div>
+                                  </div>
+                                </div>
                             </div>
-                            <div>{{ message.message }}</div>
-                             <div> {{ formatTime(timestamp) }}</div>
-                          </div>
-                        </div>
+                          </div> 
+     <!-- --------------------------------------------------------------------------------------- -->                                       
                       </div>
-<!-- ------------------------------------------------------------------------------------------------------------------ -->
-<!-- ------------------------------------------------------------------------------------------------------------------ -->
-                  </div>
-                </div>
+                      </div>
+
+<!-- ------------------------------------------------------------------------------ -->
 
                 <div class="flex flex-row items-center h-16 rounded-xl bg-white w-full px-4">
                   <div class="flex-grow ml-4">
                     <div class="relative w-full">
                       <input
-                        v-model="state.newMessage"
+                        v-model="message"
                         type="text"
                         placeholder="ส่งข้อความที่นี้..."
                         class="flex w-full border rounded-xl focus:outline-none focus:border-indigo-300 pl-4 h-10"
