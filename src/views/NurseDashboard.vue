@@ -120,7 +120,7 @@ const resetSearch = () => {
                 <thead class=" text-gray-400 uppercase bg-gray-50 ">
                   <tr>
                     <th scope="col" class="px-6 py-4 text-sm">รายชื่อ</th>
-                    <th scope="col" class="px-6 py-4 text-center text-sm">สถานะการรับบริการ</th>
+                    <!-- <th scope="col" class="px-6 py-4 text-center text-sm">สถานะการรับบริการ</th> -->
                     <th scope="col" class="px-6 py-4 text-center text-sm"> เวลาที่ตรวจ </th>
                     <th scope="col" class="px-6 py-4 text-center text-sm">(mg/dl)</th>
                     <th scope="col" class="px-6 py-4 text-center text-sm">อาการผิดปกติ</th>
@@ -135,9 +135,9 @@ const resetSearch = () => {
                   >
                     <td class="px-6 py-4 text-black font-medium">
                       {{ sugarRecord.user.fname }} {{ sugarRecord.user.lname }}</td>
-                    <td class="px-6 py-4 flex items-center justify-center">
+                    <!-- <td class="px-6 py-4 flex items-center justify-center">
                       <img src="/correct.png" class="w-6 h-6 " />
-                    </td>
+                    </td> -->
                     <td class="px-6 py-4 text-center text-blue-800">
                       <p v-html="sugarRecord.sugarValue !== null 
                       ? moment(sugarRecord.updated_at).format('DD MMMM YYYY') + '<br>' + moment(sugarRecord.updated_at).format('HH:mm')
