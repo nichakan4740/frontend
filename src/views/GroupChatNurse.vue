@@ -254,6 +254,13 @@ const state = reactive({
                       <p class="text-sm font-normal text-gray-900">
                         {{ userMessages[0].message }}
                       </p>
+
+                      <p class="text-sm font-normal text-green-500 " v-if="userMessages[0].is_answered">
+                           ตอบกลับแล้ว
+                      </p>
+                      <p class="text-sm font-normal text-red-600 " v-else>
+                           ยังไม่ได้ตอบกลับ
+                      </p>                                
                     </div>
                   </button>
                 </div>

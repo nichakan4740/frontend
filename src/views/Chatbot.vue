@@ -398,41 +398,29 @@ const nameUser = localStorage.getItem("fname");
                   <!-- --------------------------------------------------------------------------- -->
                   <!-- Message Input -->
                   <div class="flex flex-row items-center h-16 rounded-xl bg-white w-full px-4">
-                    <!-- Message Input Field -->
-                    <div class="flex-grow ml-4">
-                      <div class="relative w-full">
-                        <input
-                          type="text"
-                          v-model="messagetoadmin"
-                          class="flex w-full border rounded-xl focus:outline-none focus:border-indigo-300 pl-4 h-10"
-                        />
-                      </div>
-                    </div>
-                    <!-- Send Message Button -->
-                    <div class="ml-4">
-                      <button
-                        @click="sendMessageToAdmin(chatRoomId)"
-                        class="flex items-center justify-center bg-indigo-500 hover:bg-indigo-600 rounded-xl text-white px-4 py-1 flex-shrink-0"
-                      >
-                        <span>ส่งข้อความ</span>
-                        <span class="ml-2">
-                          <svg
-                            class="w-4 h-4 transform rotate-45 -mt-px"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg"
+                                          <!-- Message Input Field -->
+                        <div class="flex-grow mr-2">
+                          <div class="relative w-full">
+                            <input
+                              type="text"
+                              v-model="messagetoadmin"
+                              class="flex w-full border rounded-xl focus:outline-none focus:border-indigo-300 pl-4 h-10"
+                            />
+                          </div>
+                        </div>
+                        <!-- Send Message Button -->
+                        <div class="ml-4" v-if="messages.length > 0">
+                          <button
+                            @click="sendMessageToAdmin(chatRoomId)"
+                            class="flex items-center justify-center bg-indigo-500 hover:bg-indigo-600 rounded-xl text-white px-4 py-1 flex-shrink-0"
                           >
-                            <path
-                              stroke-linecap="round"
-                              stroke-linejoin="round"
-                              stroke-width="2"
-                              d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
-                            ></path>
-                          </svg>
-                        </span>
-                      </button>
-                    </div>
+                            <span>ส่งข้อความ</span>
+                          </button>
+                        </div>
+                        <div v-else>
+                          <span class="text-red-500 text-xs font-semibold ">กรุณากดปุ่มเปิดแชทใหม่</span>
+                        </div>
+                                    
                     <!-- -------------------------------------------------------- -->
                   </div>
                 </div>
