@@ -93,7 +93,7 @@ const checkinputpassword = () => {
   } else if (pass.length < 8 || !passRegex.test(pass)) {
     password.value = null;
     passwordcheck.value = null;
-    Swal.fire("รหัสผ่านต้องประกอบด้วยตัวเลข อักขระพิเศษ และตัวอักษร ที่มีความยาวมากกว่า 8 ตัวอักษร");
+    Swal.fire("รหัสผ่านต้องประกอบด้วยตัวเลข และตัวอักษร ที่มีความยาวมากกว่า 8 ตัวอักษร");
   } else if (passcheck !== pass) {
     password.value = null;
     passwordcheck.value = null;
