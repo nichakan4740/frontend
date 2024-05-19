@@ -14,6 +14,7 @@ const logoutpatient = () => {
   localStorage.removeItem('idcard');
   localStorage.removeItem('accesstoken');
   localStorage.removeItem('fname');
+   localStorage.removeItem('lname');
   localStorage.removeItem('iduser');
   backloginpatient()
 };
