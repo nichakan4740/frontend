@@ -53,14 +53,14 @@ const checkinputprofessional = () => {
   if(idp) {
     if (idp.length === 0) {
       professional_id.value = null;
-    Swal.fire("โปรดใส่เลขบัตรประชาชน");
+    Swal.fire("โปรดใส่เลขใบประกอบวิชาชีพพยาบาล");
   }
   if (idp.length < 10) {
     professional_id.value = null;
-    Swal.fire("เลขบัตรประชาชนต้องมี 10 หลัก");
+    Swal.fire("เลขใบประกอบวิชาชีพพยาบาลต้องมี 10 หลัก");
   } else if (!isNumeric) {
     professional_id.value = null;
-    Swal.fire("เลขบัตรประชาชนต้องเป็นตัวเลขเท่านั้น");
+    Swal.fire("เลขใบประกอบวิชาชีพพยาบาลต้องเป็นตัวเลขเท่านั้น");
   }
 
   }
