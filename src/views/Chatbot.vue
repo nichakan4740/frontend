@@ -6,6 +6,58 @@ import moment from "moment";
 import Swal from "sweetalert2";
 import Pusher from "pusher-js";
 
+
+const deleteChatRooms = async () => {
+  if (!userId) {
+    console.error('ไม่พบ User ID ใน localStorage');
+    return;
+  }
+
+  // Confirm Deletion
+  const result = await Swal.fire({
+    title: 'คุณต้องการเปิดแชทใหม่ใช่หรือไม่',
+    text: 'ถ้าคุณเปิดแชทใหม่แชทก่อนหน้านี้ของคุณจะถูกลบและไม่สามารถกู้คืนแชทเหล่านี้ได้!',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#3085d6',
+    cancelButtonColor: '#d33',
+    confirmButtonText: 'ใช่ฉันต้องการเปิดแชทใหม่',
+    cancelButtonText: 'ยกเลิก'
+  });
+
+   if (!result.isConfirmed) {
+    return false; // Return false if deletion is not confirmed
+      return true; // Return true if deletion is confirmed
+  }
+
+  try {
+    const response = await fetch(`${import.meta.env.VITE_BASE_URL}api/chat-rooms/user/${userId}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error('เกิดข้อผิดพลาดในการลบห้องแชท:', errorData);
+      await Swal.fire('เกิดข้อผิดพลาด!', 'เกิดข้อผิดพลาดในการลบห้องแชท.', 'error');
+      return;
+    }
+
+    const data = await response.json();
+    console.log('ลบแชทเรียบร้อยแล้ว:', data);
+    await Swal.fire('เรียบร้อย!', 'แชทของคุณถูกลบแล้ว.', 'success');
+  } catch (error) {
+    console.error('เกิดข้อผิดพลาดในการลบห้องแชท:', error);
+    await Swal.fire('เกิดข้อผิดพลาด!', 'เกิดข้อผิดพลาดในการลบห้องแชท.', 'error');
+  }
+    // หลังจากลบสำเร็จ ให้ทำการ reload หน้าเว็บ
+    window.location.reload();
+};
+
+/* --------------------------------------------------------------- */
+
 const formatTime = (time) => moment(time).format("YYYY-MM-DD");
 
 /* Constants and References */
@@ -13,7 +65,8 @@ const userId = localStorage.getItem("iduser");
 const conversations = ref([]);
 const message = ref("");
 const messageFromAdmin = ref([]);
-
+const fnameUser = localStorage.getItem("fname");
+const name = ref(fnameUser); // Define name
 /* Fetching User Messages */
 const messages = ref([]);
 const fetchUserMessages = async () => {
@@ -32,17 +85,19 @@ onMounted(() => {
   fetchUserMessages();
 });
 
+
+
 /* Send Message to All Admins */
 const sendMessageAll = async () => {
-  if (message.value.trim() === "") {
-    Swal.fire({
-      icon: "error",
-      title: "Oops...",
-      text: "ข้อความต้องไม่ว่างเปล่า",
-    });
-    return;
-  }
   try {
+      if (messages.value.length > 0) {
+      // ถ้ามีข้อความอยู่ในกล่องข้อความ
+      const confirmDeletion = await deleteChatRooms(); // Wait for deletion confirmation
+      if (!confirmDeletion) {
+        return; // If deletion is not confirmed, exit the function
+      }
+    }
+
     const response = await fetch(
       `${import.meta.env.VITE_BASE_URL}api/sendmessage/all`,
       {
@@ -55,36 +110,56 @@ const sendMessageAll = async () => {
           message: message.value,
           user_id: userId,
           admin_id: "all",
+          user_name: name.value,
+          reply_type: 'user',
         }),
       }
     );
 
-    if (!response.ok)
+    if (!response.ok) {
       throw new Error((await response.text()) || "Failed to send message");
+    }
 
     const responseData = await response.json();
     console.log("Message sent successfully:", responseData);
+
+    // เพิ่มข้อความที่ส่งไปใน messages array พร้อมกับ user_name และ reply_type
+    const newMessage = {
+      ...responseData,
+      user_name: name.value,
+      reply_type: 'user',
+    };
     
-    // เพิ่มข้อความที่ส่งไปใน messages array
-    messages.value.push(responseData);
+    messages.value.push(newMessage);
     
-    // บันทึกข้อมูลลงใน Local Storage (ตามความเหมาะสม)
-    localStorage.setItem("messages", JSON.stringify(messages.value));
+
+    // แสดงว่าเปิดแชทสำเร็จ
+    Swal.fire({
+      icon: "success",
+      title: "เปิดแชทสำเร็จ",
+    });
   } catch (error) {
     console.error("Error sending message:", error);
+    // ถ้ามีข้อผิดพลาดในการส่งข้อความ
     Swal.fire({
       icon: "error",
       title: "Oops...",
-      text: "Failed to send message",
+      text: "ไม่สามารถส่งข้อความได้",
     });
   }
 };
 
+
+
+
+
+/* ---------------------------------------------------------- */
 /* ข้อความจาก Admin */
 const pusher = new Pusher("c38b6cfa9a4f7e26bf76", {
   cluster: "ap1",
   encrypted: true,
 });
+
 const channelmessagefromAdmin = "Touserid" + userId;
 const channel = pusher.subscribe(channelmessagefromAdmin);
 channel.bind("message", (data) => {
@@ -98,16 +173,20 @@ channel.bind("message", (data) => {
   });
   // เพิ่มข้อความที่ได้รับใน messages array
   messages.value.push(data);
+  // อัปเดตค่า admin_id ใน Local Storage
+  localStorage.setItem("adminidForsendToUser", data.admin_id);
 });
 
+/* ---------------------------------------------------- */
 const messagetoadmin = ref("");
 const sendMessageToAdmin = async (chatRoomId) => {
   try {
-    const adminId =
+   /*  const adminId =
       messageFromAdmin.value.length > 0
         ? messageFromAdmin.value[messageFromAdmin.value.length - 1].admin_id
         : null;
-    console.log("Parsed Admin ID:", adminId);
+    console.log("Parsed Admin ID:", adminId); */
+    const adminId= localStorage.getItem("adminidForsendToUser");
 
     const response = await fetch(
       `${import.meta.env.VITE_BASE_URL}api/sendmessage/ToAdmin/${adminId}`,
@@ -121,6 +200,8 @@ const sendMessageToAdmin = async (chatRoomId) => {
           message: messagetoadmin.value,
           user_id: userId,
           chat_room_id: chatRoomId,
+          user_name: name.value,
+          reply_type: 'user',
         }),
       }
     );
@@ -132,21 +213,30 @@ const sendMessageToAdmin = async (chatRoomId) => {
     const responseData = await response.json();
     console.log("Message sent successfully:", responseData);
     
-    // เพิ่มข้อความที่ส่งไปใน messages array
-    messages.value.push(responseData);
+    // เพิ่มข้อความที่ส่งไปใน messages array และเพิ่ม user_name และ reply_type
+    const newMessage = {
+      ...responseData,
+      user_name: name.value,
+      reply_type: 'user',
+    };
+
+    messages.value.push(newMessage);
 
     messagetoadmin.value = "";
 
     Swal.fire({
       icon: "success",
       title: "ส่งข้อความสำเร็จ",
-    
     });
   } catch (error) {
     console.error("Error sending message:", error);
   }
 };
 
+
+
+
+/* -------------------------------------------------------------------------------------- */
 // สร้าง reactive property เพื่อตรวจสอบว่า collapse ไหนเปิดอยู่
 const activeCollapse = ref(0);
 
@@ -157,7 +247,7 @@ const toggleCollapse = (index) => {
 
 const activeTab = ref(1);
 
-const nameUser = localStorage.getItem("lname");
+const nameUser = localStorage.getItem("fname");
 
 </script>
 
@@ -226,9 +316,14 @@ const nameUser = localStorage.getItem("lname");
                           rows="4"></textarea>
                         <div class="mt-2">
                           <button @click="sendMessageAll"
-                            class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:bg-blue-600">
-                            ส่งข้อความ
+                            class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:bg-blue-600 mb-3">
+                            ส่งข้อความเพื่อเปิดแชท
                           </button>
+
+                         <!--  <button @click="deleteChatRooms" class="  items-center  px-4 py-2 bg-red-200 text-white rounded-md hover:bg-red-500 focus:outline-none focus:bg-red-600">
+                           ทำการลบแชททั้งหมด
+                          </button> -->
+
                         </div>
                       </div>
                     </div>
@@ -241,55 +336,92 @@ const nameUser = localStorage.getItem("lname");
               <div class="flex flex-col flex-auto h-full p-6">
                 <!-- Chat Content -->
                 <div class="flex flex-col flex-auto flex-shrink-0 rounded-2xl bg-gray-100 h-full p-4">
-                  <!-- Chat Messages -->
-                  <div class="flex flex-col h-full overflow-x-auto mb-4">
-                    <!-- Example Chat Messages -->
-                    <div v-for="message in messages" :key="message.id" class="flex justify-end mb-2">
-                      <div class="bg-blue-500 text-white py-2 px-4 rounded-xl max-w-xs text-right">
-                        <p>{{ message.message }}</p>
-                        {{ formatTime(message.created_at) }}
-                      </div>
+                  
+                  
+       <!-- Chat Messages -->
+          <div class="flex flex-col h-full overflow-x-auto mb-4">
+              <div v-for="message in messages" :key="message.id" > 
+                <!-- Admin -->
+                <div v-if="message.reply_type !== 'user'" class="col-start-1 col-end-8 p-3 rounded-lg">
+                  <div class="flex flex-row items-center">
+                    <div class="flex items-center justify-center h-10 w-10 rounded-full bg-indigo-500 flex-shrink-0  mr-3">
+                      <img
+                        src="https://cdn.icon-icons.com/icons2/582/PNG/512/asistante_icon-icons.com_55049.png"
+                        class="h-full w-full"
+                     />
                     </div>
-                    <!-- ---------------------------------------------------------- -->
+                    <div  class="bg-gray-300 text-black py-2 px-4 rounded-xl max-w-xs">
+                        <p class="text-sm font-semibold text-gray-900">
+                          {{message.admin_name}}
+                        </p>
+
+                        <p class="text-xs text-gray-500">
+                        {{ formatTime(message.created_at) }}
+                        </p>
+
+                        
+                        <p class="text-sm font-normal text-gray-900">
+                          {{ message.message }}
+                        </p>
+                     
+                      </div>
                   </div>
+                </div>
+
+                  <!-- user -->
+                  <div v-else class="col-start-6 col-end-13 p-3 rounded-lg">
+                  <div class="flex items-center justify-start flex-row-reverse">
+                    <div  class="h-10 w-10 bg-indigo-200 rounded-full overflow-hidden flex items-center justify-center">
+                       <img
+                        src="https://cdn.icon-icons.com/icons2/2266/PNG/512/patient_icon_140481.png"
+                        alt="User Icon"
+                        class="h-8 w-8 object-cover"
+                      />
+                    </div>
+                    <div  class="relative mr-3 text-sm bg-indigo-100 py-2 px-4 shadow rounded-xl">
+                        <p  class="text-sm font-semibold text-gray-900">
+                          {{message.user_name}}
+                        </p>
+
+                         <p class="text-xs text-gray-500">
+                        {{ formatTime(message.created_at) }}
+                       </p>
+
+                        <p class="text-sm font-normal text-gray-900">
+                          {{ message.message }}
+                        </p>
+                  </div>
+                  </div>
+                </div>
+             </div>
+           </div> 
                   <!-- --------------------------------------------------------------------------- -->
                   <!-- Message Input -->
                   <div class="flex flex-row items-center h-16 rounded-xl bg-white w-full px-4">
-                    <!-- Message Input Field -->
-                    <div class="flex-grow ml-4">
-                      <div class="relative w-full">
-                        <input
-                          type="text"
-                          v-model="messagetoadmin"
-                          class="flex w-full border rounded-xl focus:outline-none focus:border-indigo-300 pl-4 h-10"
-                        />
-                      </div>
-                    </div>
-                    <!-- Send Message Button -->
-                    <div class="ml-4">
-                      <button
-                        @click="sendMessageToAdmin(chatRoomId)"
-                        class="flex items-center justify-center bg-indigo-500 hover:bg-indigo-600 rounded-xl text-white px-4 py-1 flex-shrink-0"
-                      >
-                        <span>ส่งข้อความ</span>
-                        <span class="ml-2">
-                          <svg
-                            class="w-4 h-4 transform rotate-45 -mt-px"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg"
+                                          <!-- Message Input Field -->
+                        <div class="flex-grow mr-2">
+                          <div class="relative w-full">
+                            <input
+                              type="text"
+                              v-model="messagetoadmin"
+                              class="flex w-full border rounded-xl focus:outline-none focus:border-indigo-300 pl-4 h-10"
+                            />
+                          </div>
+                        </div>
+                        <!-- Send Message Button -->
+                        <div class="ml-4" v-if="messages.length > 0">
+                          <button
+                            @click="sendMessageToAdmin(chatRoomId)"
+                            class="flex items-center justify-center bg-indigo-500 hover:bg-indigo-600 rounded-xl text-white px-4 py-1 flex-shrink-0"
                           >
-                            <path
-                              stroke-linecap="round"
-                              stroke-linejoin="round"
-                              stroke-width="2"
-                              d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
-                            ></path>
-                          </svg>
-                        </span>
-                      </button>
-                    </div>
+                            <span>ส่งข้อความ</span>
+                          </button>
+                        </div>
+                        <div v-else>
+                          <span class="text-red-500 text-xs font-semibold ">กรุณากดปุ่มเปิดแชทใหม่</span>
+                        </div>
+                                    
+                    <!-- -------------------------------------------------------- -->
                   </div>
                 </div>
               </div>
