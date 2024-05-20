@@ -1,6 +1,6 @@
 <script setup>
 import { useRouter } from "vue-router";
-import { ref, onBeforeMount, computed, onMounted, onUnmounted, watch } from "vue";
+import { ref, onMounted, watch } from "vue";
 import Layout from '../layouts/Layout.vue';
 import moment from "moment";
 import Swal from "sweetalert2";
@@ -10,15 +10,15 @@ const appRouter = useRouter();
 /* date-time */
 const selectedDate = ref('');
 
-const fullname = localStorage.getItem("fname") + " " + localStorage.getItem("lname");
-const fname = localStorage.getItem("fname");
-const lname = localStorage.getItem("lname");
-const idcard = localStorage.getItem("idcard");
-const dob = localStorage.getItem("dob");
-const phone = localStorage.getItem("phone");
-const address = localStorage.getItem("address");
-const status = localStorage.getItem("status");
-
+// เปลี่ยนจาก localStorage มาใช้ database
+const fullname = ref('');
+const fname = ref('');
+const lname = ref('');
+const idcard = ref('');
+const dob = ref('');
+const phone = ref('');
+const address = ref('');
+const status = ref('');
 
 // เรียกข้อมูล
 const originalData = ref([]);
@@ -32,34 +32,25 @@ const myinfo = ref({
    phone: '',
    address: '',
    status: ''
-
 });
 
-
-
-/* --------------------------------------------------------------------------------------------------- */
-const MyInfo = async () => {
+const fetchUserInfo = async () => {
    try {
-      const userId = localStorage.getItem('iduser');
+      const userId = localStorage.getItem('iduser'); // Assuming you still get the user ID from localStorage
       if (userId) {
-         const response = await
-            fetch(`${import.meta.env.VITE_BASE_URL}api/patient/getProfile/${userId}`);
+         const response = await fetch(`${import.meta.env.VITE_BASE_URL}api/patient/getProfile/${userId}`);
          if (response.ok) {
             const data = await response.json();
-            localStorage.setItem("fname", data.fname);
-            localStorage.setItem("lname", data.lname);
-            localStorage.setItem("idcard", data.idcard);
-            localStorage.setItem("dob", data.dob);
-            localStorage.setItem("phone", data.phone);
-            localStorage.setItem("address", data.address);
-            localStorage.setItem("status", data.status);
+            fullname.value = `${data.fname} ${data.lname}`;
+            fname.value = data.fname;
+            lname.value = data.lname;
+            idcard.value = data.idcard;
+            dob.value = data.dob;
+            phone.value = data.phone;
+            address.value = data.address;
+            status.value = data.status;
             result.value = data;
-            // console.log(result.value.dob);
-            // console.log(result.value.phone);
-            // console.log(result.value.address);
-            // console.log(result.value.status);
          } else if (response.status === 404) {
-            // Handle case when no data is found
             console.log('No data found');
             result.value = [];
          } else {
@@ -73,59 +64,55 @@ const MyInfo = async () => {
    }
 };
 
-onMounted(MyInfo);
-/* --------------------------------------------------------------------------------------------------- */
-const existingInfo = ref({}); 
+onMounted(fetchUserInfo);
+
+const existingInfo = ref({});
 const updateinfouser = async () => {
-      try {
-        const userId = localStorage.getItem('iduser');
-        const editinfo = `${import.meta.env.VITE_BASE_URL}api/patient/updateProfile/${userId}`;
+   try {
+      const userId = localStorage.getItem('iduser');
+      const editinfo = `${import.meta.env.VITE_BASE_URL}api/patient/updateProfile/${userId}`;
 
-        // Display confirmation dialog using Swal
-        const confirmationResult = await Swal.fire({
-          title: "ยืนยันการแก้ไข",
-          text: "คุณต้องการที่จะแก้ไขข้อมูล",
-          icon: "warning",
-          confirmButtonText: "ยืนยัน",
-          cancelButtonText: "ยกเลิก",
-          showCancelButton: true,
-          showCloseButton: true
-        });
+      const confirmationResult = await Swal.fire({
+         title: "ยืนยันการแก้ไข",
+         text: "คุณต้องการที่จะแก้ไขข้อมูล",
+         icon: "warning",
+         confirmButtonText: "ยืนยัน",
+         cancelButtonText: "ยกเลิก",
+         showCancelButton: true,
+         showCloseButton: true
+      });
 
-        if (confirmationResult.isConfirmed) {
-          // Combine current info with the new info
-          const updatedInfo = {
-            ...existingInfo.value, // Use the existing info
+      if (confirmationResult.isConfirmed) {
+         const updatedInfo = {
+            ...existingInfo.value,
             ...myinfo.value
-          };
+         };
 
-          const response = await fetch(editinfo, {
+         const response = await fetch(editinfo, {
             method: "PUT",
             headers: {
-              "Content-Type": "application/json",
+               "Content-Type": "application/json",
             },
             body: JSON.stringify(updatedInfo),
-          });
+         });
 
-          if (response.ok) {
-            await MyInfo();
-          } else {
-            const errorData = await response.json(); // Fetch additional error details if available
+         if (response.ok) {
+            await fetchUserInfo();
+         } else {
+            const errorData = await response.json();
             throw new Error(`Failed to update: ${errorData.message || response.statusText}`);
-          }
-        }
-      } catch (error) {
-        console.error("Error updating data:", error);
+         }
       }
-      closeModal();
-      window.location.reload();
-    };
+   } catch (error) {
+      console.error("Error updating data:", error);
+   }
+   closeModal();
+   // window.location.reload();
+};
 
-// ให้ปุ่มเปลี่ยนสี
 const isButtonClicked = ref(false);
 
 const handleButtonClick = () => {
-   // Toggle the state when the button is clicked
    isButtonClicked.value = !isButtonClicked.value;
 };
 
@@ -148,32 +135,27 @@ watch(selectedDate, (newSelectedDate) => {
    if (newSelectedDate !== null) {
        filterDataByDate();
    }
-}); 
-
+});
 
 const getCurrentDate = () => {
    return moment().format('YYYY-MM-DD');
 };
 
-/* --------------------------------------------------------------------------------------------------- */
-/* model popup */
 const isModalOpen = ref(false);
 
- const openModal = async () => {
-      // Fetch the existing user info here and set it
-      const userId = localStorage.getItem('iduser');
-      const fetchInfoUrl = `${import.meta.env.VITE_BASE_URL}api/patient/getProfile/${userId}`;
-      const response = await fetch(fetchInfoUrl);
-      if (response.ok) {
-        const data = await response.json();
-        existingInfo.value = data;
-        // Set the form fields with the existing user info
-        myinfo.value = { ...data };
-        isModalOpen.value = true;
-      } else {
-        console.error("Failed to fetch user info");
-      }
-    };
+const openModal = async () => {
+   const userId = localStorage.getItem('iduser');
+   const fetchInfoUrl = `${import.meta.env.VITE_BASE_URL}api/patient/getProfile/${userId}`;
+   const response = await fetch(fetchInfoUrl);
+   if (response.ok) {
+      const data = await response.json();
+      existingInfo.value = data;
+      myinfo.value = { ...data };
+      isModalOpen.value = true;
+   } else {
+      console.error("Failed to fetch user info");
+   }
+};
 
 const closeModal = () => {
    isModalOpen.value = false;
@@ -189,9 +171,8 @@ const editinfo = (existingUserInfo) => {
    myinfo.value.status = existingUserInfo.status || '';
    openModal();
 };
-
-
 </script>
+
 
 <template>
    <div class="bg-gradient-to-b from-blue-100">
