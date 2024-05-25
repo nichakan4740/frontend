@@ -313,7 +313,17 @@ const countHighSugar = computed(() => result.value.filter(record => record.sugar
 // กำหนด page ละ 10 ข้อมูล -----------------------------------------------------------------------------------------
 const currentPage = ref(1);
 const itemsPerPage = 10;
-const numberOfRecords = computed(() => result.value.length);
+// const numberOfRecords = computed(() => result.value.length);
+const numberOfRecords = computed(() => {
+  if (Array.isArray(result.value) && result.value.length > 0) {
+    const filterResult = result.value.filter((item) => item.sugarValue !== null);
+    console.log(filterResult);
+    return filterResult.length;
+  } else {
+    return 0; // Return 0 or some other default value when result.value is not an array or is empty
+  }
+});
+
 const totalPages = computed(() => Math.ceil(result.value.length / itemsPerPage));
 
 const paginatedResults = computed(() => {
@@ -322,8 +332,26 @@ const paginatedResults = computed(() => {
   return result.value.slice(startIndex, endIndex);
 });
 
-const startIndex = computed(() => (currentPage.value - 1) * itemsPerPage + 1);
-const endIndex = computed(() => Math.min(currentPage.value * itemsPerPage, result.value.length));
+// const startIndex = computed(() => (currentPage.value - 1) * itemsPerPage + 1);
+// const endIndex = computed(() => Math.min(currentPage.value * itemsPerPage, result.value.length));
+const filteredResult = computed(() => {
+  if (result.value.length > 0) {
+    return result.value.filter((item) => item.sugarValue !== null);
+  } else {
+    return [];
+  }
+});
+
+// const startIndex = computed(() => (currentPage.value - 1) * itemsPerPage + 1, filteredResult.value.length);
+const startIndex = computed(() => {
+  if (filteredResult.value.length === 0) {
+    return 0;
+  } else {
+    return (currentPage.value - 1) * itemsPerPage + 1;
+  }
+});
+const endIndex = computed(() => Math.min(currentPage.value * itemsPerPage, filteredResult.value.length));
+
 
 const nextPage = () => {
   if (currentPage.value < totalPages.value) {

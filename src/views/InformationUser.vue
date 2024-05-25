@@ -1,6 +1,6 @@
 <script setup>
 import { useRouter } from "vue-router";
-import { ref, onBeforeMount, computed, onMounted, onUnmounted, watch } from "vue";
+import { ref, onMounted, watch } from "vue";
 import Layout from '../layouts/Layout.vue';
 import moment from "moment";
 import Swal from "sweetalert2";
@@ -10,15 +10,15 @@ const appRouter = useRouter();
 /* date-time */
 const selectedDate = ref('');
 
-const fullname = localStorage.getItem("fname") + " " + localStorage.getItem("lname");
-const fname = localStorage.getItem("fname");
-const lname = localStorage.getItem("lname");
-const idcard = localStorage.getItem("idcard");
-const dob = localStorage.getItem("dob");
-const phone = localStorage.getItem("phone");
-const address = localStorage.getItem("address");
-const status = localStorage.getItem("status");
-
+// เปลี่ยนจาก localStorage มาใช้ database
+const fullname = ref('');
+const fname = ref('');
+const lname = ref('');
+const idcard = ref('');
+const dob = ref('');
+const phone = ref('');
+const address = ref('');
+const status = ref('');
 
 // เรียกข้อมูล
 const originalData = ref([]);
@@ -32,34 +32,25 @@ const myinfo = ref({
    phone: '',
    address: '',
    status: ''
-
 });
 
-
-
-/* --------------------------------------------------------------------------------------------------- */
-const MyInfo = async () => {
+const fetchUserInfo = async () => {
    try {
-      const userId = localStorage.getItem('iduser');
+      const userId = localStorage.getItem('iduser'); // Assuming you still get the user ID from localStorage
       if (userId) {
-         const response = await
-            fetch(`${import.meta.env.VITE_BASE_URL}api/patient/getProfile/${userId}`);
+         const response = await fetch(`${import.meta.env.VITE_BASE_URL}api/patient/getProfile/${userId}`);
          if (response.ok) {
             const data = await response.json();
-            localStorage.setItem("fname", data.fname);
-            localStorage.setItem("lname", data.lname);
-            localStorage.setItem("idcard", data.idcard);
-            localStorage.setItem("dob", data.dob);
-            localStorage.setItem("phone", data.phone);
-            localStorage.setItem("address", data.address);
-            localStorage.setItem("status", data.status);
+            fullname.value = `${data.fname} ${data.lname}`;
+            fname.value = data.fname;
+            lname.value = data.lname;
+            idcard.value = data.idcard;
+            dob.value = data.dob;
+            phone.value = data.phone;
+            address.value = data.address;
+            status.value = data.status;
             result.value = data;
-            // console.log(result.value.dob);
-            // console.log(result.value.phone);
-            // console.log(result.value.address);
-            // console.log(result.value.status);
          } else if (response.status === 404) {
-            // Handle case when no data is found
             console.log('No data found');
             result.value = [];
          } else {
@@ -73,15 +64,14 @@ const MyInfo = async () => {
    }
 };
 
-onMounted(MyInfo);
-/* --------------------------------------------------------------------------------------------------- */
+onMounted(fetchUserInfo);
 
+const existingInfo = ref({});
 const updateinfouser = async () => {
    try {
       const userId = localStorage.getItem('iduser');
       const editinfo = `${import.meta.env.VITE_BASE_URL}api/patient/updateProfile/${userId}`;
 
-      // Display confirmation dialog using Swal
       const confirmationResult = await Swal.fire({
          title: "ยืนยันการแก้ไข",
          text: "คุณต้องการที่จะแก้ไขข้อมูล",
@@ -93,33 +83,36 @@ const updateinfouser = async () => {
       });
 
       if (confirmationResult.isConfirmed) {
+         const updatedInfo = {
+            ...existingInfo.value,
+            ...myinfo.value
+         };
+
          const response = await fetch(editinfo, {
             method: "PUT",
             headers: {
                "Content-Type": "application/json",
             },
-            body: JSON.stringify(myinfo.value),
+            body: JSON.stringify(updatedInfo),
          });
 
          if (response.ok) {
-            await MyInfo();
+            await fetchUserInfo();
          } else {
-            throw new Error("Failed to delete");
+            const errorData = await response.json();
+            throw new Error(`Failed to update: ${errorData.message || response.statusText}`);
          }
       }
    } catch (error) {
-      console.error("Error deleting data:", error);
+      console.error("Error updating data:", error);
    }
-   window.location.reload(); // Reload the browser after successfully updating the information
    closeModal();
-}
+   // window.location.reload();
+};
 
-
-// ให้ปุ่มเปลี่ยนสี
 const isButtonClicked = ref(false);
 
 const handleButtonClick = () => {
-   // Toggle the state when the button is clicked
    isButtonClicked.value = !isButtonClicked.value;
 };
 
@@ -139,38 +132,47 @@ const filterDataByDate = () => {
 };
 
 watch(selectedDate, (newSelectedDate) => {
-   result.value = filterByDaily(originalData.value, newSelectedDate);
+   if (newSelectedDate !== null) {
+       filterDataByDate();
+   }
 });
 
 const getCurrentDate = () => {
    return moment().format('YYYY-MM-DD');
 };
 
-/* --------------------------------------------------------------------------------------------------- */
-/* model popup */
 const isModalOpen = ref(false);
 
-const openModal = () => {
-   isModalOpen.value = true;
+const openModal = async () => {
+   const userId = localStorage.getItem('iduser');
+   const fetchInfoUrl = `${import.meta.env.VITE_BASE_URL}api/patient/getProfile/${userId}`;
+   const response = await fetch(fetchInfoUrl);
+   if (response.ok) {
+      const data = await response.json();
+      existingInfo.value = data;
+      myinfo.value = { ...data };
+      isModalOpen.value = true;
+   } else {
+      console.error("Failed to fetch user info");
+   }
 };
 
 const closeModal = () => {
    isModalOpen.value = false;
 };
 
-const editinfo = () => {
-   myinfo.value.fname = fname;
-   myinfo.value.lname = lname;
-   myinfo.value.idcard = idcard;
-   myinfo.value.dob = dob;
-   myinfo.value.phone = phone;
-   myinfo.value.address = address;
-   myinfo.value.status = status;
+const editinfo = (existingUserInfo) => {
+   myinfo.value.fname = existingUserInfo.fname || '';
+   myinfo.value.lname = existingUserInfo.lname || '';
+   myinfo.value.idcard = existingUserInfo.idcard || '';
+   myinfo.value.dob = existingUserInfo.dob || '';
+   myinfo.value.phone = existingUserInfo.phone || '';
+   myinfo.value.address = existingUserInfo.address || '';
+   myinfo.value.status = existingUserInfo.status || '';
    openModal();
 };
-
-
 </script>
+
 
 <template>
    <div class="bg-gradient-to-b from-blue-100">
