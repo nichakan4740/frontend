@@ -9,6 +9,57 @@ const formatTime = (time) => {
   return moment(time).format("YYYY-MM-DD");
 };
 
+
+const deleteChatRooms = async () => {
+  if (!selectedUserId.value) {
+    console.error('ไม่พบ User ID ที่เลือก');
+    return;
+  }
+
+  // Confirm Deletion
+  const result = await Swal.fire({
+    title: 'คุณต้องการลบแชทใช่หรือไม่',
+    text: 'ถ้าคุณลบแชทแชทก่อนหน้านี้จะถูกลบและไม่สามารถกู้คืนแชทเหล่านี้ได้!',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#3085d6',
+    cancelButtonColor: '#d33',
+    confirmButtonText: 'ใช่ฉันต้องการลบแชท',
+    cancelButtonText: 'ยกเลิก'
+  });
+
+  if (!result.isConfirmed) {
+    return false; // Return false if deletion is not confirmed
+  }
+
+  try {
+    const response = await fetch(`${import.meta.env.VITE_BASE_URL}api/chat-rooms/user/${selectedUserId.value}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error('เกิดข้อผิดพลาดในการลบห้องแชท:', errorData);
+      await Swal.fire('เกิดข้อผิดพลาด!', 'เกิดข้อผิดพลาดในการลบห้องแชท.', 'error');
+      return;
+    }
+
+    const data = await response.json();
+    console.log('ลบแชทเรียบร้อยแล้ว:', data);
+    await Swal.fire('เรียบร้อย!', 'แชทของคุณถูกลบแล้ว.', 'success');
+  } catch (error) {
+    console.error('เกิดข้อผิดพลาดในการลบห้องแชท:', error);
+    await Swal.fire('เกิดข้อผิดพลาด!', 'เกิดข้อผิดพลาดในการลบห้องแชท.', 'error');
+  }
+
+  // หลังจากลบสำเร็จ ให้ทำการ reload หน้าเว็บ
+  window.location.reload();
+};
+
+
 const pusher = new Pusher("c38b6cfa9a4f7e26bf76", {
   cluster: "ap1",
   encrypted: true,
@@ -158,11 +209,19 @@ onMounted(() => {
       }
       allMessages.value[data.user_id].push(newMessage);
 
-      // Update messages with the latest message from the admin for the user
+   
       messages.value[data.user_id] = [newMessage];
     } 
   });
+
+  
 });
+
+
+
+
+
+
 
 
 // แสดงข้อความตอบกลับจาก user
@@ -260,7 +319,12 @@ const state = reactive({
                       </p>
                       <p class="text-sm font-normal text-red-600 " v-else>
                            ยังไม่ได้ตอบกลับ
-                      </p>                                
+                      </p>
+                      
+                       <button @click="deleteChatRooms" class="mt-4 px-4 py-2 bg-red-600 text-white rounded-lg">
+                       ลบห้องแชท
+                      </button>
+
                     </div>
                   </button>
                 </div>
@@ -287,8 +351,9 @@ const state = reactive({
                                     </div>
                                     <div  class="bg-gray-300 text-black py-2 px-4 rounded-xl max-w-xs">
                                         <p class="text-sm font-semibold text-gray-900">
-                                          {{message.user_name}}
-                                        </p>
+                                          {{message.user_name}}  
+                                        </p> 
+                                          
 
                                         <p class="text-xs text-gray-500">
                                         {{ formatTime(message.created_at) }}
@@ -314,7 +379,7 @@ const state = reactive({
                                     </div>
                                     <div  class="relative mr-3 text-sm bg-indigo-100 py-2 px-4 shadow rounded-xl">
                                         <p  class="text-sm font-semibold text-gray-900">
-                                          {{message.admin_name}}
+                                          {{message.admin_name}}  
                                         </p>
 
                                         <p class="text-xs text-gray-500">
@@ -322,7 +387,7 @@ const state = reactive({
                                       </p>
 
                                         <p class="text-sm font-normal text-gray-900">
-                                          {{ message.message }}
+                                          {{ message.message }}  
                                         </p>
                                     </div>
                                   </div>

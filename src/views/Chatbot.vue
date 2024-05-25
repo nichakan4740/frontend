@@ -7,55 +7,6 @@ import Swal from "sweetalert2";
 import Pusher from "pusher-js";
 
 
-const deleteChatRooms = async () => {
-  if (!userId) {
-    console.error('ไม่พบ User ID ใน localStorage');
-    return;
-  }
-
-  // Confirm Deletion
-  const result = await Swal.fire({
-    title: 'คุณต้องการเปิดแชทใหม่ใช่หรือไม่',
-    text: 'ถ้าคุณเปิดแชทใหม่แชทก่อนหน้านี้ของคุณจะถูกลบและไม่สามารถกู้คืนแชทเหล่านี้ได้!',
-    icon: 'warning',
-    showCancelButton: true,
-    confirmButtonColor: '#3085d6',
-    cancelButtonColor: '#d33',
-    confirmButtonText: 'ใช่ฉันต้องการเปิดแชทใหม่',
-    cancelButtonText: 'ยกเลิก'
-  });
-
-   if (!result.isConfirmed) {
-    return false; // Return false if deletion is not confirmed
-      return true; // Return true if deletion is confirmed
-  }
-
-  try {
-    const response = await fetch(`${import.meta.env.VITE_BASE_URL}api/chat-rooms/user/${userId}`, {
-      method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json',
-      }
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      console.error('เกิดข้อผิดพลาดในการลบห้องแชท:', errorData);
-      await Swal.fire('เกิดข้อผิดพลาด!', 'เกิดข้อผิดพลาดในการลบห้องแชท.', 'error');
-      return;
-    }
-
-    const data = await response.json();
-    console.log('ลบแชทเรียบร้อยแล้ว:', data);
-    await Swal.fire('เรียบร้อย!', 'แชทของคุณถูกลบแล้ว.', 'success');
-  } catch (error) {
-    console.error('เกิดข้อผิดพลาดในการลบห้องแชท:', error);
-    await Swal.fire('เกิดข้อผิดพลาด!', 'เกิดข้อผิดพลาดในการลบห้องแชท.', 'error');
-  }
-    // หลังจากลบสำเร็จ ให้ทำการ reload หน้าเว็บ
-    window.location.reload();
-};
-
 /* --------------------------------------------------------------- */
 
 const formatTime = (time) => moment(time).format("YYYY-MM-DD");
@@ -90,14 +41,16 @@ onMounted(() => {
 /* Send Message to All Admins */
 const sendMessageAll = async () => {
   try {
-      if (messages.value.length > 0) {
+    /*   if (messages.value.length > 0) {
       // ถ้ามีข้อความอยู่ในกล่องข้อความ
       const confirmDeletion = await deleteChatRooms(); // Wait for deletion confirmation
-      if (!confirmDeletion) {
+     
+     if (!confirmDeletion) {
         return; // If deletion is not confirmed, exit the function
       }
+      
     }
-
+ */
     const response = await fetch(
       `${import.meta.env.VITE_BASE_URL}api/sendmessage/all`,
       {
@@ -380,8 +333,9 @@ const nameUser = localStorage.getItem("fname");
                     </div>
                     <div  class="relative mr-3 text-sm bg-indigo-100 py-2 px-4 shadow rounded-xl">
                         <p  class="text-sm font-semibold text-gray-900">
-                          {{message.user_name}}
+                          {{message.user_name}}      
                         </p>
+                      
 
                          <p class="text-xs text-gray-500">
                         {{ formatTime(message.created_at) }}
