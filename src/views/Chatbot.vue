@@ -64,7 +64,7 @@ const sendMessageAll = async () => {
           user_id: userId,
           admin_id: "all",
           user_name: name.value,
-          reply_type: 'user',
+          reply_type: 'alladmin',
         }),
       }
     );
@@ -80,7 +80,7 @@ const sendMessageAll = async () => {
     const newMessage = {
       ...responseData,
       user_name: name.value,
-      reply_type: 'user',
+      reply_type: 'alladmin',
     };
     
     messages.value.push(newMessage);
@@ -295,7 +295,7 @@ const nameUser = localStorage.getItem("fname");
           <div class="flex flex-col h-full overflow-x-auto mb-4">
               <div v-for="message in messages" :key="message.id" > 
                 <!-- Admin -->
-                <div v-if="message.reply_type !== 'user'" class="col-start-1 col-end-8 p-3 rounded-lg">
+                <div v-if="message.reply_type !== 'user' && message.reply_type !== 'alladmin'" class="col-start-1 col-end-8 p-3 rounded-lg">
                   <div class="flex flex-row items-center">
                     <div class="flex items-center justify-center h-10 w-10 rounded-full bg-indigo-500 flex-shrink-0  mr-3">
                       <img
