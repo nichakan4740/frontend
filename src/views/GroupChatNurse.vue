@@ -84,12 +84,15 @@ const sendMessageToUser = async (userId) => {
       }),
     });
 
+
     if (response.ok) {
       const responseData = await response.json();
       Swal.fire({
         icon: 'success',
         title: 'ส่งข้อความสำเร็จ',
       });
+ /*        // หลังจากลบสำเร็จ ให้ทำการ reload หน้าเว็บ
+  window.location.reload();  */
 
       // Add the new message directly to selectedUserMessages and allMessages
       const newMessage = {
@@ -125,6 +128,7 @@ const sendMessageToUser = async (userId) => {
       text: 'ไม่สามารถส่งข้อความได้',
     });
   }
+  
 };
 
 

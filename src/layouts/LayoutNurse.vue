@@ -1,7 +1,7 @@
 <script setup>
 import { ref } from "vue";
 import { useRouter } from "vue-router";
-import SidebarNurse from "../components/SidebarNurse.vue";
+import SidebarNurse from "../sidebar/SidebarNurse.vue";
 
 // ฟังก์ชันสำหรับการ logout พยาบาล
 const router = useRouter();

@@ -1,7 +1,7 @@
 <script setup>
 import { ref } from "vue";
 import { useRouter } from "vue-router";
-import Sidebar from "../components/Sidebar.vue";
+import Sidebar from "../sidebar/Sidebar.vue";
 const showMenu = ref(false);
 
 const toggleMenu = () => {
