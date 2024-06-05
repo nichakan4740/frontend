@@ -139,6 +139,7 @@ const sendMessageToAdmin = async (chatRoomId) => {
         ? messageFromAdmin.value[messageFromAdmin.value.length - 1].admin_id
         : null;
     console.log("Parsed Admin ID:", adminId); */
+    
     const adminId= localStorage.getItem("adminidForsendToUser");
 
     const response = await fetch(
